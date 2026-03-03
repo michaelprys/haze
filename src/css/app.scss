@@ -1,5 +1,19 @@
-// app global css in SCSS form
+@font-face {
+    font-family: 'Streamster';
+    src:
+        url('Streamster.woff2') format('woff2'),
+        url('Streamster.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
 body {
+    font-family: 'Courier New', sans-serif;
+}
+
+img {
+    display: block;
 }
 
 .small-screen-only {
@@ -18,4 +32,9 @@ body {
     @media (min: $breakpoint-sm-min) {
         display: block;
     }
+}
+
+.constrain {
+    max-width: 60.9375rem;
+    margin: 0 auto;
 }
