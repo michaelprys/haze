@@ -1,8 +1,8 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
-import { defineConfig } from '#q-app/wrappers';
-import { fileURLToPath } from 'node:url';
+import { defineConfig } from '#q-app/wrappers'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig((ctx) => {
     return {
@@ -15,7 +15,7 @@ export default defineConfig((ctx) => {
         boot: ['i18n', 'axios'],
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
-        css: ['app.scss'],
+        css: ['app.sass'],
 
         // https://github.com/quasarframework/quasar/tree/dev/extras
         extras: [
@@ -234,5 +234,5 @@ export default defineConfig((ctx) => {
              */
             extraScripts: [],
         },
-    };
-});
+    }
+})

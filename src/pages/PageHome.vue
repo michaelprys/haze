@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { date } from 'quasar';
+import { date } from 'quasar'
 
 const posts = [
     {
@@ -16,11 +16,11 @@ const posts = [
         location: 'San Diego, United States',
         imageUrl: 'https://cdn.quasar.dev/img/boy-avatar.png',
     },
-];
+]
 
 const niceDate = (value: number) => {
-    return date.formatDate(value, 'MMMM D, h:mm A');
-};
+    return date.formatDate(value, 'MMMM D, h:mm A')
+}
 </script>
 
 <template>
@@ -59,45 +59,36 @@ const niceDate = (value: number) => {
     </q-page>
 </template>
 
-<style lang="scss">
-.feed-page {
-    //background: #0d0d0d;
-    min-height: 100vh;
-}
+<style lang="sass">
+.feed-page
+    min-height: 100vh
 
-.feed-container {
-    width: 100%;
-    max-width: 37.5rem;
-}
+.feed-container
+    width: 100%
+    max-width: 37.5rem
 
-.post-card {
-    //background: #121212;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 120, 0, 0.15);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
-}
+.post-card
+    background-color: #121212
+    border-radius: 20px
+    border: 1px solid rgba(255, 120, 0, 0.15)
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6)
 
-.post-image {
-    max-height: 25rem;
-}
+.post-image
+    max-height: 25rem
 
-.username {
-    font-weight: bold;
-    color: #ffffff;
-}
+.username
+    font-weight: bold
+    color: #ffffff
 
-.caption {
-    color: #ff9a3c;
-}
+.caption
+    color: #ff9a3c
 
-.location {
-    color: #ff7a00;
-    font-size: 0.9rem;
-}
+.location
+    color: #ff7a00
+    font-size: 0.9rem
 
-.date {
-    color: #777;
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-}
+.date
+    color: #777
+    font-size: 0.75rem
+    margin-top: 0.25rem
 </style>
