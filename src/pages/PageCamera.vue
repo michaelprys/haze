@@ -2,6 +2,8 @@
 import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { uid } from 'quasar'
 import type { Post } from 'src/types/post'
+import type { Location } from 'src/types/location'
+import { api } from 'boot/axios'
 
 const post = ref<Post>({
     id: uid(),
@@ -79,6 +81,36 @@ const getImageSrc = (file: Post['photoFile']) => {
     imagePicked.value = true
 }
 
+const latitude = ref<number | null>(null)
+const longitude = ref<number | null>(null)
+
+const getLocation = async () => {
+    try {
+        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 })
+        })
+        latitude.value = pos.coords.latitude
+        longitude.value = pos.coords.longitude
+
+        const data = await getPreciseLocation(pos)
+
+        await getPreciseLocation(pos)
+
+        console.log(latitude.value, longitude.value)
+        console.log(data)
+    } catch (err) {
+        console.error('Geolocation not found: ', err)
+    }
+}
+
+const getPreciseLocation = async (pos: GeolocationPosition) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`
+
+    const { data } = await api.get<Location>(url)
+
+    post.value.location = `${data.address.city}, ${data.address.country}`
+}
+
 onMounted(() => {
     void initCamera()
 })
@@ -144,7 +176,7 @@ onBeforeUnmount(() => {
                 class="q-mt-md input-style"
             >
                 <template v-slot:append>
-                    <q-icon name="place" class="text-orange" />
+                    <q-btn @click="getLocation" icon="place" />
                 </template>
             </q-input>
 
