@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
 import { uid } from 'quasar'
 import type { Post } from 'src/types/post'
 import type { Location } from 'src/types/location'
 import { api } from 'boot/axios'
+import { useQuasar } from 'quasar'
+import { delay } from 'src/utils/delay'
 
 const post = ref<Post>({
     id: uid(),
@@ -13,13 +15,17 @@ const post = ref<Post>({
     date: Date.now(),
 })
 
+const $q = useQuasar()
 const hasCameraSupport = ref(true)
 const imageCaptured = ref(false)
 const imagePicked = ref(false)
+const locationPending = ref(false)
 
 const videoRef = useTemplateRef<HTMLVideoElement>('videoRef')
 const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
 const pickerModel = ref<File | null>(null)
+
+const hasGeolocation = computed(() => 'geolocation' in navigator)
 
 const initCamera = async () => {
     try {
@@ -86,29 +92,38 @@ const longitude = ref<number | null>(null)
 
 const getLocation = async () => {
     try {
+        locationPending.value = true
+
         const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 })
         })
         latitude.value = pos.coords.latitude
         longitude.value = pos.coords.longitude
 
-        const data = await getPreciseLocation(pos)
-
         await getPreciseLocation(pos)
-
-        console.log(latitude.value, longitude.value)
-        console.log(data)
     } catch (err) {
         console.error('Geolocation not found: ', err)
+
+        $q.notify({
+            type: 'negative',
+            message: 'Could not find the location',
+        })
+    } finally {
+        await delay(500)
+        locationPending.value = false
     }
 }
 
 const getPreciseLocation = async (pos: GeolocationPosition) => {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`
 
-    const { data } = await api.get<Location>(url)
+    try {
+        const { data } = await api.get<Location>(url)
 
-    post.value.location = `${data.address.city}, ${data.address.country}`
+        post.value.location = `${data.address.city}, ${data.address.country}`
+    } catch (err) {
+        console.error(err)
+    }
 }
 
 onMounted(() => {
@@ -176,7 +191,18 @@ onBeforeUnmount(() => {
                 class="q-mt-md input-style"
             >
                 <template v-slot:append>
-                    <q-btn @click="getLocation" icon="place" />
+                    <q-spinner
+                        v-if="locationPending"
+                        style="margin-right: 1.2rem"
+                        color="orange"
+                        size="18px"
+                    ></q-spinner>
+
+                    <q-btn
+                        v-if="!locationPending && hasGeolocation"
+                        @click="getLocation"
+                        icon="place"
+                    />
                 </template>
             </q-input>
 
