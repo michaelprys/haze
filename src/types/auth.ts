@@ -1,7 +1,7 @@
 export type User = {
     id: number
     email: string
-    username: string
+    user_metadata: { username?: string }
 }
 
 export type SignInPayload = {

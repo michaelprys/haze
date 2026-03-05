@@ -1,15 +1,42 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import { Dark } from 'quasar'
+import { useStoreAuth } from 'stores/storeAuth'
+import { useQuasar } from 'quasar'
+import handleError from 'src/utils/handleError'
+import { useRouter } from 'vue-router'
 
-const isLoggedIn = ref(false)
-
+const router = useRouter()
+const $q = useQuasar()
+const storeAuth = useStoreAuth()
 const isDark = ref(Dark.isActive)
+
+const handleSignOut = async () => {
+    try {
+        await storeAuth.signOut()
+
+        $q.notify({
+            type: 'positive',
+            message: 'Signed out successfully',
+        })
+
+        await router.push({ name: 'sign-in' })
+    } catch (error) {
+        const message = handleError(error)
+        $q.notify({
+            type: 'negative',
+            message: message ?? 'Error signing out',
+        })
+    }
+}
 
 const toggleTheme = () => {
     Dark.set(!Dark.isActive)
     isDark.value = Dark.isActive
 }
+watchEffect(() => {
+    console.log(storeAuth.isAuthenticated)
+})
 </script>
 
 <template>
@@ -43,7 +70,22 @@ const toggleTheme = () => {
                         @click="toggleTheme"
                     />
 
-                    <q-btn round flat :icon="isLoggedIn ? 'user' : 'logout'" class="header-icon" />
+                    <q-btn
+                        v-if="storeAuth.isAuthenticated"
+                        @click="handleSignOut"
+                        round
+                        flat
+                        icon="logout"
+                        class="header-icon"
+                    />
+                    <q-btn
+                        v-else
+                        :to="{ name: 'sign-in' }"
+                        round
+                        flat
+                        icon="account_circle"
+                        class="header-icon"
+                    />
                 </div>
             </q-toolbar>
         </q-header>

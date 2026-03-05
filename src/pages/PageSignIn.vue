@@ -1,17 +1,62 @@
 <script setup lang="ts">
-import { ref } from 'vue'
+import { useStoreAuth } from 'stores/storeAuth'
 import AuthLayout from 'layouts/AuthLayout.vue'
+import type { SignInPayload } from 'src/types/auth'
+import { useQuasar } from 'quasar'
+import { useTemplateRef, reactive } from 'vue'
+import type { QForm } from 'quasar'
+import handleError from 'src/utils/handleError'
+import { useRouter } from 'vue-router'
 
-const email = ref('')
-const password = ref('')
-const remember = ref(false)
+const storeAuth = useStoreAuth()
+const $q = useQuasar()
+const signInForm = useTemplateRef<QForm>('signInForm')
+const router = useRouter()
 
-const onSubmit = () => {
-    console.log('Sign In:', {
-        email: email.value,
-        password: password.value,
-        remember: remember.value,
-    })
+const formData = reactive({
+    email: '',
+    password: '',
+})
+
+const handleSignIn = async () => {
+    if (!signInForm.value) return
+
+    signInForm.value.resetValidation()
+
+    const success = await signInForm.value.validate()
+
+    if (!success) {
+        $q.notify({
+            type: 'negative',
+            message: '',
+        })
+    }
+
+    try {
+        const payload: SignInPayload = {
+            email: formData.email,
+            password: formData.password,
+        }
+
+        const response = await storeAuth.signIn(payload)
+
+        if (response) {
+            $q.notify({
+                type: 'positive',
+                message: 'Signed in successfully!',
+                timeout: 3000,
+                icon: 'mail',
+            })
+            await router.push({ name: 'home' })
+        }
+    } catch (error) {
+        const message = handleError(error)
+
+        $q.notify({
+            type: 'negative',
+            message: message ?? 'Error signing in',
+        })
+    }
 }
 </script>
 
@@ -19,9 +64,9 @@ const onSubmit = () => {
     <div class="auth-container">
         <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+                <q-form ref="signInForm" class="q-gutter-y-md" @submit.prevent="handleSignIn">
                     <q-input
-                        v-model="email"
+                        v-model="formData.email"
                         label="Email"
                         type="email"
                         outlined
@@ -31,7 +76,7 @@ const onSubmit = () => {
                     />
 
                     <q-input
-                        v-model="password"
+                        v-model="formData.password"
                         label="Password"
                         type="password"
                         outlined
@@ -41,9 +86,15 @@ const onSubmit = () => {
                     />
 
                     <div class="row items-center justify-between q-mt-sm">
-                        <q-checkbox v-model="remember" label="Remember me" color="primary" dark />
+                        <!--                        <q-checkbox v-model="remember" label="Remember me" color="primary" dark />-->
 
-                        <q-btn flat label="Forgot?" class="forgot-btn" no-caps />
+                        <q-btn
+                            :to="{ name: 'forgot-password' }"
+                            flat
+                            label="Forgot?"
+                            class="forgot-btn"
+                            no-caps
+                        />
                     </div>
 
                     <q-btn
