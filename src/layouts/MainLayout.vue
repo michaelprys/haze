@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watchEffect } from 'vue'
+import { ref } from 'vue'
 import { Dark } from 'quasar'
 import { useStoreAuth } from 'stores/storeAuth'
 import { useQuasar } from 'quasar'
@@ -34,9 +34,6 @@ const toggleTheme = () => {
     Dark.set(!Dark.isActive)
     isDark.value = Dark.isActive
 }
-watchEffect(() => {
-    console.log(storeAuth.isAuthenticated)
-})
 </script>
 
 <template>

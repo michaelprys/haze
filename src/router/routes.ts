@@ -6,38 +6,38 @@ const routes: RouteRecordRaw[] = [
         component: () => import('layouts/MainLayout.vue'),
         children: [
             { path: '', name: 'home', component: () => import('pages/PageHome.vue') },
-            { path: '/camera', name: 'camera', component: () => import('pages/PageCamera.vue') },
+            { path: 'camera', name: 'camera', component: () => import('pages/PageCamera.vue') },
             {
-                path: '/auth/sign-in',
+                path: 'auth/sign-in',
                 name: 'sign-in',
                 component: () => import('pages/PageSignIn.vue'),
             },
             {
-                path: '/auth/sign-up',
+                path: 'auth/sign-up',
                 name: 'sign-up',
                 component: () => import('pages/PageSignUp.vue'),
             },
             {
-                path: '/auth/forgot-password',
+                path: 'auth/forgot-password',
                 name: 'forgot-password',
                 component: () => import('pages/PageForgotPassword.vue'),
             },
             {
-                path: '/auth/reset-password',
+                path: 'auth/reset-password',
                 name: 'reset-password',
                 component: () => import('pages/PageResetPassword.vue'),
             },
             {
-                path: '/auth/verify-email',
+                path: 'auth/verify-email',
                 name: 'verify-email',
                 component: () => import('pages/PageVerifyEmail.vue'),
             },
             {
-                path: '/auth/email-verification',
+                path: 'auth/email-verification',
                 name: 'email-verification',
                 component: () => import('pages/PageEmailVerification.vue'),
             },
-            { path: '', redirect: { name: 'sign-in' } },
+            // { path: '', redirect: { name: 'sign-in' } },
         ],
     },
 

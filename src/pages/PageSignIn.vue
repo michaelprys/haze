@@ -121,7 +121,6 @@ const rememberMe = ref(false)
     color: #ff9500
     font-size: 0.75rem
 
-
 .auth-input
     :deep(.q-field__control)
         background: rgba(255, 255, 255, 0.02)

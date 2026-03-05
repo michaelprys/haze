@@ -1,9 +1,3 @@
-export type User = {
-    id: number
-    email: string
-    user_metadata: { username?: string }
-}
-
 export type SignInPayload = {
     email: string
     password: string

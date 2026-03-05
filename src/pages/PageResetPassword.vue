@@ -1,23 +1,46 @@
 <script setup lang="ts">
 import AuthLayout from 'layouts/AuthLayout.vue'
-import { supabase } from 'src/utils/supabaseClient'
 import { reactive } from 'vue'
+import { useStoreAuth } from 'stores/storeAuth'
+import handleError from 'src/utils/handleError'
+import { useQuasar } from 'quasar'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
+const $q = useQuasar()
+const storeAuth = useStoreAuth()
 
 const formData = reactive({
     newPassword: '',
     confirmNewPassword: '',
 })
 
-const changePassword = () => {}
+const handleResetPassword = async () => {
+    try {
+        await storeAuth.resetPassword(formData.newPassword)
 
-await supabase.auth.getSession()
+        $q.notify({
+            type: 'positive',
+            message: 'Password changed successfully',
+        })
+
+        await router.push({ name: 'sign-in' })
+    } catch (error) {
+        const message = handleError(error)
+
+        $q.notify({
+            type: 'negative',
+            message: message ?? 'Error changing password',
+        })
+    }
+}
 </script>
 
 <template>
     <div class="auth-container">
         <AuthLayout title="Reset Password" subtitle="Set your new password">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="changePassword">
+                <q-form class="q-gutter-y-md" @submit.prevent="handleResetPassword">
                     <q-input
                         v-model="formData.newPassword"
                         label="New Password"
@@ -25,7 +48,12 @@ await supabase.auth.getSession()
                         outlined
                         dense
                         color="primary"
+                        autocomplete="new-password"
                         class="auth-input"
+                        :rules="[
+                            (val) => !!val || 'Password is required',
+                            (val) => val.length >= 6 || 'At least 6 characters',
+                        ]"
                     />
 
                     <q-input
@@ -36,6 +64,11 @@ await supabase.auth.getSession()
                         dense
                         color="primary"
                         class="auth-input"
+                        autocomplete="new-password"
+                        :rules="[
+                            (val) => !!val || 'Password is required',
+                            (val) => val === formData.newPassword || 'Passwords do not match',
+                        ]"
                     />
 
                     <q-btn
