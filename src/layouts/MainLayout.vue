@@ -34,21 +34,17 @@ const toggleTheme = () => {
 
                 <q-space />
 
-                <q-btn
-                    round
-                    flat
-                    :icon="isDark ? 'light_mode' : 'dark_mode'"
-                    class="header-icon"
-                    @click="toggleTheme"
-                />
+                <div class="flex q-gutter-x-xs">
+                    <q-btn
+                        round
+                        flat
+                        :icon="isDark ? 'light_mode' : 'dark_mode'"
+                        class="header-icon"
+                        @click="toggleTheme"
+                    />
 
-                <q-btn
-                    round
-                    flat
-                    :icon="isLoggedIn ? 'user' : 'logout'"
-                    class="header-icon"
-                    @click="toggleTheme"
-                />
+                    <q-btn round flat :icon="isLoggedIn ? 'user' : 'logout'" class="header-icon" />
+                </div>
             </q-toolbar>
         </q-header>
 

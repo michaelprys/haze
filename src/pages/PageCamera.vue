@@ -151,6 +151,7 @@ onBeforeUnmount(() => {
                 <canvas v-show="imageCaptured" class="full-width" height="240" ref="canvasRef" />
 
                 <div
+                    class="camera-placeholder"
                     style="
                         height: 350px;
                         object-fit: cover;
@@ -255,6 +256,9 @@ onBeforeUnmount(() => {
     margin: 0 auto
     border-radius: 1rem
     box-shadow: 0 0 1.875rem rgba(255, 120, 0, 0.18)
+
+.camera-placeholder
+    border-radius: 0.8rem
 
 .post-image
     width: 100%

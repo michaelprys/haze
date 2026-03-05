@@ -9,7 +9,7 @@ defineProps<{
     <q-page class="auth-page flex flex-center">
         <div class="auth-container">
             <div class="text-center">
-                <div class="logo-glow q-mb-md">
+                <div class="logo-glow">
                     <img
                         class="logo-image"
                         src="/src/assets/logo.webp"
@@ -23,7 +23,7 @@ defineProps<{
                 <div class="auth-subtitle">{{ subtitle }}</div>
             </div>
 
-            <q-card class="auth-card q-mt-xl" flat bordered>
+            <q-card class="auth-card q-mt-lg" flat bordered>
                 <q-card-section>
                     <slot name="form" />
                 </q-card-section>
@@ -43,7 +43,7 @@ defineProps<{
 
 .auth-container
     width: 100%
-    max-width: 26rem
+    max-width: 30rem
     padding: 2rem
 
 .auth-title
@@ -64,6 +64,8 @@ defineProps<{
 .logo-image
     width: 5rem
     height: 5rem
+    margin-top: 5px
+    margin-left: 1px
 
 .auth-card
     width: 100%
