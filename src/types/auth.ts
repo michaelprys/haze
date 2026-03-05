@@ -15,6 +15,7 @@ export type SignUpPayload = {
     username: string
 }
 
-export type ResetPasswordPayload = {
+export type RequestPasswordResetPayload = {
     email: string
+    redirectTo: string
 }

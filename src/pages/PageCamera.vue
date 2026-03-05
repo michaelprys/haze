@@ -6,6 +6,7 @@ import type { Location } from 'src/types/location'
 import { api } from 'boot/axios'
 import { useQuasar } from 'quasar'
 import { delay } from 'src/utils/delay'
+import ActionButton from 'components/ActionButton.vue'
 
 const post = ref<Post>({
     id: uid(),
@@ -183,6 +184,7 @@ onBeforeUnmount(() => {
 
                 <q-file
                     class="text-center"
+                    style="margin-left: 3px"
                     v-else
                     @update:model-value="getImageSrc"
                     v-model="pickerModel"
@@ -225,7 +227,7 @@ onBeforeUnmount(() => {
             </q-input>
 
             <div class="q-mt-xl">
-                <q-btn label="Publish" class="post-btn full-width" unelevated size="md" />
+                <ActionButton label="Publish"></ActionButton>
             </div>
         </q-card>
     </q-page>
@@ -233,7 +235,6 @@ onBeforeUnmount(() => {
 
 <style lang="sass">
 .haze-bg
-    //background: radial-gradient(circle at top, #1a1a1a, #0d0d0d 70%)
     min-height: 100vh
     display: flex
     justify-content: center
@@ -241,7 +242,6 @@ onBeforeUnmount(() => {
     padding-top: 1.75rem
 
 .post-card
-    //background: #111
     border-radius: 1.5rem
     box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.6)
     width: 100%
@@ -268,7 +268,6 @@ onBeforeUnmount(() => {
 .camera-btn
     background: linear-gradient(135deg, rgba(255, 122, 0, 0.8), rgba(255, 60, 0, 0.8)) !important
     color: white
-    //box-shadow: 0 0 1.5625rem rgba(255, 120, 0, 0.5)
     transition: transform 0.2s ease
 
     &:hover

@@ -42,7 +42,7 @@ watchEffect(() => {
 <template>
     <q-layout view="lHh Lpr lFf" class="app-layout">
         <q-header class="app-header" bordered height-hint="4rem">
-            <q-toolbar class="constrain" style="height: 4rem; min-height: 4rem">
+            <q-toolbar class="container" style="height: 4rem; min-height: 4rem">
                 <q-btn
                     class="logo-btn no-hover-effect"
                     :ripple="false"
@@ -91,7 +91,11 @@ watchEffect(() => {
         </q-header>
 
         <q-page-container class="page-container">
-            <router-view />
+            <router-view v-slot="{ Component, route }">
+                <transition name="fade" mode="out-in" appear>
+                    <component :is="Component" :key="route.path" />
+                </transition>
+            </router-view>
         </q-page-container>
 
         <q-footer class="app-footer small-screen-only" bordered>
@@ -101,7 +105,7 @@ watchEffect(() => {
                 active-color="orange"
                 align="justify"
             >
-                <q-route-tab :to="{ name: 'home' }" icon="fa-solid fa-house" />
+                <q-route-tab :to="{ name: 'home' }" icon="fa-solid fa-home" />
                 <q-route-tab :to="{ name: 'camera' }" icon="fa-solid fa-camera" />
             </q-tabs>
         </q-footer>
@@ -143,7 +147,7 @@ watchEffect(() => {
     top: 50%
     transform: translate(-50%, -50%)
     font-size: 1.5rem
-    font-family: 'Streamster'
+    font-family: 'Streamster', sans-serif
     letter-spacing: 0.125rem
     line-height: 1
     color: var(--q-primary)
@@ -162,15 +166,6 @@ watchEffect(() => {
     background: var(--q-dark)
     backdrop-filter: blur(0.75rem)
     border-top: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
-
-//.tabs .q-tab {
-//    color: var(--q-info)
-//    transition: 0.3s ease
-//}
-//
-//.tabs .q-tab--active {
-//    color: var(--q-primary) !important
-//}
 
 .no-hover-effect
     .q-focus-helper

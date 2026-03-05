@@ -1,13 +1,55 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import AuthLayout from 'layouts/AuthLayout.vue'
+import { useStoreAuth } from 'stores/storeAuth'
+import { useQuasar } from 'quasar'
+import type { RequestPasswordResetPayload } from 'src/types/auth'
+import handleError from 'src/utils/handleError'
 
+const $q = useQuasar()
+const storeAuth = useStoreAuth()
 const email = ref('')
+const redirectTo = `${window.location.origin}/auth/reset-password`
 
-const onSubmit = () => {
-    console.log('Forgot Password:', {
+const seconds = ref(0)
+let timer: ReturnType<typeof setInterval> | null = null
+
+const startTimer = () => {
+    seconds.value = 10
+
+    timer = setInterval(() => {
+        if (seconds.value > 0) {
+            seconds.value--
+        } else {
+            clearInterval(timer!)
+            timer = null
+        }
+    }, 1000)
+}
+
+const handleRequestPasswordReset = async () => {
+    const payload: RequestPasswordResetPayload = {
         email: email.value,
-    })
+        redirectTo,
+    }
+
+    try {
+        await storeAuth.requestPasswordReset(payload)
+
+        $q.notify({
+            type: 'positive',
+            message: 'Reset link sent. If the email exists, you will receive it shortly',
+        })
+
+        startTimer()
+    } catch (error) {
+        const message = handleError(error)
+
+        $q.notify({
+            type: 'negative',
+            message,
+        })
+    }
 }
 </script>
 
@@ -15,7 +57,7 @@ const onSubmit = () => {
     <div class="auth-container">
         <AuthLayout title="Forgot Password" subtitle="Enter your email to receive a reset link">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+                <q-form class="q-gutter-y-md" @submit.prevent="handleRequestPasswordReset">
                     <q-input
                         v-model="email"
                         label="Email"
@@ -24,11 +66,13 @@ const onSubmit = () => {
                         dense
                         color="primary"
                         class="auth-input"
+                        autocomplete="email"
                     />
 
                     <q-btn
                         type="submit"
-                        label="Send Reset Link"
+                        :disable="seconds > 0"
+                        :label="`${seconds > 0 ? `Resend in ${seconds}` : 'Send Reset Link'}`"
                         class="auth-button full-width q-mt-md"
                         no-caps
                     />
@@ -47,7 +91,6 @@ const onSubmit = () => {
 .forgot-btn
     color: #ff9500
     font-size: 0.75rem
-
 
 .auth-input
     :deep(.q-field__control)

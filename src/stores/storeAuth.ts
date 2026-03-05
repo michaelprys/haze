@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { supabase } from 'src/utils/supabaseClient'
-import type { SignUpPayload, SignInPayload } from 'src/types/auth'
+import type { SignUpPayload, SignInPayload, RequestPasswordResetPayload } from 'src/types/auth'
 import { computed, ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
 import handleError from 'src/utils/handleError'
@@ -29,7 +29,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
 
         if (!email) throw new Error('Email required')
 
-        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+        const { data, error } = await supabase.auth.signUp({
             email,
             password,
             options: {
@@ -38,9 +38,9 @@ export const useStoreAuth = defineStore('storeAuth', () => {
             },
         })
 
-        if (signUpError) throw signUpError
+        if (error) throw error
 
-        return signUpData
+        return data
     }
 
     const signIn = async (payload: SignInPayload) => {
@@ -48,14 +48,14 @@ export const useStoreAuth = defineStore('storeAuth', () => {
 
         if (!email) throw new Error('Email required')
 
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        const { data, error } = await supabase.auth.signInWithPassword({
             email,
             password,
         })
 
-        if (signInError) throw signInError
+        if (error) throw error
 
-        return signInData
+        return data
     }
 
     const signOut = async () => {
@@ -64,10 +64,23 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         if (signOutError) throw signOutError
     }
 
+    const requestPasswordReset = async (payload: RequestPasswordResetPayload) => {
+        const { email, redirectTo } = payload
+
+        const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
+            redirectTo,
+        })
+
+        if (error) throw error
+
+        return data
+    }
+
     return {
+        isAuthenticated,
         signUp,
         signIn,
         signOut,
-        isAuthenticated,
+        requestPasswordReset,
     }
 })

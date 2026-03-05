@@ -3,7 +3,7 @@ import { useStoreAuth } from 'stores/storeAuth'
 import AuthLayout from 'layouts/AuthLayout.vue'
 import type { SignInPayload } from 'src/types/auth'
 import { useQuasar } from 'quasar'
-import { useTemplateRef, reactive } from 'vue'
+import { useTemplateRef, reactive, ref } from 'vue'
 import type { QForm } from 'quasar'
 import handleError from 'src/utils/handleError'
 import { useRouter } from 'vue-router'
@@ -58,6 +58,8 @@ const handleSignIn = async () => {
         })
     }
 }
+
+const rememberMe = ref(false)
 </script>
 
 <template>
@@ -86,7 +88,7 @@ const handleSignIn = async () => {
                     />
 
                     <div class="row items-center justify-between q-mt-sm">
-                        <!--                        <q-checkbox v-model="remember" label="Remember me" color="primary" dark />-->
+                        <q-checkbox v-model="rememberMe" label="Remember me" color="primary" dark />
 
                         <q-btn
                             :to="{ name: 'forgot-password' }"

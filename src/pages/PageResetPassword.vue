@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import AuthLayout from 'layouts/AuthLayout.vue'
+import { supabase } from 'src/utils/supabaseClient'
+import { reactive } from 'vue'
 
-const newPassword = ref(''),
-    confirmNewPassword = ref('')
+const formData = reactive({
+    newPassword: '',
+    confirmNewPassword: '',
+})
 
-const onSubmit = () => {
-    console.log('Reset New Password:', {
-        newPassword: newPassword.value,
-        confirmNewPassword: confirmNewPassword.value,
-    })
-}
+const changePassword = () => {}
+
+await supabase.auth.getSession()
 </script>
 
 <template>
     <div class="auth-container">
         <AuthLayout title="Reset Password" subtitle="Set your new password">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
+                <q-form class="q-gutter-y-md" @submit.prevent="changePassword">
                     <q-input
-                        v-model="newPassword"
+                        v-model="formData.newPassword"
                         label="New Password"
                         type="password"
                         outlined
@@ -29,7 +29,7 @@ const onSubmit = () => {
                     />
 
                     <q-input
-                        v-model="confirmNewPassword"
+                        v-model="formData.confirmNewPassword"
                         label="Confirm New Password"
                         type="password"
                         outlined

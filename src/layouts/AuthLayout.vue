@@ -39,7 +39,6 @@ defineProps<{
 <style scoped lang="sass">
 .auth-page
     min-height: 100svh
-    background: radial-gradient(circle at top, #111 0%, #000 60%)
 
 .auth-container
     width: 100%
