@@ -2,9 +2,11 @@
 import { ref } from 'vue'
 import AuthLayout from 'layouts/AuthLayout.vue'
 
-const email = ref('')
-const password = ref('')
-const remember = ref(false)
+const email = ref(''),
+    password = ref(''),
+    username = ref(''),
+    confirmPassword = ref(''),
+    remember = ref(false)
 
 const onSubmit = () => {
     console.log('Login:', {
@@ -17,13 +19,23 @@ const onSubmit = () => {
 
 <template>
     <div class="auth-container">
-        <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
+        <AuthLayout title="Create Account" subtitle="Sign up to get started">
             <template #form>
                 <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
                     <q-input
                         v-model="email"
                         label="Email"
                         type="email"
+                        outlined
+                        dense
+                        color="primary"
+                        class="auth-input"
+                    />
+
+                    <q-input
+                        v-model="username"
+                        label="Username"
+                        type="text"
                         outlined
                         dense
                         color="primary"
@@ -40,35 +52,34 @@ const onSubmit = () => {
                         class="auth-input"
                     />
 
-                    <div class="row items-center justify-between q-mt-sm">
-                        <q-checkbox v-model="remember" label="Remember me" color="primary" dark />
-
-                        <q-btn flat label="Forgot?" class="forgot-btn" no-caps />
-                    </div>
+                    <q-input
+                        v-model="confirmPassword"
+                        label="Confirm Password"
+                        type="password"
+                        outlined
+                        dense
+                        color="primary"
+                        class="auth-input"
+                    />
 
                     <q-btn
-                        type="submit"
-                        label="Sign In"
                         class="auth-button full-width q-mt-md"
+                        type="submit"
+                        label="Sign Up"
                         no-caps
                     />
                 </q-form>
             </template>
 
             <template #footer>
-                Don't have an account?
-                <RouterLink class="auth-link" :to="{ name: 'sign-up' }">Sign up</RouterLink>
+                Already have an account?
+                <RouterLink class="auth-link" :to="{ name: 'sign-in' }">Sign in</RouterLink>
             </template>
         </AuthLayout>
     </div>
 </template>
 
 <style scoped lang="sass">
-.forgot-btn
-    color: #ff9500
-    font-size: 0.75rem
-
-
 .auth-input
     :deep(.q-field__control)
         background: rgba(255, 255, 255, 0.02)
