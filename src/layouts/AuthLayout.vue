@@ -8,7 +8,7 @@ defineProps<{
 <template>
     <q-page class="auth-page flex flex-center">
         <div class="auth-container">
-            <div class="auth-header text-center q-mb-xl">
+            <div class="text-center">
                 <div class="logo-glow q-mb-md">
                     <img
                         class="logo-image"
@@ -23,7 +23,7 @@ defineProps<{
                 <div class="auth-subtitle">{{ subtitle }}</div>
             </div>
 
-            <q-card class="auth-card" flat bordered>
+            <q-card class="auth-card q-mt-xl" flat bordered>
                 <q-card-section>
                     <slot name="form" />
                 </q-card-section>

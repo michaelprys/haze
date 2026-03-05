@@ -9,6 +9,21 @@ const routes: RouteRecordRaw[] = [
             { path: '/camera', name: 'camera', component: () => import('pages/PageCamera.vue') },
             { path: '/sign-in', name: 'sign-in', component: () => import('pages/PageSignIn.vue') },
             { path: '/sign-up', name: 'sign-up', component: () => import('pages/PageSignUp.vue') },
+            {
+                path: '/forgot-password',
+                name: 'forgot-password',
+                component: () => import('pages/PageForgotPassword.vue'),
+            },
+            {
+                path: '/reset-password',
+                name: 'reset-password',
+                component: () => import('pages/PageResetPassword.vue'),
+            },
+            {
+                path: '/verify-email',
+                name: 'verify-email',
+                component: () => import('pages/PageVerifyEmail.vue'),
+            },
             { path: '', redirect: { name: 'sign-in' } },
         ],
     },

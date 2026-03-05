@@ -9,7 +9,7 @@ const email = ref(''),
     remember = ref(false)
 
 const onSubmit = () => {
-    console.log('Login:', {
+    console.log('Sign Up:', {
         email: email.value,
         password: password.value,
         remember: remember.value,

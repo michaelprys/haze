@@ -2,37 +2,25 @@
 import { ref } from 'vue'
 import AuthLayout from 'layouts/AuthLayout.vue'
 
-const email = ref('')
-const password = ref('')
-const remember = ref(false)
+const newPassword = ref(''),
+    confirmNewPassword = ref('')
 
 const onSubmit = () => {
-    console.log('Sign In:', {
-        email: email.value,
-        password: password.value,
-        remember: remember.value,
+    console.log('Reset New Password:', {
+        newPassword: newPassword.value,
+        confirmNewPassword: confirmNewPassword.value,
     })
 }
 </script>
 
 <template>
     <div class="auth-container">
-        <AuthLayout title="Welcome Back" subtitle="Sign in to continue">
+        <AuthLayout title="Reset Password" subtitle="Set your new password">
             <template #form>
                 <q-form class="q-gutter-y-md" @submit.prevent="onSubmit">
                     <q-input
-                        v-model="email"
-                        label="Email"
-                        type="email"
-                        outlined
-                        dense
-                        color="primary"
-                        class="auth-input"
-                    />
-
-                    <q-input
-                        v-model="password"
-                        label="Password"
+                        v-model="newPassword"
+                        label="New Password"
                         type="password"
                         outlined
                         dense
@@ -40,15 +28,19 @@ const onSubmit = () => {
                         class="auth-input"
                     />
 
-                    <div class="row items-center justify-between q-mt-sm">
-                        <q-checkbox v-model="remember" label="Remember me" color="primary" dark />
-
-                        <q-btn flat label="Forgot?" class="forgot-btn" no-caps />
-                    </div>
+                    <q-input
+                        v-model="confirmNewPassword"
+                        label="Confirm New Password"
+                        type="password"
+                        outlined
+                        dense
+                        color="primary"
+                        class="auth-input"
+                    />
 
                     <q-btn
                         type="submit"
-                        label="Sign In"
+                        label="Reset Password"
                         class="auth-button full-width q-mt-md"
                         no-caps
                     />
@@ -56,8 +48,8 @@ const onSubmit = () => {
             </template>
 
             <template #footer>
-                Don't have an account?
-                <RouterLink class="auth-link" :to="{ name: 'sign-up' }">Sign up</RouterLink>
+                Already have an account?
+                <RouterLink class="auth-link" :to="{ name: 'sign-in' }">Sign in</RouterLink>
             </template>
         </AuthLayout>
     </div>
