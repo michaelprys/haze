@@ -2,6 +2,8 @@
 import { ref } from 'vue'
 import { Dark } from 'quasar'
 
+const isLoggedIn = ref(false)
+
 const isDark = ref(Dark.isActive)
 
 const toggleTheme = () => {
@@ -13,7 +15,7 @@ const toggleTheme = () => {
 <template>
     <q-layout view="lHh Lpr lFf" class="app-layout">
         <q-header class="app-header" bordered height-hint="4rem">
-            <q-toolbar class="constrain" style="height: 4rem min-height: 4rem">
+            <q-toolbar class="constrain" style="height: 4rem; min-height: 4rem">
                 <q-btn
                     class="logo-btn no-hover-effect"
                     :ripple="false"
@@ -21,7 +23,7 @@ const toggleTheme = () => {
                     flat
                     dense
                 >
-                    <img src="src/assets/logo.webp" width="4.375rem" class="logo" />
+                    <img src="src/assets/logo.webp" width="1024" class="logo" alt="Haze logo" />
                 </q-btn>
 
                 <q-space />
@@ -36,6 +38,14 @@ const toggleTheme = () => {
                     round
                     flat
                     :icon="isDark ? 'light_mode' : 'dark_mode'"
+                    class="header-icon"
+                    @click="toggleTheme"
+                />
+
+                <q-btn
+                    round
+                    flat
+                    :icon="isLoggedIn ? 'user' : 'logout'"
                     class="header-icon"
                     @click="toggleTheme"
                 />

@@ -36,8 +36,8 @@ const initCamera = async () => {
         if (videoRef.value) {
             videoRef.value.srcObject = stream
         }
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
+        console.error(error)
         hasCameraSupport.value = false
     }
 }
@@ -94,15 +94,15 @@ const getLocation = async () => {
     try {
         locationPending.value = true
 
-        const pos = await new Promise<GeolocationPosition>((resolve, reject) => {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
             navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 })
         })
-        latitude.value = pos.coords.latitude
-        longitude.value = pos.coords.longitude
+        latitude.value = position.coords.latitude
+        longitude.value = position.coords.longitude
 
-        await getPreciseLocation(pos)
-    } catch (err) {
-        console.error('Geolocation not found: ', err)
+        await getPreciseLocation(position)
+    } catch (error) {
+        console.error('Geolocation not found: ', error)
 
         $q.notify({
             type: 'negative',
@@ -114,15 +114,15 @@ const getLocation = async () => {
     }
 }
 
-const getPreciseLocation = async (pos: GeolocationPosition) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${pos.coords.latitude}&lon=${pos.coords.longitude}`
+const getPreciseLocation = async (position: GeolocationPosition) => {
+    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 
     try {
         const { data } = await api.get<Location>(url)
 
         post.value.location = `${data.address.city}, ${data.address.country}`
-    } catch (err) {
-        console.error(err)
+    } catch (error) {
+        console.error(error)
     }
 }
 
@@ -142,7 +142,7 @@ onBeforeUnmount(() => {
         <q-card class="post-card q-pa-lg">
             <div class="camera-frame">
                 <video
-                    v-show="!imageCaptured && !imagePicked"
+                    v-show="!imageCaptured && !imagePicked && hasCameraSupport"
                     class="full-width"
                     ref="videoRef"
                     autoplay
@@ -150,7 +150,23 @@ onBeforeUnmount(() => {
                 />
                 <canvas v-show="imageCaptured" class="full-width" height="240" ref="canvasRef" />
 
-                <q-img v-show="imagePicked" :src="post.photoUrl" alt="Attached photo" />
+                <div
+                    style="
+                        height: 350px;
+                        object-fit: cover;
+                        width: 100%;
+                        background: linear-gradient(
+                            to bottom right,
+                            #4b0082,
+                            #9c0f5f,
+                            #c71585,
+                            #ff4500
+                        );
+                        overflow: hidden;
+                    "
+                >
+                    <q-img v-show="imagePicked" :src="post.photoUrl" alt="Attached photo" />
+                </div>
             </div>
 
             <div class="text-center q-mt-lg">
@@ -165,6 +181,7 @@ onBeforeUnmount(() => {
                 />
 
                 <q-file
+                    class="text-center"
                     v-else
                     @update:model-value="getImageSrc"
                     v-model="pickerModel"

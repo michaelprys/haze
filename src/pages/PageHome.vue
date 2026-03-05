@@ -18,7 +18,7 @@ const posts = [
     },
 ]
 
-const niceDate = (value: number) => {
+const formattedDate = (value: number) => {
     return date.formatDate(value, 'MMMM D, h:mm A')
 }
 </script>
@@ -51,7 +51,7 @@ const niceDate = (value: number) => {
                         {{ post.location }}
                     </div>
                     <div class="date">
-                        {{ niceDate(post.date) }}
+                        {{ formattedDate(post.date) }}
                     </div>
                 </q-card-section>
             </q-card>
