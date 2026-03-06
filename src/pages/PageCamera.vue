@@ -12,7 +12,6 @@ const { post, handlePublishPost } = usePost()
 const {
     hasCameraSupport,
     imageCaptured,
-    imagePicked,
     pickerModel,
     videoRef,
     canvasRef,
@@ -20,7 +19,12 @@ const {
     captureImage,
     deactivateCamera,
     getImageSrc,
+    checkDevice,
 } = useCamera(post)
+
+const onDeviceChange = () => {
+    void checkDevice()
+}
 
 // Geolocation
 const { locationPending, hasGeolocation, getLocation } = useGeolocation(post)
@@ -28,9 +32,13 @@ const { locationPending, hasGeolocation, getLocation } = useGeolocation(post)
 // Hooks
 onMounted(() => {
     void initCamera()
+
+    navigator.mediaDevices.addEventListener('devicechange', onDeviceChange)
 })
 
 onBeforeUnmount(() => {
+    navigator.mediaDevices.removeEventListener('devicechange', onDeviceChange)
+
     if (hasCameraSupport.value) {
         deactivateCamera()
     }
@@ -40,33 +48,19 @@ onBeforeUnmount(() => {
 <template>
     <q-page class="haze-bg q-pa-md">
         <q-card class="post-card q-pa-lg">
-            <div class="camera-frame">
-                <video
-                    v-show="!imageCaptured && !imagePicked && hasCameraSupport"
-                    class="full-width"
-                    ref="videoRef"
-                    autoplay
-                    playsinline
-                />
-                <canvas v-show="imageCaptured" class="full-width" height="240" ref="canvasRef" />
+            <div class="camera-wrapper">
+                <div class="camera-frame">
+                    <video
+                        v-show="!imageCaptured && hasCameraSupport"
+                        ref="videoRef"
+                        autoplay
+                        playsinline
+                        class="camera-shot"
+                    />
 
-                <div
-                    class="camera-placeholder"
-                    style="
-                        height: 350px;
-                        object-fit: cover;
-                        width: 100%;
-                        background: linear-gradient(
-                            to bottom right,
-                            #4b0082,
-                            #9c0f5f,
-                            #c71585,
-                            #ff4500
-                        );
-                        overflow: hidden;
-                    "
-                >
-                    <q-img v-show="imagePicked" :src="post.photoUrl" alt="Attached photo" />
+                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
+
+                    <div v-show="!hasCameraSupport" class="camera-placeholder" />
                 </div>
             </div>
 
@@ -82,14 +76,17 @@ onBeforeUnmount(() => {
                 />
 
                 <q-file
-                    class="text-center"
-                    style="margin-left: 3px"
                     v-else
-                    @update:model-value="getImageSrc"
                     v-model="pickerModel"
-                    borderless
-                    label="Choose an image"
-                />
+                    @update:model-value="getImageSrc"
+                    dense
+                    flat
+                    class="image-link"
+                >
+                    <template #default>
+                        <span class="image-link-text">+ add image</span>
+                    </template>
+                </q-file>
             </div>
 
             <q-input
@@ -148,21 +145,35 @@ onBeforeUnmount(() => {
     max-width: 45rem
 
 .camera-frame
-    display: flex
-    justify-content: center
-    align-items: center
+    position: relative
+    overflow: hidden
+    aspect-ratio: 3 / 2
+    border-radius: 1.5rem
     width: 100%
     max-width: 35rem
     margin: 0 auto
-    border-radius: 1rem
-    box-shadow: 0 0 1.875rem rgba(255, 120, 0, 0.18)
+    background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%)
+    box-shadow:  0 14px 40px rgba(0, 0, 0, 0.8),  0 0 0 1px rgba(255, 140, 0, 0.08)
+
+.camera-shot
+    position: absolute
+    inset: 0
+    z-index: 1
+    object-fit: cover
 
 .camera-placeholder
-    border-radius: 0.8rem
+    position: absolute
+    inset: 0
+    z-index: 0
+    object-fit: cover
+    width: 100%
+    height: 100%
+    background: linear-gradient(to bottom right, #4b0082, #9c0f5f, #c71585, #ff4500)
+    overflow: hidden
 
 .post-image
     width: 100%
-    border-radius: 1rem
+    border-radius: 1.5rem
     max-height: 25rem
 
 .camera-btn
@@ -172,6 +183,37 @@ onBeforeUnmount(() => {
 
     &:hover
         transform: scale(1.1)
+
+.image-link
+    max-width: 220px
+    align-items: center
+    .q-field__native
+        display: none
+
+    .q-field__control::before,
+    .q-field__control::after
+        display: none !important
+
+    .q-field__control
+        background: transparent !important
+        box-shadow: none !important
+        padding: 0
+        min-height: auto
+
+.image-link-text
+    display: flex
+    align-items: center
+    cursor: pointer
+    font-size: 1rem
+    font-weight: 500
+    letter-spacing: 0.05em
+    color: #ff9a3c
+    transition: all 0.25s ease
+    text-shadow: 0 0 6px rgba(255, 122, 0, 0.35)
+
+    &:hover
+        color: #ffb15c
+        text-shadow: 0 0
 
 .input-style
     .q-field__control

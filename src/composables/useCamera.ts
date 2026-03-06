@@ -4,6 +4,7 @@ import type { Post } from 'src/types/post'
 
 export const useCamera = (post: Ref<Post>) => {
     const hasCameraSupport = ref(true),
+        isCameraInitializing = ref(true),
         imageCaptured = ref(false),
         imagePicked = ref(false),
         pickerModel = ref<File | null>(null),
@@ -11,6 +12,8 @@ export const useCamera = (post: Ref<Post>) => {
         canvasRef = ref<HTMLCanvasElement | null>(null)
 
     const initCamera = async () => {
+        isCameraInitializing.value = true
+
         try {
             const stream = await navigator.mediaDevices.getUserMedia({
                 video: true,
@@ -19,9 +22,13 @@ export const useCamera = (post: Ref<Post>) => {
             if (videoRef.value) {
                 videoRef.value.srcObject = stream
             }
+
+            hasCameraSupport.value = true
         } catch (error) {
             console.error(error)
             hasCameraSupport.value = false
+        } finally {
+            isCameraInitializing.value = false
         }
     }
     const deactivateCamera = () => {
@@ -70,8 +77,19 @@ export const useCamera = (post: Ref<Post>) => {
         imagePicked.value = true
     }
 
+    const checkDevice = async () => {
+        const devices = await navigator.mediaDevices.enumerateDevices()
+
+        const hasVideoInput = devices.some((d) => d.kind === 'videoinput')
+
+        if (hasVideoInput && !hasCameraSupport.value) {
+            void initCamera()
+        }
+    }
+
     return {
         hasCameraSupport,
+        isCameraInitializing,
         imageCaptured,
         imagePicked,
         pickerModel,
@@ -81,5 +99,6 @@ export const useCamera = (post: Ref<Post>) => {
         captureImage,
         deactivateCamera,
         getImageSrc,
+        checkDevice,
     }
 }
