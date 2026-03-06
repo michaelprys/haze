@@ -67,10 +67,10 @@ export default defineConfig((ctx) => {
                 [
                     '@intlify/unplugin-vue-i18n/vite',
                     {
-                        // if you want to use Vue I18n Legacy API, you need to set `compositionOnly: false`
+                        // if you want to composables Vue I18n Legacy API, you need to set `compositionOnly: false`
                         // compositionOnly: false,
 
-                        // if you want to use named tokens in your Vue I18n messages, such as 'Hello {name}',
+                        // if you want to composables named tokens in your Vue I18n messages, such as 'Hello {name}',
                         // you need to set `runtimeOnly: false`
                         // runtimeOnly: false,
 
@@ -141,7 +141,7 @@ export default defineConfig((ctx) => {
 
         // https://v2.quasar.dev/quasar-cli-vite/developing-ssr/configuring-ssr
         ssr: {
-            prodPort: 3000, // The default port that the production server should use
+            prodPort: 3000, // The default port that the production server should composables
             // (gets superseded if process.env.PORT is specified at runtime)
 
             middlewares: [
@@ -157,7 +157,7 @@ export default defineConfig((ctx) => {
             // manualPostHydrationTrigger: true,
 
             pwa: false,
-            // pwaOfflineHtmlFilename: 'offline.html', // do NOT use index.html as name!
+            // pwaOfflineHtmlFilename: 'offline.html', // do NOT composables index.html as name!
 
             // pwaExtendGenerateSWOptions (cfg) {},
             // pwaExtendInjectManifestOptions (cfg) {}
@@ -196,7 +196,7 @@ export default defineConfig((ctx) => {
             // Electron preload scripts (if any) from /src-electron, WITHOUT file extension
             preloadScripts: ['electron-preload'],
 
-            // specify the debugging port to use for the Electron app when running in development mode
+            // specify the debugging port to composables for the Electron app when running in development mode
             inspectPort: 5858,
 
             bundler: 'packager', // 'packager' or 'builder'
@@ -226,7 +226,7 @@ export default defineConfig((ctx) => {
 
             /**
              * The list of extra scripts (js/ts) not in your bex manifest that you want to
-             * compile and use in your browser extension. Maybe dynamic use them?
+             * compile and composables in your browser extension. Maybe dynamic composables them?
              *
              * Each entry in the list should be a relative filename to /src-bex/
              *

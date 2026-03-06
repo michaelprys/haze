@@ -6,11 +6,12 @@ import { useQuasar } from 'quasar'
 import type { RequestPasswordResetPayload } from 'src/types/auth'
 import handleError from 'src/utils/handleError'
 
-const $q = useQuasar()
-const storeAuth = useStoreAuth()
-const email = ref('')
-const redirectTo = `${window.location.origin}/auth/reset-password`
+const $q = useQuasar(),
+    storeAuth = useStoreAuth(),
+    email = ref(''),
+    redirectTo = `${window.location.origin}/auth/reset-password`
 
+// Timer
 const seconds = ref(0)
 let timer: ReturnType<typeof setInterval> | null = null
 
@@ -27,6 +28,7 @@ const startTimer = () => {
     }, 1000)
 }
 
+// Password reset
 const handleRequestPasswordReset = async () => {
     const payload: RequestPasswordResetPayload = {
         email: email.value,

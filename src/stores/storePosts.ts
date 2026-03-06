@@ -6,12 +6,14 @@ export const useStorePosts = defineStore('storePosts', () => {
     const publishPost = async (draftPost: PostPayload) => {
         if (!draftPost.photoFile) throw new Error('File not found')
 
+        // Get user session
         const {
             data: { user },
         } = await supabase.auth.getUser()
 
         if (!user) throw new Error('Not authenticated')
 
+        // Upload to bucket
         const { data: storageData, error: storageError } = await supabase.storage
             .from('post-media')
             .upload(draftPost.uniqueFileName, draftPost.photoFile, {
@@ -20,6 +22,7 @@ export const useStorePosts = defineStore('storePosts', () => {
 
         if (storageError) throw storageError
 
+        // Get image url
         const {
             data: { publicUrl },
         } = supabase.storage.from('post-media').getPublicUrl(storageData.path)
@@ -32,6 +35,7 @@ export const useStorePosts = defineStore('storePosts', () => {
             taken_at: draftPost.takenAt,
         }
 
+        // Insert post
         const { error: postError } = await supabase.from('posts').insert(post)
 
         if (postError) throw postError

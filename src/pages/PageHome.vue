@@ -2,6 +2,7 @@
 import { date } from 'quasar'
 import ActionButton from 'components/ActionButton.vue'
 
+// Posts
 const posts = [
     {
         id: 1,
@@ -81,7 +82,7 @@ const formattedDate = (value: number) => {
                     <q-card-section>
                         <ActionButton
                             label="Create Post"
-                            :to="{ name: 'camera' }"
+                            :to="{ name: 'camera-page' }"
                             icon="add_a_photo"
                         />
                     </q-card-section>

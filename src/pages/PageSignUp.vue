@@ -8,17 +8,19 @@ import type { QForm } from 'quasar'
 import handleError from 'src/utils/handleError'
 import { useRouter } from 'vue-router'
 
-const storeAuth = useStoreAuth()
-const $q = useQuasar()
-const signUpForm = useTemplateRef<QForm>('signUpForm')
-const router = useRouter()
+// Common
+const router = useRouter(),
+    $q = useQuasar(),
+    storeAuth = useStoreAuth()
 
-const formData = reactive({
-    email: '',
-    password: '',
-    username: '',
-    confirmPassword: '',
-})
+// Form
+const signUpForm = useTemplateRef<QForm>('signUpForm'),
+    formData = reactive({
+        email: '',
+        password: '',
+        username: '',
+        confirmPassword: '',
+    })
 
 const handleSignUp = async () => {
     if (!signUpForm.value) return

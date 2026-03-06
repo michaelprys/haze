@@ -1,178 +1,35 @@
 <script setup lang="ts">
-import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
-import type { Post } from 'src/types/post'
-import type { Location } from 'src/types/location'
-import { api } from 'boot/axios'
-import { useQuasar } from 'quasar'
-import { delay } from 'src/utils/delay'
+import { onBeforeUnmount, onMounted } from 'vue'
+import { useCamera } from 'src/composables/useCamera'
+import { usePost } from 'src/composables/usePost'
 import ActionButton from 'components/ActionButton.vue'
-import { useStorePosts } from 'stores/storePosts'
-import handleError from 'src/utils/handleError'
-import { useRouter } from 'vue-router'
+import { useGeolocation } from 'src/composables/useGeolocation'
 
-const router = useRouter(),
-    storePosts = useStorePosts(),
-    $q = useQuasar()
+// Post
+const { post, handlePublishPost } = usePost()
 
-const post = ref<Post>({
-    caption: '',
-    location: '',
-    photoFile: null,
-    takenAt: new Date().toISOString(),
-})
+// Camera
+const {
+    hasCameraSupport,
+    imageCaptured,
+    imagePicked,
+    pickerModel,
+    videoRef,
+    canvasRef,
+    initCamera,
+    captureImage,
+    deactivateCamera,
+    getImageSrc,
+} = useCamera(post)
 
-const generateUniqueFileName = (file: Blob | File) => {
-    const ext = 'name' in file && file.name ? file.name.split('.').pop() || 'jpg' : 'png'
+// Geolocation
+const { locationPending, hasGeolocation, getLocation } = useGeolocation(post)
 
-    return `post-${crypto.randomUUID()}.${ext}`
-}
-const handlePublishPost = async () => {
-    if (!post.value.photoFile) {
-        $q.notify({
-            type: 'negative',
-            message: `Please add a ${hasCameraSupport.value ? 'photo' : 'image'} before publishing`,
-        })
-        return
-    }
-
-    try {
-        await storePosts.publishPost({
-            ...post.value,
-            photoFile: post.value.photoFile,
-            uniqueFileName: generateUniqueFileName(post.value.photoFile),
-        })
-
-        $q.notify({
-            type: 'positive',
-            message: 'Image published',
-        })
-
-        post.value = {
-            caption: '',
-            location: '',
-            photoFile: null,
-            takenAt: new Date().toISOString(),
-        }
-
-        await router.push({ name: 'home' })
-    } catch (error) {
-        const message = handleError(error)
-
-        $q.notify({
-            type: 'negative',
-            message: message ?? 'Cannot publish image',
-        })
-    }
-}
-
-const hasCameraSupport = ref(true),
-    imageCaptured = ref(false),
-    imagePicked = ref(false),
-    pickerModel = ref<File | null>(null),
-    videoRef = useTemplateRef<HTMLVideoElement>('videoRef'),
-    canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
-
-const initCamera = async () => {
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: true,
-        })
-
-        if (videoRef.value) {
-            videoRef.value.srcObject = stream
-        }
-    } catch (error) {
-        console.error(error)
-        hasCameraSupport.value = false
-    }
-}
-const deactivateCamera = () => {
-    const stream = videoRef.value?.srcObject
-
-    if (!(stream instanceof MediaStream)) return
-
-    stream.getVideoTracks().forEach((track) => {
-        track.stop()
-    })
-}
-const captureImage = () => {
-    const video = videoRef.value
-    const canvas = canvasRef.value
-    const context = canvas?.getContext('2d')
-
-    if (!canvas || !video || !context) return
-
-    canvas.width = video.getBoundingClientRect().width
-    canvas.height = video.getBoundingClientRect().height
-    context.drawImage(video, 0, 0, canvas.width, canvas.height)
-
-    const dataURItoBlob = (dataURI: string): Blob => {
-        const byteString = atob(dataURI.split(',')[1]!)
-        const mime = dataURI.match(/:(.*?)/)?.[1] ?? 'application/octet-stream'
-
-        const ab = new ArrayBuffer(byteString.length)
-        const ia = new Uint8Array(ab)
-        for (let i = 0; i < byteString.length; i++) {
-            ia[i] = byteString.charCodeAt(i)
-        }
-
-        return new Blob([ab], { type: mime })
-    }
-
-    imageCaptured.value = true
-    post.value.photoFile = dataURItoBlob(canvas.toDataURL())
-    deactivateCamera()
-}
-const getImageSrc = (file: Post['photoFile']) => {
-    if (!file) return null
-    post.value.photoUrl = URL.createObjectURL(file)
-    post.value.photoFile = file
-    imagePicked.value = true
-}
-
-const locationPending = ref(false),
-    latitude = ref<number | null>(null),
-    longitude = ref<number | null>(null),
-    hasGeolocation = computed(() => 'geolocation' in navigator)
-
-const getLocation = async () => {
-    try {
-        locationPending.value = true
-
-        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-            navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 })
-        })
-        latitude.value = position.coords.latitude
-        longitude.value = position.coords.longitude
-
-        await getPreciseLocation(position)
-    } catch (error) {
-        console.error('Geolocation not found: ', error)
-
-        $q.notify({
-            type: 'negative',
-            message: 'Could not find the location',
-        })
-    } finally {
-        await delay(500)
-        locationPending.value = false
-    }
-}
-const getPreciseLocation = async (position: GeolocationPosition) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
-
-    try {
-        const { data } = await api.get<Location>(url)
-
-        post.value.location = `${data.address.city}, ${data.address.country}`
-    } catch (error) {
-        console.error(error)
-    }
-}
-
+// Hooks
 onMounted(() => {
     void initCamera()
 })
+
 onBeforeUnmount(() => {
     if (hasCameraSupport.value) {
         deactivateCamera()
@@ -264,12 +121,13 @@ onBeforeUnmount(() => {
                         v-if="!locationPending && hasGeolocation"
                         @click="getLocation"
                         icon="place"
+                        flat
                     />
                 </template>
             </q-input>
 
             <div class="q-mt-xl">
-                <ActionButton @click="handlePublishPost" label="Publish" />
+                <ActionButton @click="handlePublishPost(hasCameraSupport)" label="Publish" />
             </div>
         </q-card>
     </q-page>

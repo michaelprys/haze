@@ -6,7 +6,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('layouts/LayoutMain.vue'),
         children: [
             { path: '', name: 'home', component: () => import('pages/PageHome.vue') },
-            { path: 'camera', name: 'camera', component: () => import('pages/PageCamera.vue') },
+            {
+                path: 'camera-page',
+                name: 'camera-page',
+                component: () => import('pages/PageCamera.vue'),
+            },
             {
                 path: 'auth/sign-in',
                 name: 'sign-in',

@@ -3,14 +3,15 @@ import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
 
-const route = useRoute()
-const router = useRouter()
+// Common
+const route = useRoute(),
+    router = useRouter()
 
-const status = computed(() => route.query.status as string)
-const isSuccess = computed(() => status.value === 'success')
-// const isError = computed(() => status.value === 'error')
+// Sign in
+const status = computed(() => route.query.status as string),
+    isSuccess = computed(() => status.value === 'success')
 
-const goToLogin = () => router.push({ name: 'sign-in' })
+const goToSignIn = () => router.push({ name: 'sign-in' })
 </script>
 
 <template>
@@ -34,7 +35,7 @@ const goToLogin = () => router.push({ name: 'sign-in' })
                             label="Go to Sign In"
                             class="auth-button full-width q-mt-md"
                             no-caps
-                            @click="goToLogin"
+                            @click="goToSignIn"
                         />
                     </div>
 
@@ -45,7 +46,7 @@ const goToLogin = () => router.push({ name: 'sign-in' })
                             label="Back to Sign In"
                             class="auth-button full-width q-mt-md"
                             no-caps
-                            @click="goToLogin"
+                            @click="goToSignIn"
                         />
                     </div>
                 </div>

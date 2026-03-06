@@ -104,7 +104,7 @@ const handleSignOut = async () => {
                 align="justify"
             >
                 <q-route-tab :to="{ name: 'home' }" icon="fa-solid fa-home" />
-                <q-route-tab :to="{ name: 'camera' }" icon="fa-solid fa-camera" />
+                <q-route-tab :to="{ name: 'camera-page' }" icon="fa-solid fa-camera" />
             </q-tabs>
         </q-footer>
     </q-layout>

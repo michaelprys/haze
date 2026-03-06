@@ -6,10 +6,12 @@ import handleError from 'src/utils/handleError'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 
-const router = useRouter()
-const $q = useQuasar()
-const storeAuth = useStoreAuth()
+// Common
+const router = useRouter(),
+    $q = useQuasar(),
+    storeAuth = useStoreAuth()
 
+// Form
 const formData = reactive({
     newPassword: '',
     confirmNewPassword: '',
