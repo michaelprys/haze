@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AuthLayout from 'layouts/AuthLayout.vue'
+import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { reactive } from 'vue'
 import { useStoreAuth } from 'stores/storeAuth'
 import handleError from 'src/utils/handleError'
@@ -38,7 +38,7 @@ const handleResetPassword = async () => {
 
 <template>
     <div class="auth-container">
-        <AuthLayout title="Reset Password" subtitle="Set your new password">
+        <LayoutAuth title="Reset Password" subtitle="Set your new password">
             <template #form>
                 <q-form class="q-gutter-y-md" @submit.prevent="handleResetPassword">
                     <q-input
@@ -84,7 +84,7 @@ const handleResetPassword = async () => {
                 Already have an account?
                 <RouterLink class="auth-link" :to="{ name: 'sign-in' }">Sign in</RouterLink>
             </template>
-        </AuthLayout>
+        </LayoutAuth>
     </div>
 </template>
 

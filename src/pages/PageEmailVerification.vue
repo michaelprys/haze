@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import AuthLayout from 'layouts/AuthLayout.vue'
+import LayoutAuth from 'layouts/LayoutAuth.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,7 +15,7 @@ const goToLogin = () => router.push({ name: 'sign-in' })
 
 <template>
     <div class="auth-container">
-        <AuthLayout
+        <LayoutAuth
             :title="isSuccess ? 'Email Confirmed' : 'Verification Failed'"
             :subtitle="
                 isSuccess
@@ -50,7 +50,7 @@ const goToLogin = () => router.push({ name: 'sign-in' })
                     </div>
                 </div>
             </template>
-        </AuthLayout>
+        </LayoutAuth>
     </div>
 </template>
 

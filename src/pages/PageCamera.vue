@@ -1,32 +1,76 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref, useTemplateRef } from 'vue'
-import { uid } from 'quasar'
 import type { Post } from 'src/types/post'
 import type { Location } from 'src/types/location'
 import { api } from 'boot/axios'
 import { useQuasar } from 'quasar'
 import { delay } from 'src/utils/delay'
 import ActionButton from 'components/ActionButton.vue'
+import { useStorePosts } from 'stores/storePosts'
+import handleError from 'src/utils/handleError'
+import { useRouter } from 'vue-router'
+
+const router = useRouter(),
+    storePosts = useStorePosts(),
+    $q = useQuasar()
 
 const post = ref<Post>({
-    id: uid(),
     caption: '',
     location: '',
     photoFile: null,
-    date: Date.now(),
+    takenAt: new Date().toISOString(),
 })
 
-const $q = useQuasar()
-const hasCameraSupport = ref(true)
-const imageCaptured = ref(false)
-const imagePicked = ref(false)
-const locationPending = ref(false)
+const generateUniqueFileName = (file: Blob | File) => {
+    const ext = 'name' in file && file.name ? file.name.split('.').pop() || 'jpg' : 'png'
 
-const videoRef = useTemplateRef<HTMLVideoElement>('videoRef')
-const canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
-const pickerModel = ref<File | null>(null)
+    return `post-${crypto.randomUUID()}.${ext}`
+}
+const handlePublishPost = async () => {
+    if (!post.value.photoFile) {
+        $q.notify({
+            type: 'negative',
+            message: `Please add a ${hasCameraSupport.value ? 'photo' : 'image'} before publishing`,
+        })
+        return
+    }
 
-const hasGeolocation = computed(() => 'geolocation' in navigator)
+    try {
+        await storePosts.publishPost({
+            ...post.value,
+            photoFile: post.value.photoFile,
+            uniqueFileName: generateUniqueFileName(post.value.photoFile),
+        })
+
+        $q.notify({
+            type: 'positive',
+            message: 'Image published',
+        })
+
+        post.value = {
+            caption: '',
+            location: '',
+            photoFile: null,
+            takenAt: new Date().toISOString(),
+        }
+
+        await router.push({ name: 'home' })
+    } catch (error) {
+        const message = handleError(error)
+
+        $q.notify({
+            type: 'negative',
+            message: message ?? 'Cannot publish image',
+        })
+    }
+}
+
+const hasCameraSupport = ref(true),
+    imageCaptured = ref(false),
+    imagePicked = ref(false),
+    pickerModel = ref<File | null>(null),
+    videoRef = useTemplateRef<HTMLVideoElement>('videoRef'),
+    canvasRef = useTemplateRef<HTMLCanvasElement>('canvasRef')
 
 const initCamera = async () => {
     try {
@@ -42,7 +86,6 @@ const initCamera = async () => {
         hasCameraSupport.value = false
     }
 }
-
 const deactivateCamera = () => {
     const stream = videoRef.value?.srcObject
 
@@ -52,7 +95,6 @@ const deactivateCamera = () => {
         track.stop()
     })
 }
-
 const captureImage = () => {
     const video = videoRef.value
     const canvas = canvasRef.value
@@ -81,15 +123,17 @@ const captureImage = () => {
     post.value.photoFile = dataURItoBlob(canvas.toDataURL())
     deactivateCamera()
 }
-
 const getImageSrc = (file: Post['photoFile']) => {
     if (!file) return null
     post.value.photoUrl = URL.createObjectURL(file)
+    post.value.photoFile = file
     imagePicked.value = true
 }
 
-const latitude = ref<number | null>(null)
-const longitude = ref<number | null>(null)
+const locationPending = ref(false),
+    latitude = ref<number | null>(null),
+    longitude = ref<number | null>(null),
+    hasGeolocation = computed(() => 'geolocation' in navigator)
 
 const getLocation = async () => {
     try {
@@ -114,7 +158,6 @@ const getLocation = async () => {
         locationPending.value = false
     }
 }
-
 const getPreciseLocation = async (position: GeolocationPosition) => {
     const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`
 
@@ -130,7 +173,6 @@ const getPreciseLocation = async (position: GeolocationPosition) => {
 onMounted(() => {
     void initCamera()
 })
-
 onBeforeUnmount(() => {
     if (hasCameraSupport.value) {
         deactivateCamera()
@@ -227,7 +269,7 @@ onBeforeUnmount(() => {
             </q-input>
 
             <div class="q-mt-xl">
-                <ActionButton label="Publish"></ActionButton>
+                <ActionButton @click="handlePublishPost" label="Publish" />
             </div>
         </q-card>
     </q-page>

@@ -8,6 +8,7 @@ import handleError from 'src/utils/handleError'
 export const useStoreAuth = defineStore('storeAuth', () => {
     const user = ref<User | null>(null)
     const isAuthenticated = computed(() => !!user.value)
+    const hasRememberMe = ref(false)
 
     supabase.auth
         .getUser()
@@ -86,6 +87,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
 
     return {
         isAuthenticated,
+        hasRememberMe,
         signUp,
         signIn,
         signOut,

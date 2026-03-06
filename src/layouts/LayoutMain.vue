@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import { Dark } from 'quasar'
+// import { ref } from 'vue'
+// import { Dark } from 'quasar'
 import { useStoreAuth } from 'stores/storeAuth'
 import { useQuasar } from 'quasar'
 import handleError from 'src/utils/handleError'
@@ -9,7 +9,7 @@ import { useRouter } from 'vue-router'
 const router = useRouter()
 const $q = useQuasar()
 const storeAuth = useStoreAuth()
-const isDark = ref(Dark.isActive)
+// const isDark = ref(Dark.isActive)
 
 const handleSignOut = async () => {
     try {
@@ -30,10 +30,10 @@ const handleSignOut = async () => {
     }
 }
 
-const toggleTheme = () => {
-    Dark.set(!Dark.isActive)
-    isDark.value = Dark.isActive
-}
+// const toggleTheme = () => {
+//     Dark.set(!Dark.isActive)
+//     isDark.value = Dark.isActive
+// }
 </script>
 
 <template>
@@ -59,13 +59,13 @@ const toggleTheme = () => {
                 <q-space />
 
                 <div class="flex q-gutter-x-xs">
-                    <q-btn
-                        round
-                        flat
-                        :icon="isDark ? 'light_mode' : 'dark_mode'"
-                        class="header-icon"
-                        @click="toggleTheme"
-                    />
+                    <!--                    <q-btn-->
+                    <!--                        round-->
+                    <!--                        flat-->
+                    <!--                        :icon="isDark ? 'light_mode' : 'dark_mode'"-->
+                    <!--                        class="header-icon"-->
+                    <!--                        @click="toggleTheme"-->
+                    <!--                    />-->
 
                     <q-btn
                         v-if="storeAuth.isAuthenticated"
@@ -75,6 +75,7 @@ const toggleTheme = () => {
                         icon="logout"
                         class="header-icon"
                     />
+
                     <q-btn
                         v-else
                         :to="{ name: 'sign-in' }"

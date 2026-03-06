@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import AuthLayout from 'layouts/AuthLayout.vue'
+import LayoutAuth from 'layouts/LayoutAuth.vue'
 
 const resendVerification = () => {
     console.log('Resend verification email')
@@ -8,7 +8,7 @@ const resendVerification = () => {
 
 <template>
     <div class="auth-container">
-        <AuthLayout
+        <LayoutAuth
             title="Verify Email"
             subtitle="Please check your inbox and verify your email address"
         >
@@ -27,7 +27,7 @@ const resendVerification = () => {
                 Already verified?
                 <RouterLink class="auth-link" :to="{ name: 'sign-in' }"> Sign in </RouterLink>
             </template>
-        </AuthLayout>
+        </LayoutAuth>
     </div>
 </template>
 

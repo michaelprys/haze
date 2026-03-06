@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useTemplateRef, reactive } from 'vue'
-import AuthLayout from 'layouts/AuthLayout.vue'
+import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { useStoreAuth } from 'stores/storeAuth'
 import type { SignUpPayload } from 'src/types/auth'
 import { useQuasar } from 'quasar'
@@ -73,7 +73,7 @@ const handleSignUp = async () => {
 
 <template>
     <div class="auth-container">
-        <AuthLayout title="Create Account" subtitle="Sign up to get started">
+        <LayoutAuth title="Create Account" subtitle="Sign up to get started">
             <template #form>
                 <q-form class="q-gutter-y-md" ref="signUpForm" @submit.prevent="handleSignUp">
                     <q-input
@@ -154,7 +154,7 @@ const handleSignUp = async () => {
                 Already have an account?
                 <RouterLink class="auth-link" :to="{ name: 'sign-in' }">Sign in</RouterLink>
             </template>
-        </AuthLayout>
+        </LayoutAuth>
     </div>
 </template>
 

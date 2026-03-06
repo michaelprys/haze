@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import AuthLayout from 'layouts/AuthLayout.vue'
+import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { useStoreAuth } from 'stores/storeAuth'
 import { useQuasar } from 'quasar'
 import type { RequestPasswordResetPayload } from 'src/types/auth'
@@ -55,7 +55,7 @@ const handleRequestPasswordReset = async () => {
 
 <template>
     <div class="auth-container">
-        <AuthLayout title="Forgot Password" subtitle="Enter your email to receive a reset link">
+        <LayoutAuth title="Forgot Password" subtitle="Enter your email to receive a reset link">
             <template #form>
                 <q-form class="q-gutter-y-md" @submit.prevent="handleRequestPasswordReset">
                     <q-input
@@ -83,7 +83,7 @@ const handleRequestPasswordReset = async () => {
                 Already have an account?
                 <RouterLink class="auth-link" :to="{ name: 'sign-in' }">Sign in</RouterLink>
             </template>
-        </AuthLayout>
+        </LayoutAuth>
     </div>
 </template>
 
