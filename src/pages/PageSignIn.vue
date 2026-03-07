@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import { useStoreAuth } from 'stores/storeAuth'
+import { useStoreAuth } from 'stores/auth.store'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
-import type { SignInPayload } from 'src/types/auth'
+import type { SignInPayload } from 'src/types/auth.types'
 import { useQuasar } from 'quasar'
 import { useTemplateRef, reactive } from 'vue'
 import type { QForm } from 'quasar'
-import handleError from 'src/utils/handleError'
+import handleErrorUtils from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
 
 // Common
@@ -52,7 +52,7 @@ const handleSignIn = async () => {
             await router.push({ name: 'home' })
         }
     } catch (error) {
-        const message = handleError(error)
+        const message = handleErrorUtils(error)
 
         $q.notify({
             type: 'negative',

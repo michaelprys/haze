@@ -1,9 +1,13 @@
 import { defineStore } from 'pinia'
-import { supabase } from 'src/utils/supabaseClient'
-import type { SignUpPayload, SignInPayload, RequestPasswordResetPayload } from 'src/types/auth'
+import { supabase } from 'src/api/supabaseClient'
+import type {
+    SignUpPayload,
+    SignInPayload,
+    RequestPasswordResetPayload,
+} from 'src/types/auth.types'
 import { computed, ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
-import handleError from 'src/utils/handleError'
+import handleErrorUtils from 'src/utils/handleError.utils'
 
 export const useStoreAuth = defineStore('storeAuth', () => {
     const user = ref<User | null>(null)
@@ -16,8 +20,8 @@ export const useStoreAuth = defineStore('storeAuth', () => {
             user.value = authState.user ?? null
         })
         .catch((error) => {
-            const message = handleError(error)
-            console.error('Auth check failed: ', message)
+            const message = handleErrorUtils(error)
+            console.error('LayoutAuth check failed: ', message)
             user.value = null
         })
 
@@ -26,17 +30,13 @@ export const useStoreAuth = defineStore('storeAuth', () => {
     })
 
     const signUp = async (payload: SignUpPayload) => {
-        const { email, username, password } = payload
+        const { email, password } = payload
 
         if (!email) throw new Error('Email required')
 
         const { data, error } = await supabase.auth.signUp({
             email,
             password,
-            options: {
-                data: { username },
-                emailRedirectTo: `${window.location.origin}/#/email-verification`,
-            },
         })
 
         if (error) throw error

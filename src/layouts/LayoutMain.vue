@@ -1,9 +1,9 @@
 <script setup lang="ts">
 // import { ref } from 'vue'
 // import { Dark } from 'quasar'
-import { useStoreAuth } from 'stores/storeAuth'
+import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
-import handleError from 'src/utils/handleError'
+import handleErrorUtils from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
 
 const router = useRouter()
@@ -22,7 +22,7 @@ const handleSignOut = async () => {
 
         await router.push({ name: 'sign-in' })
     } catch (error) {
-        const message = handleError(error)
+        const message = handleErrorUtils(error)
         $q.notify({
             type: 'negative',
             message: message ?? 'Error signing out',
@@ -148,10 +148,12 @@ const handleSignOut = async () => {
     font-family: 'Streamster', sans-serif
     letter-spacing: 0.125rem
     line-height: 1
-    color: var(--q-primary)
+    color: $primary
+    transition: text-shadow 0.2s ease
+    will-change: text-shadow
 
-.title::before
-    display: none
+    &:hover
+        text-shadow: 0 0 0 rgba(255, 120, 0, 1), 0 0 6px rgba(255, 90, 0, 0.9), 0 0 10px rgba(255, 60, 0, 0)
 
 .header-icon
     color: var(--q-primary)

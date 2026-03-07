@@ -5,14 +5,14 @@ import { usePost } from 'src/composables/usePost'
 import ActionButton from 'components/ActionButton.vue'
 import { useGeolocation } from 'src/composables/useGeolocation'
 
-// Post
+// PostTypes
 const { post, handlePublishPost } = usePost()
 
 // Camera
 const {
     hasCameraSupport,
     imageCaptured,
-    pickerModel,
+    cameraModel,
     videoRef,
     canvasRef,
     initCamera,
@@ -77,7 +77,7 @@ onBeforeUnmount(() => {
 
                 <q-file
                     v-else
-                    v-model="pickerModel"
+                    v-model="cameraModel"
                     @update:model-value="getImageSrc"
                     dense
                     flat

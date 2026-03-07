@@ -6,7 +6,7 @@ export type SignInPayload = {
 export type SignUpPayload = {
     email: string
     password: string
-    username: string
+    username?: string
 }
 
 export type RequestPasswordResetPayload = {

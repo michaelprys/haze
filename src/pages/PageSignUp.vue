@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { useTemplateRef, reactive } from 'vue'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
-import { useStoreAuth } from 'stores/storeAuth'
-import type { SignUpPayload } from 'src/types/auth'
+import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
-import type { QForm } from 'quasar'
-import handleError from 'src/utils/handleError'
+import handleErrorUtils from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
+import type { SignUpPayload } from 'src/types/auth.types'
+import type { QForm } from 'quasar'
 
 // Common
 const router = useRouter(),
@@ -48,8 +48,8 @@ const handleSignUp = async () => {
     try {
         const payload: SignUpPayload = {
             email: formData.email,
-            username: formData.username,
             password: formData.password,
+            username: formData.username,
         }
 
         const response = await storeAuth.signUp(payload)
@@ -63,7 +63,7 @@ const handleSignUp = async () => {
             })
         }
     } catch (error) {
-        const message = handleError(error)
+        const message = handleErrorUtils(error)
 
         $q.notify({
             type: 'negative',

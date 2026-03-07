@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { supabase } from 'src/utils/supabaseClient'
-import type { PostPayload } from 'src/types/post'
+import { supabase } from 'src/api/supabaseClient'
+import type { PostPayload } from 'src/types/post.types'
 
 export const useStorePosts = defineStore('storePosts', () => {
     const publishPost = async (draftPost: PostPayload) => {
@@ -13,7 +13,7 @@ export const useStorePosts = defineStore('storePosts', () => {
 
         if (!user) throw new Error('Not authenticated')
 
-        // Upload to bucket
+        // Upload to 'posts' bucket
         const { data: storageData, error: storageError } = await supabase.storage
             .from('post-media')
             .upload(draftPost.uniqueFileName, draftPost.photoFile, {
@@ -25,8 +25,9 @@ export const useStorePosts = defineStore('storePosts', () => {
         // Get image url
         const {
             data: { publicUrl },
-        } = supabase.storage.from('post-media').getPublicUrl(storageData.path)
+        } = supabase.storage.from('post-media').getPublicUrl(storageData?.path)
 
+        // Insert post
         const post = {
             user_id: user.id,
             caption: draftPost.caption,
@@ -35,7 +36,6 @@ export const useStorePosts = defineStore('storePosts', () => {
             taken_at: draftPost.takenAt,
         }
 
-        // Insert post
         const { error: postError } = await supabase.from('posts').insert(post)
 
         if (postError) throw postError

@@ -1,17 +1,17 @@
 import { ref } from 'vue'
-import type { Post } from 'src/types/post'
-import handleError from 'src/utils/handleError'
+import type { PostTypes } from 'src/types/post.types'
+import handleErrorUtils from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
-import { useStorePosts } from 'stores/storePosts'
+import { useStorePosts } from 'stores/posts.store'
 import { useQuasar } from 'quasar'
-import { generateUniqueFileName } from 'src/utils/generateUniqueFileName'
+import { generateFileName } from 'src/utils/generateFileName.utils'
 
 export const usePost = () => {
     const router = useRouter(),
         storePosts = useStorePosts(),
         $q = useQuasar()
 
-    const post = ref<Post>({
+    const post = ref<PostTypes>({
         caption: '',
         location: '',
         photoFile: null,
@@ -31,7 +31,7 @@ export const usePost = () => {
             await storePosts.publishPost({
                 ...post.value,
                 photoFile: post.value.photoFile,
-                uniqueFileName: generateUniqueFileName(post.value.photoFile),
+                uniqueFileName: generateFileName(post.value.photoFile),
             })
 
             $q.notify({
@@ -48,7 +48,7 @@ export const usePost = () => {
 
             await router.push({ name: 'home' })
         } catch (error) {
-            const message = handleError(error)
+            const message = handleErrorUtils(error)
 
             $q.notify({
                 type: 'negative',
@@ -59,7 +59,7 @@ export const usePost = () => {
 
     return {
         post,
-        generateUniqueFileName,
+        generateUniqueFileName: generateFileName,
         handlePublishPost,
     }
 }

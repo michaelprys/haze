@@ -1,6 +1,14 @@
 <script setup lang="ts">
 import { date } from 'quasar'
+import { ref, watchEffect } from 'vue'
 import ActionButton from 'components/ActionButton.vue'
+// import type { PostTypes } from 'src/types/post.types'
+import { useQuasar } from 'quasar'
+import { useStoreProfile } from 'stores/userData.store'
+import handleError from 'src/utils/handleError.utils'
+
+const $q = useQuasar()
+const storeProfile = useStoreProfile()
 
 // Posts
 const posts = [
@@ -23,6 +31,34 @@ const posts = [
 const formattedDate = (value: number) => {
     return date.formatDate(value, 'MMMM D, h:mm A')
 }
+
+const avatarSrc = ref('https://cdn.quasar.dev/img/boy-avatar.png')
+const avatarModel = ref<File | null>(null)
+
+const handleUpdateAvatar = async () => {
+    try {
+        await storeProfile.updateAvatar(avatarModel.value)
+
+        const timestamp = Date.now()
+        avatarSrc.value = `${storeProfile.currentAvatarUrl || 'https://cdn.quasar.dev/img/boy-avatar.png'}?t=${timestamp}`
+
+        $q.notify({
+            type: 'positive',
+            message: 'Avatar updated successfully',
+        })
+    } catch (error) {
+        const message = handleError(error)
+
+        $q.notify({
+            type: 'negative',
+            message: message ?? 'Error uploading avatar',
+        })
+    }
+}
+
+watchEffect(() => {
+    console.log(avatarModel)
+})
 </script>
 
 <template>
@@ -69,9 +105,20 @@ const formattedDate = (value: number) => {
             <div class="profile large-screen-only">
                 <q-card class="profile-card" flat bordered>
                     <q-card-section class="text-center">
-                        <q-avatar size="90px" class="q-mb-md">
-                            <img src="https://cdn.quasar.dev/img/boy-avatar.png" />
-                        </q-avatar>
+                        <div class="avatar-wrapper">
+                            <q-avatar size="90px">
+                                <q-img :src="avatarSrc" alt="Profile picture" />
+                            </q-avatar>
+
+                            <q-file
+                                v-model="avatarModel"
+                                @update:model-value="handleUpdateAvatar"
+                                class="avatar-overlay"
+                                flat
+                            >
+                                <q-icon name="edit" class="overlay-icon"
+                            /></q-file>
+                        </div>
 
                         <div class="profile-name">MichaelPrys</div>
                         <div class="profile-sub">Traveller</div>
@@ -150,6 +197,60 @@ const formattedDate = (value: number) => {
     font-size: 0.75rem
     margin-top: 0.25rem
 
+.avatar-wrapper
+    position: relative
+    display: inline-block
+    cursor: pointer
+
+    .avatar-overlay
+        position: absolute
+        inset: 0
+        border-radius: 50%
+        display: flex
+        align-items: center
+        justify-content: center
+        background: linear-gradient(135deg, rgba(255, 154, 0, 0.35), rgba(255, 94, 0, 0.35))
+        opacity: 0
+        transition: opacity 0.3s ease
+
+    .overlay-icon
+        font-size: 22px
+        color: white
+        transform: scale(0.9)
+        transition: transform 0.25s ease
+
+    &::before
+        content: ""
+        position: absolute
+        inset: -4px
+        border-radius: 50%
+        padding: 3px
+        background: conic-gradient(from 0deg, #ff9a00, #ff6a00, #ffb347, #ff7a18, #ff9a00)
+        -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 100%)
+        mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 100%)
+        opacity: 0
+        transition: opacity 0.35s ease
+        animation: lava-spin 6s linear infinite
+
+    &:hover
+        .avatar-overlay
+            opacity: 1
+
+        .overlay-icon
+            transform: scale(1)
+
+        &::before
+            opacity: 1
+
+@keyframes lava-spin
+    from
+        transform: rotate(0deg)
+    to
+        transform: rotate(360deg)
+
+.overlay-btn
+    color: white
+
 .profile-card
     background-color: #121212
     border-radius: 20px
@@ -159,6 +260,7 @@ const formattedDate = (value: number) => {
 .profile-name
     font-weight: bold
     color: #ffffff
+    margin-top: 1rem
 
 .profile-sub
     color: #aaa

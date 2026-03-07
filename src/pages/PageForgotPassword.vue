@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
-import { useStoreAuth } from 'stores/storeAuth'
+import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
-import type { RequestPasswordResetPayload } from 'src/types/auth'
-import handleError from 'src/utils/handleError'
+import type { RequestPasswordResetPayload } from 'src/types/auth.types'
+import handleErrorUtils from 'src/utils/handleError.utils'
 
 const $q = useQuasar(),
     storeAuth = useStoreAuth(),
@@ -45,7 +45,7 @@ const handleRequestPasswordReset = async () => {
 
         startTimer()
     } catch (error) {
-        const message = handleError(error)
+        const message = handleErrorUtils(error)
 
         $q.notify({
             type: 'negative',

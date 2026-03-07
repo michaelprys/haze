@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { reactive } from 'vue'
-import { useStoreAuth } from 'stores/storeAuth'
-import handleError from 'src/utils/handleError'
+import { useStoreAuth } from 'stores/auth.store'
+import handleErrorUtils from 'src/utils/handleError.utils'
 import { useQuasar } from 'quasar'
 import { useRouter } from 'vue-router'
 
@@ -28,7 +28,7 @@ const handleResetPassword = async () => {
 
         await router.push({ name: 'sign-in' })
     } catch (error) {
-        const message = handleError(error)
+        const message = handleErrorUtils(error)
 
         $q.notify({
             type: 'negative',

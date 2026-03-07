@@ -1,4 +1,4 @@
-export type Post = {
+export type PostTypes = {
     caption: string
     location: string
     photoFile: Blob | File | null
@@ -6,7 +6,7 @@ export type Post = {
     takenAt: string
 }
 
-export type PostPayload = Post & {
+export type PostPayload = PostTypes & {
     photoFile: Blob | File
     uniqueFileName: string
 }

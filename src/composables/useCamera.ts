@@ -1,13 +1,13 @@
 import { ref } from 'vue'
 import type { Ref } from 'vue'
-import type { Post } from 'src/types/post'
+import type { PostTypes } from 'src/types/post.types'
 
-export const useCamera = (post: Ref<Post>) => {
+export const useCamera = (post: Ref<PostTypes>) => {
     const hasCameraSupport = ref(true),
         isCameraInitializing = ref(true),
         imageCaptured = ref(false),
         imagePicked = ref(false),
-        pickerModel = ref<File | null>(null),
+        cameraModel = ref<File | null>(null),
         videoRef = ref<HTMLVideoElement | null>(null),
         canvasRef = ref<HTMLCanvasElement | null>(null)
 
@@ -70,7 +70,7 @@ export const useCamera = (post: Ref<Post>) => {
         deactivateCamera()
     }
 
-    const getImageSrc = (file: Post['photoFile']) => {
+    const getImageSrc = (file: PostTypes['photoFile']) => {
         if (!file) return null
         post.value.photoUrl = URL.createObjectURL(file)
         post.value.photoFile = file
@@ -92,7 +92,7 @@ export const useCamera = (post: Ref<Post>) => {
         isCameraInitializing,
         imageCaptured,
         imagePicked,
-        pickerModel,
+        cameraModel,
         videoRef,
         canvasRef,
         initCamera,
