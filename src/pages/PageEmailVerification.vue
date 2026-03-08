@@ -68,10 +68,10 @@ const goToSignIn = () => router.push({ name: 'sign-in' })
     align-items: center
 
 .message
-    margin-top: 12px
+    margin-top: 0.75rem
     font-size: 0.9rem
     color: #aaa
-    max-width: 280px
+    max-width: 17.5rem
 
 .success
     .message

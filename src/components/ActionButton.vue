@@ -17,7 +17,7 @@ defineProps({
     background-size: 400% 400%
     color: white
     font-weight: 600
-    border-radius: 999px
+    border-radius: 62.4375rem
     animation: gtaGradient 5s ease infinite
 
 @keyframes gtaGradient

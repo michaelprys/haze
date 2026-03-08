@@ -8,26 +8,9 @@
 body
     font-family: 'Courier New', sans-serif
 
-.q-page
-    //background: linear-gradient(180deg, #1a1410 0%, #24160f 55%, #181818 100%)
-
-img 
+img
     display: block
 
-.small-screen-only
-    @media (width <= $breakpoint-xs-max)
-        display: block
-    
-    @media (width >= $breakpoint-sm-min)
-        display: none
-    
-.large-screen-only
-    @media (width <= $breakpoint-xs-max)
-        display: none
-    
-    @media (width >= $breakpoint-sm-min)
-        display: block
-    
 .container
     max-width: 60.9375rem
     margin: 0 auto
@@ -40,3 +23,18 @@ img
 .fade-enter-from,
 .fade-leave-to
     opacity: 0
+
+
+.small-screen-only
+    @media (width <= $breakpoint-xs-max)
+        display: block
+
+    @media (width >= $breakpoint-sm-min)
+        display: none
+
+.large-screen-only
+    @media (width <= $breakpoint-xs-max)
+        display: none
+
+    @media (width >= $breakpoint-sm-min)
+        display: block

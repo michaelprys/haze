@@ -57,44 +57,44 @@ defineProps<{
 .logo-glow
     display: inline-flex
     background: rgba(255, 149, 0, 0.1)
-    border-radius: 20px
-    box-shadow: 0 0 15px rgba(255, 149, 0, 0.4)
+    border-radius: 1.25rem
+    box-shadow: 0 0 0.9375rem rgba(255, 149, 0, 0.4)
 
 .logo-image
     width: 5rem
     height: 5rem
-    margin-top: 5px
-    margin-left: 1px
+    margin-top: 0.3125rem
+    margin-left: 0.0625rem
 
 .auth-card
     width: 100%
     background-color: #121212
-    border-radius: 20px
+    border-radius: 1.25rem
     border: 1px solid rgba(255, 120, 0, 0.15)
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6)
+    box-shadow: 0 0.9375rem 2.5rem rgba(0, 0, 0, 0.6)
 
 .bottom-text
     color: #777
     font-size: 0.85rem
 
 :global(.auth-button)
-    height: 44px
-    border-radius: 12px
+    height: 2.75rem
+    border-radius: 0.75rem
     font-weight: 600
-    letter-spacing: 0.5px
+    letter-spacing: 0.03125rem
     background: linear-gradient(135deg, #ff9500, #ff3a00)
-    box-shadow: 0 8px 20px rgba(255, 80, 0, 0.35)
+    box-shadow: 0 0.5rem 1.25rem rgba(255, 80, 0, 0.35)
     transition: all 0.25s ease
 
 :global(.auth-button:hover)
-    box-shadow: 0 12px 28px rgba(255, 80, 0, 0.5)
+    box-shadow: 0 0.75rem 1.75rem rgba(255, 80, 0, 0.5)
 
 
 :global(.auth-link)
     color: #ff6d00
     font-weight: 600
     cursor: pointer
-    margin-left: 4px
+    margin-left: 0.25rem
     transition: 0.2s
     text-decoration: none
 

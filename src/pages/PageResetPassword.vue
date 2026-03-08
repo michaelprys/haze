@@ -95,11 +95,10 @@ const handleResetPassword = async () => {
     color: #ff9500
     font-size: 0.75rem
 
-
 .auth-input
     :deep(.q-field__control)
         background: rgba(255, 255, 255, 0.02)
-        border-radius: 12px
+        border-radius: 0.75rem
 
     :deep(.q-field__label)
         color: #aaa

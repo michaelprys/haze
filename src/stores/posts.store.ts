@@ -1,17 +1,14 @@
 import { defineStore } from 'pinia'
 import { supabase } from 'src/api/supabaseClient'
-import type { PostPayload } from 'src/types/post.types'
+import type { PostPayload, PostApi } from 'src/types/post.types'
+import { getCurrentUser } from 'src/api/auth'
 
 export const useStorePosts = defineStore('storePosts', () => {
     const publishPost = async (draftPost: PostPayload) => {
         if (!draftPost.photoFile) throw new Error('File not found')
 
         // Get user session
-        const {
-            data: { user },
-        } = await supabase.auth.getUser()
-
-        if (!user) throw new Error('Not authenticated')
+        const user = await getCurrentUser()
 
         // Upload to 'posts' bucket
         const { data: storageData, error: storageError } = await supabase.storage
@@ -41,5 +38,16 @@ export const useStorePosts = defineStore('storePosts', () => {
         if (postError) throw postError
     }
 
-    return { publishPost }
+    // Fetch posts
+    const loadPosts = async (): Promise<PostApi[]> => {
+        const user = await getCurrentUser()
+
+        const { data, error } = await supabase.from('posts').select('*').eq('user_id', user.id)
+
+        if (error) throw error
+
+        return data
+    }
+
+    return { publishPost, loadPosts }
 })

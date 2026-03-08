@@ -1,12 +1,12 @@
 import type { Location } from 'src/types/location.types'
 import type { Ref } from 'vue'
-import type { PostTypes } from 'src/types/post.types'
+import type { Post } from 'src/types/post.types'
 import { api } from 'boot/axios'
 import { computed, ref } from 'vue'
 import { delay } from 'src/utils/delay.utils'
 import { useQuasar } from 'quasar'
 
-export const useGeolocation = (post: Ref<PostTypes>) => {
+export const useGeolocation = (post: Ref<Post>) => {
     const locationPending = ref(false),
         latitude = ref<number | null>(null),
         longitude = ref<number | null>(null),

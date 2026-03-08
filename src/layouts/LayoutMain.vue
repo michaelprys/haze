@@ -115,10 +115,10 @@ const handleSignOut = async () => {
     display: flex
     justify-content: center
     align-items: center
-    min-height: 5rem !important
-    background: var(--q-dark)
+    min-height: 5rem
+    background: $dark
     backdrop-filter: blur(0.75rem)
-    border-bottom: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
+    border-bottom: 0.0625rem solid rgba(var(--q-primary), 0.2)
 
 .app-header .q-toolbar
     min-height: 4rem
@@ -132,8 +132,8 @@ const handleSignOut = async () => {
     transform: scale(1.05)
 
 .logo-btn
-    padding: 0.25rem !important
-    min-width: auto !important
+    padding: 0.25rem
+    min-width: auto
 
 .logo-btn img
     margin-left: 0.1875rem
@@ -153,24 +153,24 @@ const handleSignOut = async () => {
     will-change: text-shadow
 
     &:hover
-        text-shadow: 0 0 0 rgba(255, 120, 0, 1), 0 0 6px rgba(255, 90, 0, 0.9), 0 0 10px rgba(255, 60, 0, 0)
+        text-shadow: 0 0 0 rgba(255, 120, 0, 1), 0 0 0.375rem rgba(255, 90, 0, 0.9), 0 0 0.625rem rgba(255, 60, 0, 0)
 
 .header-icon
-    color: var(--q-primary)
+    color: $primary
 
 .page-container
     background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%)
     min-height: 100vh
 
 .app-footer
-    background: var(--q-dark)
+    background: $dark
     backdrop-filter: blur(0.75rem)
     border-top: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
 
 .no-hover-effect
     .q-focus-helper
-        display: none !important
+        display: none
 
     &:hover
-        background: transparent !important
+        background-color: transparent
 </style>

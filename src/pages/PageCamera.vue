@@ -5,12 +5,14 @@ import { usePost } from 'src/composables/usePost'
 import ActionButton from 'components/ActionButton.vue'
 import { useGeolocation } from 'src/composables/useGeolocation'
 
-// PostTypes
+// Post
 const { post, handlePublishPost } = usePost()
 
 // Camera
 const {
     hasCameraSupport,
+    isCameraInitializing,
+    isCameraActive,
     imageCaptured,
     cameraModel,
     videoRef,
@@ -18,12 +20,21 @@ const {
     initCamera,
     captureImage,
     deactivateCamera,
+    resumeCamera,
     getImageSrc,
     checkDevice,
 } = useCamera(post)
 
+// Camera loading
+
 const onDeviceChange = () => {
-    void checkDevice()
+    isCameraInitializing.value = true
+    deactivateCamera()
+    void checkDevice().finally(() => (isCameraInitializing.value = false))
+}
+
+const handleDeviceChange = () => {
+    void onDeviceChange()
 }
 
 // Geolocation
@@ -33,11 +44,11 @@ const { locationPending, hasGeolocation, getLocation } = useGeolocation(post)
 onMounted(() => {
     void initCamera()
 
-    navigator.mediaDevices.addEventListener('devicechange', onDeviceChange)
+    navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange)
 })
 
 onBeforeUnmount(() => {
-    navigator.mediaDevices.removeEventListener('devicechange', onDeviceChange)
+    navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange)
 
     if (hasCameraSupport.value) {
         deactivateCamera()
@@ -50,30 +61,60 @@ onBeforeUnmount(() => {
         <q-card class="post-card q-pa-lg">
             <div class="camera-wrapper">
                 <div class="camera-frame">
-                    <video
-                        v-show="!imageCaptured && hasCameraSupport"
-                        ref="videoRef"
-                        autoplay
-                        playsinline
-                        class="camera-shot"
-                    />
+                    <div class="camera-frame">
+                        <q-skeleton
+                            v-if="isCameraInitializing"
+                            class="camera-skeleton"
+                            animation="wave"
+                        />
 
-                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
+                        <video
+                            v-show="isCameraActive && !imageCaptured"
+                            ref="videoRef"
+                            autoplay
+                            playsinline
+                            class="camera-shot"
+                        />
+                        <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
 
-                    <div v-show="!hasCameraSupport" class="camera-placeholder" />
+                        <q-img
+                            v-if="!hasCameraSupport && post.photoUrl"
+                            :src="post.photoUrl"
+                            class="camera-shot"
+                            fit="cover"
+                            loading="eager"
+                        />
+
+                        <div
+                            v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
+                            class="camera-placeholder"
+                        />
+                    </div>
                 </div>
             </div>
 
             <div class="text-center q-mt-lg">
-                <q-btn
-                    v-if="hasCameraSupport"
-                    round
-                    icon="camera_alt"
-                    size="lg"
-                    class="camera-btn"
-                    unelevated
-                    @click="captureImage"
-                />
+                <div v-if="hasCameraSupport">
+                    <q-btn
+                        v-if="hasCameraSupport && !imageCaptured"
+                        round
+                        icon="camera_alt"
+                        size="lg"
+                        class="camera-btn"
+                        unelevated
+                        @click="captureImage"
+                    />
+
+                    <q-btn
+                        v-else-if="imageCaptured"
+                        round
+                        icon="replay"
+                        size="lg"
+                        class="camera-btn"
+                        unelevated
+                        @click="resumeCamera"
+                    />
+                </div>
 
                 <q-file
                     v-else
@@ -95,6 +136,7 @@ onBeforeUnmount(() => {
                 dense
                 dark
                 outlined
+                type="textarea"
                 class="q-mt-lg input-style"
             />
 
@@ -153,7 +195,7 @@ onBeforeUnmount(() => {
     max-width: 35rem
     margin: 0 auto
     background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%)
-    box-shadow:  0 14px 40px rgba(0, 0, 0, 0.8),  0 0 0 1px rgba(255, 140, 0, 0.08)
+    box-shadow:  0 0.875rem 2.5rem rgba(0, 0, 0, 0.8),  0 0 0 0.0625rem rgba(255, 140, 0, 0.08)
 
 .camera-shot
     position: absolute
@@ -171,13 +213,16 @@ onBeforeUnmount(() => {
     background: linear-gradient(to bottom right, #4b0082, #9c0f5f, #c71585, #ff4500)
     overflow: hidden
 
+.camera-skeleton
+    height: 100%
+
 .post-image
     width: 100%
     border-radius: 1.5rem
     max-height: 25rem
 
 .camera-btn
-    background: linear-gradient(135deg, rgba(255, 122, 0, 0.8), rgba(255, 60, 0, 0.8)) !important
+    background: linear-gradient(135deg, rgba(255, 122, 0, 0.8), rgba(255, 60, 0, 0.8))
     color: white
     transition: transform 0.2s ease
 
@@ -185,18 +230,18 @@ onBeforeUnmount(() => {
         transform: scale(1.1)
 
 .image-link
-    max-width: 220px
+    max-width: 13.75rem
     align-items: center
     .q-field__native
         display: none
 
     .q-field__control::before,
     .q-field__control::after
-        display: none !important
+        display: none
 
     .q-field__control
-        background: transparent !important
-        box-shadow: none !important
+        background: transparent
+        box-shadow: none
         padding: 0
         min-height: auto
 
@@ -209,7 +254,7 @@ onBeforeUnmount(() => {
     letter-spacing: 0.05em
     color: #ff9a3c
     transition: all 0.25s ease
-    text-shadow: 0 0 6px rgba(255, 122, 0, 0.35)
+    text-shadow: 0 0 0.375rem rgba(255, 122, 0, 0.35)
 
     &:hover
         color: #ffb15c
@@ -225,13 +270,30 @@ onBeforeUnmount(() => {
 
     .q-field__control::before,
     .q-field__control::after
-        border-color: rgba(255, 154, 60, 0.3) !important
+        border-color: rgba(255, 154, 60, 0.3)
+
+    textarea
+        scrollbar-width: thin
+        scrollbar-color: rgba(255,154,60,0.45) transparent
+
+        &::-webkit-scrollbar
+            width: 0.375rem
+
+        &::-webkit-scrollbar-track
+            background: transparent
+
+        &::-webkit-scrollbar-thumb
+            background: rgba(255,154,60,0.45)
+            border-radius: 62.4375rem
+
+        &::-webkit-scrollbar-thumb:hover
+            background: rgba(255,154,60,0.7)
 
 .post-btn
-    background: linear-gradient(90deg, #ff7a00, #ff3c00, #000) !important
+    background: linear-gradient(90deg, #ff7a00, #ff3c00, #000)
     color: white
     font-weight: 700
-    border-radius: 999px
+    border-radius: 62.4375rem
     letter-spacing: 0.0625rem
     text-transform: uppercase
     transition: all 0.3s ease

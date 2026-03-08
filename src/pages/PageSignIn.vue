@@ -131,7 +131,7 @@ const handleSignIn = async () => {
 .auth-input
     :deep(.q-field__control)
         background: rgba(255, 255, 255, 0.02)
-        border-radius: 12px
+        border-radius: 0.75rem
 
     :deep(.q-field__label)
         color: #aaa

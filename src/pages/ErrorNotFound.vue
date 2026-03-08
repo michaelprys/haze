@@ -1,18 +1,39 @@
 <script setup lang="ts"></script>
 
 <template>
-    <div class="auth-container fullscreen flex flex-center text-center">
+    <section class="section flex flex-center text-center">
         <div>
             <div class="text-h1">404</div>
 
-            <div class="text-subtitle1 q-mt-sm" style="opacity: 0.7">Page not found</div>
+            <div class="text-subtitle1 q-mt-sm" style="opacity: 0.7">
+                the void remembers nothing
+            </div>
 
-            <q-btn class="q-mt-xl auth-button" label="Go Home" no-caps :to="{ name: 'home' }" />
+            <q-btn
+                class="q-mt-xl auth-button"
+                color="primary"
+                outline
+                label="Return"
+                no-caps
+                :to="{ name: 'home' }"
+            />
         </div>
-    </div>
+
+        <div class="bg"></div>
+    </section>
 </template>
 
 <style scoped lang="sass">
-.auth-container
-    background-color: transparent
+.section
+    position: relative
+    min-height: 100svh
+
+.bg
+    position: absolute
+    inset: 0
+    pointer-events: none
+    background-image: url('src/assets/cosmos.avif')
+    opacity: 0.2
+    filter: contrast(2) grayscale(1)
+    background-size: cover
 </style>

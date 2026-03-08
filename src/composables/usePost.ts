@@ -1,5 +1,5 @@
 import { ref } from 'vue'
-import type { PostTypes } from 'src/types/post.types'
+import type { Post } from 'src/types/post.types'
 import handleErrorUtils from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
 import { useStorePosts } from 'stores/posts.store'
@@ -11,7 +11,8 @@ export const usePost = () => {
         storePosts = useStorePosts(),
         $q = useQuasar()
 
-    const post = ref<PostTypes>({
+    const post = ref<Post>({
+        id: '',
         caption: '',
         location: '',
         photoFile: null,
@@ -22,7 +23,7 @@ export const usePost = () => {
         if (!post.value.photoFile) {
             $q.notify({
                 type: 'negative',
-                message: `Please add a ${hasCameraSupport ? 'photo' : 'image'} before publishing`,
+                message: `Please ${hasCameraSupport ? 'take a photo' : 'add an image'} before publishing`,
             })
             return
         }
@@ -40,9 +41,11 @@ export const usePost = () => {
             })
 
             post.value = {
+                id: '',
                 caption: '',
                 location: '',
                 photoFile: null,
+                photoUrl: '',
                 takenAt: new Date().toISOString(),
             }
 
