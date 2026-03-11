@@ -55,7 +55,7 @@ const goToSignIn = () => router.push({ name: 'sign-in' })
     </div>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .callback-content
     display: flex
     flex-direction: column

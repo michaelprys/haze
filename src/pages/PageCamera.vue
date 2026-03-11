@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted } from 'vue'
 import { useCamera } from 'src/composables/useCamera'
 import { usePost } from 'src/composables/usePost'
-import ActionButton from 'components/ActionButton.vue'
+import ButtonActive from 'components/ButtonActive.vue'
 import { useGeolocation } from 'src/composables/useGeolocation'
 
 // Post
@@ -57,38 +57,43 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-    <q-page class="haze-bg q-pa-md">
+    <q-page class="haze-bg q-pa-md relative">
         <q-card class="post-card q-pa-lg">
             <div class="camera-wrapper">
                 <div class="camera-frame">
-                    <div class="camera-frame">
-                        <q-skeleton
-                            v-if="isCameraInitializing"
-                            class="camera-skeleton"
-                            animation="wave"
-                        />
+                    <q-skeleton
+                        v-if="isCameraInitializing"
+                        class="camera-skeleton"
+                        animation="wave"
+                    />
 
-                        <video
-                            v-show="isCameraActive && !imageCaptured"
-                            ref="videoRef"
-                            autoplay
-                            playsinline
-                            class="camera-shot"
-                        />
-                        <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
+                    <video
+                        v-show="isCameraActive && !imageCaptured"
+                        ref="videoRef"
+                        autoplay
+                        playsinline
+                        class="camera-shot"
+                    />
+                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
 
-                        <q-img
-                            v-if="!hasCameraSupport && post.photoUrl"
-                            :src="post.photoUrl"
-                            class="camera-shot"
-                            fit="cover"
-                            loading="eager"
-                        />
+                    <q-img
+                        v-if="!hasCameraSupport && post.photoUrl"
+                        :src="post.photoUrl"
+                        class="camera-shot"
+                        fit="cover"
+                        loading="eager"
+                    />
 
-                        <div
-                            v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
-                            class="camera-placeholder"
-                        />
+                    <div
+                        v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
+                        class="camera-placeholder"
+                    >
+                        <div class="placeholder-wrapper">
+                            <span class="placeholder-title">
+                                turn on your camera, or add a memory <br />
+                            </span>
+                            <span class="placeholder-subtitle"> to capture the moment... </span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -122,10 +127,10 @@ onBeforeUnmount(() => {
                     @update:model-value="getImageSrc"
                     dense
                     flat
-                    class="image-link"
+                    class="memory-link"
                 >
                     <template #default>
-                        <span class="image-link-text">+ add image</span>
+                        <span class="memory-link-text">+ add memory</span>
                     </template>
                 </q-file>
             </div>
@@ -166,15 +171,15 @@ onBeforeUnmount(() => {
             </q-input>
 
             <div class="q-mt-xl">
-                <ActionButton @click="handlePublishPost(hasCameraSupport)" label="Publish" />
+                <ButtonActive @click="handlePublishPost(hasCameraSupport)" label="Publish" />
             </div>
         </q-card>
     </q-page>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .haze-bg
-    min-height: 100vh
+    min-height: 100svh
     display: flex
     justify-content: center
     align-items: flex-start
@@ -182,7 +187,7 @@ onBeforeUnmount(() => {
 
 .post-card
     border-radius: 1.5rem
-    box-shadow: 0 1.25rem 3.75rem rgba(0, 0, 0, 0.6)
+    box-shadow: 0 1.25rem 1.75rem rgba(0, 0, 0, 0.3)
     width: 100%
     max-width: 45rem
 
@@ -204,14 +209,35 @@ onBeforeUnmount(() => {
     object-fit: cover
 
 .camera-placeholder
+    display: grid
+    place-items: center
     position: absolute
     inset: 0
     z-index: 0
     object-fit: cover
     width: 100%
     height: 100%
-    background: linear-gradient(to bottom right, #4b0082, #9c0f5f, #c71585, #ff4500)
+    background: linear-gradient(145deg, #4b0082 0%, #9c0f5f 35%, #c71585 70%, #ff4500 100%)
+    background-blend-mode: overlay
     overflow: hidden
+
+.placeholder-wrapper
+    display: flex
+    flex-direction: column
+    align-items: flex-end
+    margin-right: 1.5rem
+    font-style: italic
+    font-family: 'Georgia', 'Times New Roman', serif
+    font-weight: 400
+    font-size: 1.05rem
+    letter-spacing: 0.025em
+    line-height: 1.45
+    color: #fff7df
+
+.placeholder-subtitle
+    margin-right: -1.5rem
+    font-size: 0.9rem
+    opacity: 0.85
 
 .camera-skeleton
     height: 100%
@@ -229,7 +255,7 @@ onBeforeUnmount(() => {
     &:hover
         transform: scale(1.1)
 
-.image-link
+:deep(.memory-link)
     max-width: 13.75rem
     align-items: center
     .q-field__native
@@ -245,7 +271,7 @@ onBeforeUnmount(() => {
         padding: 0
         min-height: auto
 
-.image-link-text
+.memory-link-text
     display: flex
     align-items: center
     cursor: pointer
@@ -260,7 +286,7 @@ onBeforeUnmount(() => {
         color: #ffb15c
         text-shadow: 0 0
 
-.input-style
+:deep(.input-style)
     .q-field__control
         background: #1b1b1b
         border-radius: 0.875rem
@@ -297,4 +323,8 @@ onBeforeUnmount(() => {
     letter-spacing: 0.0625rem
     text-transform: uppercase
     transition: all 0.3s ease
+
+@media(width <= $breakpoint-sm-min)
+    .placeholder-wrapper
+        font-size: 0.7rem
 </style>

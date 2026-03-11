@@ -1,6 +1,6 @@
 import { ref } from 'vue'
 import type { Post } from 'src/types/post.types'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
 import { useStorePosts } from 'stores/posts.store'
 import { useQuasar } from 'quasar'
@@ -51,7 +51,7 @@ export const usePost = () => {
 
             await router.push({ name: 'home' })
         } catch (error) {
-            const message = handleErrorUtils(error)
+            const message = handleError(error)
 
             $q.notify({
                 type: 'negative',

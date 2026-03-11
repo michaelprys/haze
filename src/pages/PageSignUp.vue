@@ -3,7 +3,7 @@ import { useTemplateRef, reactive } from 'vue'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
 import type { SignUpPayload } from 'src/types/auth.types'
 import type { QForm } from 'quasar'
@@ -32,8 +32,9 @@ const handleSignUp = async () => {
     if (!success) {
         $q.notify({
             type: 'negative',
-            message: '',
+            message: 'Please fill out the form correctly',
         })
+        return
     }
 
     if (formData.password !== formData.confirmPassword) {
@@ -41,29 +42,28 @@ const handleSignUp = async () => {
             type: 'positive',
             message: "Passwords don't match",
         })
+        return
     }
-
-    await router.push({ name: 'sign-in' })
 
     try {
         const payload: SignUpPayload = {
             email: formData.email,
-            password: formData.password,
             username: formData.username,
+            password: formData.password,
         }
 
-        const response = await storeAuth.signUp(payload)
+        await storeAuth.signUp(payload)
 
-        if (response) {
-            $q.notify({
-                type: 'positive',
-                message: 'Signed up successfully! Please check your inbox and confirm email',
-                timeout: 6000,
-                icon: 'mail',
-            })
-        }
+        $q.notify({
+            type: 'positive',
+            message: 'Signed up successfully! Please check your inbox and confirm email',
+            timeout: 6000,
+            icon: 'mail',
+        })
+
+        await router.push({ name: 'sign-in' })
     } catch (error) {
-        const message = handleErrorUtils(error)
+        const message = handleError(error)
 
         $q.notify({
             type: 'negative',
@@ -160,7 +160,7 @@ const handleSignUp = async () => {
     </div>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .auth-input
     :deep(.q-field__control)
         background: rgba(255, 255, 255, 0.02)

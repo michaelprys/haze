@@ -5,11 +5,13 @@ import type { SignInPayload } from 'src/types/auth.types'
 import { useQuasar } from 'quasar'
 import { useTemplateRef, reactive } from 'vue'
 import type { QForm } from 'quasar'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
+import { useRoute } from 'vue-router'
 
 // Common
 const router = useRouter(),
+    route = useRoute(),
     $q = useQuasar(),
     storeAuth = useStoreAuth()
 
@@ -49,10 +51,15 @@ const handleSignIn = async () => {
                 timeout: 3000,
                 icon: 'mail',
             })
-            await router.push({ name: 'home' })
+
+            if (route.query.next) {
+                await router.push(route.query.next as string)
+            } else {
+                await router.push({ name: 'home' })
+            }
         }
     } catch (error) {
-        const message = handleErrorUtils(error)
+        const message = handleError(error)
 
         $q.notify({
             type: 'negative',
@@ -123,7 +130,7 @@ const handleSignIn = async () => {
     </div>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .forgot-btn
     color: #ff9500
     font-size: 0.75rem

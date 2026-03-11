@@ -30,5 +30,3 @@ const resendVerification = () => {
         </LayoutAuth>
     </div>
 </template>
-
-<style scoped lang="sass"></style>

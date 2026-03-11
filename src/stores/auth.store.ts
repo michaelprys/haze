@@ -7,7 +7,7 @@ import type {
 } from 'src/types/auth.types'
 import { computed, ref } from 'vue'
 import type { User } from '@supabase/supabase-js'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 
 export const useStoreAuth = defineStore('storeAuth', () => {
     const user = ref<User | null>(null)
@@ -20,7 +20,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
             user.value = authState.user ?? null
         })
         .catch((error) => {
-            const message = handleErrorUtils(error)
+            const message = handleError(error)
             console.error('LayoutAuth check failed: ', message)
             user.value = null
         })
@@ -30,18 +30,23 @@ export const useStoreAuth = defineStore('storeAuth', () => {
     })
 
     const signUp = async (payload: SignUpPayload) => {
-        const { email, password } = payload
+        const { email, username, password } = payload
 
         if (!email) throw new Error('Email required')
 
-        const { data, error } = await supabase.auth.signUp({
+        const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
             email,
             password,
+            options: {
+                data: {
+                    username: username ?? null,
+                },
+            },
         })
 
-        if (error) throw error
+        if (signUpError) throw new Error(signUpError.message)
 
-        return data
+        return signUpData
     }
 
     const signIn = async (payload: SignInPayload) => {
@@ -55,6 +60,8 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         })
 
         if (error) throw error
+
+        console.log(isAuthenticated.value)
 
         return data
     }

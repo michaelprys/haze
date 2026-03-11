@@ -5,11 +5,17 @@ const routes: RouteRecordRaw[] = [
         path: '/',
         component: () => import('layouts/LayoutMain.vue'),
         children: [
-            { path: '', name: 'home', component: () => import('pages/PageHome.vue') },
+            {
+                path: '',
+                name: 'home',
+                component: () => import('pages/PageHome.vue'),
+                meta: { requiresAuth: true },
+            },
             {
                 path: 'camera-page',
                 name: 'camera-page',
                 component: () => import('pages/PageCamera.vue'),
+                meta: { requiresAuth: true },
             },
             {
                 path: 'auth/sign-in',
@@ -41,7 +47,7 @@ const routes: RouteRecordRaw[] = [
                 name: 'email-verification',
                 component: () => import('pages/PageEmailVerification.vue'),
             },
-            // { path: '', redirect: { name: 'sign-in' } },
+            { path: '', redirect: { name: 'sign-in' } },
         ],
     },
 

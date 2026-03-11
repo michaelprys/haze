@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { date } from 'quasar'
-import { computed, onMounted, ref } from 'vue'
-import ActionButton from 'components/ActionButton.vue'
+import { onMounted, ref } from 'vue'
+import ButtonActive from 'components/ButtonActive.vue'
 import { useQuasar } from 'quasar'
-import { useStoreProfile } from 'stores/userData.store'
+import { useStoreProfile } from 'stores/profile.store'
 import handleError from 'src/utils/handleError.utils'
-import { useStorePosts } from 'stores/posts.store'
+import { useStorePosts } from 'src/stores/posts.store'
 import type { Post } from 'src/types/post.types'
+import ItemAvatar from 'components/ItemAvatar.vue'
 
 const storeProfile = useStoreProfile(),
     storePosts = useStorePosts(),
@@ -20,8 +21,7 @@ const formattedDate = (value: string) => {
 }
 
 // Update avatar
-const avatarSrc = computed(() => storeProfile.currentAvatarUrl),
-    avatarModel = ref<File | null>(null)
+const avatarModel = ref<File | null>(null)
 
 const handleUpdateAvatar = async () => {
     if (!avatarModel.value) return
@@ -31,7 +31,7 @@ const handleUpdateAvatar = async () => {
 
         $q.notify({
             type: 'positive',
-            message: 'Avatar updated successfully',
+            message: 'ItemAvatar updated successfully',
         })
     } catch (error) {
         const message = handleError(error)
@@ -45,11 +45,36 @@ const handleUpdateAvatar = async () => {
     }
 }
 
+const onAvatarUpdate = async (file: File) => {
+    avatarModel.value = file
+    await handleUpdateAvatar()
+}
+
 // Load posts
 const pending = ref(true)
 
+// Skeleton
+const showSkeleton = ref(false),
+    MIN_SKELETON = 500,
+    THRESHOLD = 200
+let skeletonTimer: ReturnType<typeof setTimeout> | null = null
+
+const onImageLoad = () => {
+    if (skeletonTimer) clearTimeout(skeletonTimer)
+
+    skeletonTimer = setTimeout(() => {
+        showSkeleton.value = true
+
+        setTimeout(() => {
+            showSkeleton.value = false
+        }, MIN_SKELETON)
+    }, THRESHOLD)
+}
+
 onMounted(async () => {
     try {
+        await storeProfile.loadUserInfo()
+
         const apiPosts = await storePosts.loadPosts()
 
         posts.value = apiPosts.map((p) => ({
@@ -69,7 +94,7 @@ onMounted(async () => {
 </script>
 
 <template>
-    <q-page class="feed-page flex flex-center q-pa-md">
+    <q-page class="flex flex-center q-pa-md">
         <div class="content-container">
             <div class="loading-state text-center q-my-xl" v-if="pending">
                 <q-spinner-dots color="orange" size="4rem" />
@@ -79,34 +104,22 @@ onMounted(async () => {
                 <q-card class="profile-card" flat>
                     <q-card-section class="text-center q-pt-lg q-pb-lg">
                         <div class="avatar-wrapper q-mb-md">
-                            <q-avatar class="profile-avatar" size="150px">
-                                <q-img
-                                    :src="avatarSrc"
-                                    fit="cover"
-                                    style="width: 100%; height: 100%"
-                                />
-                            </q-avatar>
-
-                            <q-file
-                                v-model="avatarModel"
-                                @update:model-value="handleUpdateAvatar"
-                                borderless
-                                dense
-                                no-thumbnails
-                            >
-                                <q-icon class="overlay-icon" name="edit" />
-                            </q-file>
+                            <ItemAvatar
+                                :avatarSrc="storeProfile.profileInfo?.avatarUrl ?? ''"
+                                @update-avatar="onAvatarUpdate"
+                                @load="onImageLoad"
+                            />
                         </div>
 
-                        <div class="profile-name">MPrys</div>
-                        <div class="profile-sub">Traveller</div>
+                        <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
+                        <div class="profile-sub">{{ storeProfile.profileInfo?.bio }}</div>
 
                         <div class="empty-vibe q-mt-lg q-mb-xl">
                             <div class="empty-main">quiet for now</div>
                             <div class="empty-hint accent-line">waiting for a moment</div>
                         </div>
 
-                        <ActionButton
+                        <ButtonActive
                             class="shot-btn"
                             label="Create post"
                             :to="{ name: 'camera-page' }"
@@ -126,20 +139,26 @@ onMounted(async () => {
                     flat
                     bordered
                 >
-                    <q-item class="q-my-sm post-header" align="start">
+                    <q-item class="q-my-sm post-header">
                         <q-item-section avatar top>
-                            <q-avatar size="48px">
+                            <q-avatar size="3rem">
                                 <q-img
                                     class="post-avatar"
-                                    :src="avatarSrc"
-                                    fit="cover"
-                                    style="width: 100%; height: 100%"
-                                />
+                                    :src="storeProfile.profileInfo?.avatarUrl ?? ''"
+                                    alt="Post image"
+                                    @load="onImageLoad"
+                                >
+                                    <template #loading>
+                                        <q-skeleton type="QAvatar" width="100%" height="100%" />
+                                    </template>
+                                </q-img>
                             </q-avatar>
                         </q-item-section>
 
                         <q-item-section class="header-text">
-                            <q-item-label class="username">MichaelPrys</q-item-label>
+                            <q-item-label class="post-username">{{
+                                storeProfile.profileInfo?.username
+                            }}</q-item-label>
                             <q-item-label class="caption">
                                 {{ post.caption }}
                             </q-item-label>
@@ -148,9 +167,9 @@ onMounted(async () => {
 
                     <q-separator />
 
-                    <q-img :src="post.photoUrl" class="post-image">
+                    <q-img :src="post.photoUrl" class="post-image" @load="onImageLoad">
                         <template #loading>
-                            <q-spinner color="orange" />
+                            <q-skeleton width="100%" height="100%" />
                         </template>
 
                         <template #error>
@@ -172,42 +191,27 @@ onMounted(async () => {
             <div class="profile large-screen-only" v-if="posts.length > 0">
                 <q-card class="profile-card" flat bordered>
                     <q-card-section class="text-center">
-                        <div class="avatar-wrapper">
-                            <q-avatar class="avatar" size="90px">
-                                <q-img
-                                    :src="avatarSrc"
-                                    fit="cover"
-                                    style="width: 100%; height: 100%"
-                                />
-                            </q-avatar>
+                        <ItemAvatar
+                            :avatarSrc="storeProfile.profileInfo?.avatarUrl ?? ''"
+                            @update-avatar="onAvatarUpdate"
+                        />
 
-                            <q-file
-                                v-model="avatarModel"
-                                @update:model-value="handleUpdateAvatar"
-                                class="avatar-overlay"
-                                borderless
-                                dense
-                                no-thumbnails
-                            >
-                                <q-icon name="edit" class="overlay-icon"
-                            /></q-file>
+                        <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
+                        <div class="profile-sub">
+                            {{ storeProfile.profileInfo?.bio || 'No bio yet' }}
                         </div>
-
-                        <div class="profile-name">MichaelPrys</div>
-                        <div class="profile-sub">Traveller</div>
                     </q-card-section>
 
                     <q-separator />
 
                     <q-card-section class="text-center q-py-md">
-                        <ActionButton
+                        <ButtonActive
                             label="Create Post"
                             :to="{ name: 'camera-page' }"
                             flat
                             no-caps
                             dense
                             unelevated
-                            class="create-post-btn"
                         />
                     </q-card-section>
                 </q-card>
@@ -216,7 +220,7 @@ onMounted(async () => {
     </q-page>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 .q-img__content > .post-placeholder
     position: absolute
     inset: 0
@@ -248,28 +252,10 @@ onMounted(async () => {
         opacity: 0.78
         color: #ffbb90
 
-.feed-page
-    min-height: 100vh
-    background: linear-gradient(170deg, #111111 0%, #121212 40%, #141414 70%, #16120a 90%, #111111 100%)
-    position: relative
-
-    &::before
-        content: ""
-        position: absolute
-        inset: 0
-        background: radial-gradient(ellipse at 50% 30%, rgba(255, 140, 0, 0.025) 0%, transparent 80%)
-        pointer-events: none
-        z-index: 0
-
-    > *
-        position: relative
-        z-index: 1
-
 .content-container
     width: 100%
     max-width: 75rem
     display: flex
-    flex-direction: row
     justify-content: center
     align-items: flex-start
     gap: 4rem
@@ -282,6 +268,9 @@ onMounted(async () => {
     align-items: center
     justify-content: center
 
+.profile
+    flex: 0 0 22rem
+
 .profile-card
     background-color: #0d0d0d
     border-radius: 1.75rem
@@ -291,13 +280,13 @@ onMounted(async () => {
     width: 100%
 
 .profile-name
-    font-size: 1.95rem
+    font-size: 1.5rem
     font-weight: 700
     margin-bottom: 0.3rem
     text-shadow: 0 0.0625rem 0.25rem rgba(0,0,0,0.8)
 
 .profile-sub
-    font-size: 0.95rem
+    font-size: 0.8rem
     color: #c8a070
     font-weight: 300
     letter-spacing: 0.0625rem
@@ -367,11 +356,11 @@ onMounted(async () => {
 
 @keyframes gradientFlow
     0%
-        background-position: 0% 50%
+        background-position: 0 50%
     50%
         background-position: 100% 50%
     100%
-        background-position: 0% 50%
+        background-position: 0 50%
 
 .feed
     width: 100%
@@ -384,17 +373,20 @@ onMounted(async () => {
     box-shadow: 0 1.25rem 5rem rgba(0,0,0,0.8)
 
 .post-image
+    width: 100%
     max-height: 28rem
+    aspect-ratio: 16/9
 
-.post-avatar
-    background-color: $info
-
-.username
+.post-username
     font-weight: 600
     color: #ffe8c0
 
 .post-header
     align-items: flex-start
+
+.post-avatar
+    width: 100%
+    height: 100%
 
 .header-text
     display: flex
@@ -415,37 +407,6 @@ onMounted(async () => {
     font-size: 0.78rem
     margin-top: 0.3rem
 
-.avatar-wrapper
-    position: relative
-    display: inline-block
-    background-color: $info
-    border-radius: 50%
-
-.avatar-overlay
-    position: absolute
-    inset: 0
-    border-radius: 50%
-    display: flex
-    align-items: center
-    justify-content: center
-    background: linear-gradient(135deg, rgba(255,150,50,0.42), rgba(255,110,40,0.42), rgba(255,140,0,0.35))
-    opacity: 0
-    transition: opacity .3s ease
-    cursor: pointer
-
-.overlay-icon
-    font-size: 1.625rem
-    color: white
-    filter: drop-shadow(0 0 0.4375rem #ffaa60)
-    transform: scale(0.85)
-    transition: all .25s ease
-    cursor: pointer
-
-.avatar-wrapper:hover .avatar-overlay
-    opacity: 1
-
-.avatar-wrapper:hover .overlay-icon
-    transform: scale(1.1)
 
 .profile.large-screen-only
     width: 24rem
@@ -458,6 +419,8 @@ onMounted(async () => {
         align-items: center
         gap: 3rem
 
+    .profile
+        flex: initial
 
     .profile.large-screen-only
         position: static
@@ -468,10 +431,6 @@ onMounted(async () => {
 
     .empty-profile
         padding: 1rem
-
-    .avatar
-        width: 8.125rem
-        height: 8.125rem
 
     .profile-name
         font-size: 1.8rem

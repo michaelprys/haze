@@ -5,9 +5,7 @@
         <div>
             <div class="text-h1">404</div>
 
-            <div class="text-subtitle1 q-mt-sm" style="opacity: 0.7">
-                the void remembers nothing
-            </div>
+            <div class="text-subtitle1 q-mt-sm" style="opacity: 0.7">empty as the void</div>
 
             <q-btn
                 class="q-mt-xl auth-button"
@@ -23,7 +21,7 @@
     </section>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .section
     position: relative
     min-height: 100svh

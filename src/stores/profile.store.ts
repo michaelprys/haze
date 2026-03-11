@@ -1,19 +1,19 @@
 import { defineStore } from 'pinia'
 import { supabase } from 'src/api/supabaseClient'
-import type { UserData } from 'src/types/userData.types'
+import type { ProfileInfo } from 'src/types/profileInfo.types'
 import { ref } from 'vue'
 import { getCurrentUser } from 'src/api/auth'
 
 export const useStoreProfile = defineStore(
     'storeProfile',
     () => {
-        const currentAvatarUrl = ref<string>('')
+        const profileInfo = ref<ProfileInfo>()
 
-        const updateAvatar = async (avatar: UserData['avatar']) => {
+        const updateAvatar = async (avatar: ProfileInfo['avatar']) => {
             // Get user session
             const user = await getCurrentUser()
 
-            if (!avatar) throw new Error('Avatar not found')
+            if (!avatar) throw new Error('ItemAvatar not found')
 
             // Upload to 'profiles' bucket
             const ext = avatar.name.split('.').pop()?.toLowerCase() || 'jpg'
@@ -40,12 +40,28 @@ export const useStoreProfile = defineStore(
                 { onConflict: 'user_id' },
             )
 
-            currentAvatarUrl.value = publicUrl
-
             if (avatarError) throw avatarError
         }
 
-        return { updateAvatar, currentAvatarUrl }
+        const loadUserInfo = async () => {
+            const user = await getCurrentUser()
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, bio, avatar_url')
+                .eq('user_id', user.id)
+                .single()
+
+            if (error) throw error
+
+            profileInfo.value = {
+                username: data.username,
+                bio: data.bio,
+                avatarUrl: data.avatar_url,
+            }
+        }
+
+        return { profileInfo, updateAvatar, loadUserInfo }
     },
     { persist: {} },
 )

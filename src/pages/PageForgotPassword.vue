@@ -4,7 +4,7 @@ import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
 import type { RequestPasswordResetPayload } from 'src/types/auth.types'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 
 const $q = useQuasar(),
     storeAuth = useStoreAuth(),
@@ -45,7 +45,7 @@ const handleRequestPasswordReset = async () => {
 
         startTimer()
     } catch (error) {
-        const message = handleErrorUtils(error)
+        const message = handleError(error)
 
         $q.notify({
             type: 'negative',
@@ -89,7 +89,7 @@ const handleRequestPasswordReset = async () => {
     </div>
 </template>
 
-<style scoped lang="sass">
+<style lang="sass" scoped>
 .forgot-btn
     color: #ff9500
     font-size: 0.75rem

@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import Logo from 'src/assets/logo.webp'
+
 // import { ref } from 'vue'
 // import { Dark } from 'quasar'
 import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
-import handleErrorUtils from 'src/utils/handleError.utils'
+import handleError from 'src/utils/handleError.utils'
 import { useRouter } from 'vue-router'
+import ItemBackground from 'components/ItemBackground.vue'
 
 const router = useRouter()
 const $q = useQuasar()
@@ -22,7 +25,7 @@ const handleSignOut = async () => {
 
         await router.push({ name: 'sign-in' })
     } catch (error) {
-        const message = handleErrorUtils(error)
+        const message = handleError(error)
         $q.notify({
             type: 'negative',
             message: message ?? 'Error signing out',
@@ -47,12 +50,17 @@ const handleSignOut = async () => {
                     flat
                     dense
                 >
-                    <img src="src/assets/logo.webp" width="1024" class="logo" alt="Haze logo" />
+                    <img :src="Logo" width="1024" class="logo" alt="Haze logo" />
                 </q-btn>
 
                 <q-space />
 
-                <q-btn :to="{ name: 'home' }" class="title no-hover-effect" :ripple="false" no-caps
+                <q-btn
+                    :to="{ name: 'home' }"
+                    class="title no-hover-effect"
+                    :ripple="false"
+                    no-caps
+                    flat
                     >Haze</q-btn
                 >
 
@@ -89,6 +97,8 @@ const handleSignOut = async () => {
         </q-header>
 
         <q-page-container class="page-container">
+            <ItemBackground />
+
             <router-view v-slot="{ Component, route }">
                 <transition name="fade" mode="out-in" appear>
                     <component :is="Component" :key="route.path" />
@@ -110,7 +120,11 @@ const handleSignOut = async () => {
     </q-layout>
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
+.page-container
+    background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%)
+    min-height: 100svh
+
 .app-header
     display: flex
     justify-content: center
@@ -158,17 +172,13 @@ const handleSignOut = async () => {
 .header-icon
     color: $primary
 
-.page-container
-    background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%)
-    min-height: 100vh
-
 .app-footer
     background: $dark
     backdrop-filter: blur(0.75rem)
     border-top: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
 
 .no-hover-effect
-    .q-focus-helper
+    :deep(.q-focus-helper)
         display: none
 
     &:hover

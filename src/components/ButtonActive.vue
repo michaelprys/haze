@@ -10,7 +10,7 @@ defineProps({
     <q-btn class="full-width create-btn" :icon="icon" :label="label" :to="to" unelevated />
 </template>
 
-<style lang="sass">
+<style lang="sass" scoped>
 
 .create-btn
     background: linear-gradient(135deg, #ffb347, #ff7a00, #ff3d00, #ffb347)
