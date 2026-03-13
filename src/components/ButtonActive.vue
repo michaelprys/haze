@@ -3,11 +3,16 @@ defineProps({
     label: String,
     to: Object,
     icon: String,
+    loading: Boolean,
 })
 </script>
 
 <template>
-    <q-btn class="full-width create-btn" :icon="icon" :label="label" :to="to" unelevated />
+    <q-btn :loading="loading" class="full-width create-btn" :icon="icon" :label="label" :to="to" unelevated>
+        <template #loading>
+            <q-spinner />
+        </template>
+    </q-btn>
 </template>
 
 <style lang="sass" scoped>

@@ -9,7 +9,8 @@ import handleError from 'src/utils/handleError.utils'
 const $q = useQuasar(),
     storeAuth = useStoreAuth(),
     email = ref(''),
-    redirectTo = `${window.location.origin}/auth/reset-password`
+    redirectTo = `${window.location.origin}/auth/reset-password`,
+    loading = ref(false)
 
 // Timer
 const seconds = ref(0)
@@ -30,6 +31,8 @@ const startTimer = () => {
 
 // Password reset
 const handleRequestPasswordReset = async () => {
+    loading.value = true
+
     const payload: RequestPasswordResetPayload = {
         email: email.value,
         redirectTo,
@@ -51,6 +54,8 @@ const handleRequestPasswordReset = async () => {
             type: 'negative',
             message,
         })
+    } finally {
+        loading.value = false
     }
 }
 </script>
@@ -59,7 +64,7 @@ const handleRequestPasswordReset = async () => {
     <div class="auth-container">
         <LayoutAuth title="Forgot Password" subtitle="Enter your email to receive a reset link">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="handleRequestPasswordReset">
+                <q-form @submit.prevent="handleRequestPasswordReset">
                     <q-input
                         v-model="email"
                         label="Email"
@@ -77,7 +82,12 @@ const handleRequestPasswordReset = async () => {
                         :label="`${seconds > 0 ? `Resend in ${seconds}` : 'Send Reset Link'}`"
                         class="auth-button full-width q-mt-md"
                         no-caps
-                    />
+                        :loading="loading"
+                    >
+                        <template #loading>
+                            <q-spinner />
+                        </template>
+                    </q-btn>
                 </q-form>
             </template>
 

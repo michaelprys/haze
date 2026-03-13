@@ -6,13 +6,14 @@ import Logo from 'src/assets/logo.webp'
 import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
 import handleError from 'src/utils/handleError.utils'
-import { useRouter } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import ItemBackground from 'components/ItemBackground.vue'
 
-const router = useRouter()
-const $q = useQuasar()
-const storeAuth = useStoreAuth()
-// const isDark = ref(Dark.isActive)
+const router = useRouter(),
+    route = useRoute(),
+    $q = useQuasar(),
+    storeAuth = useStoreAuth()
+//  isDark = ref(Dark.isActive)
 
 const handleSignOut = async () => {
     try {
@@ -43,30 +44,17 @@ const handleSignOut = async () => {
     <q-layout view="lHh Lpr lFf" class="app-layout">
         <q-header class="app-header" bordered height-hint="4rem">
             <q-toolbar class="container" style="height: 4rem; min-height: 4rem">
-                <q-btn
-                    class="logo-btn no-hover-effect"
-                    :ripple="false"
-                    :to="{ name: 'home' }"
-                    flat
-                    dense
-                >
+                <q-btn class="logo-btn no-hover-effect" :ripple="false" :to="{ name: 'home' }" flat dense>
                     <img :src="Logo" width="1024" class="logo" alt="Haze logo" />
                 </q-btn>
 
                 <q-space />
 
-                <q-btn
-                    :to="{ name: 'home' }"
-                    class="title no-hover-effect"
-                    :ripple="false"
-                    no-caps
-                    flat
-                    >Haze</q-btn
-                >
+                <q-btn :to="{ name: 'home' }" class="title no-hover-effect" :ripple="false" no-caps flat>Haze</q-btn>
 
                 <q-space />
 
-                <div class="flex q-gutter-x-xs">
+                <div class="flex">
                     <!--                    <q-btn-->
                     <!--                        round-->
                     <!--                        flat-->
@@ -84,14 +72,7 @@ const handleSignOut = async () => {
                         class="header-icon"
                     />
 
-                    <q-btn
-                        v-else
-                        :to="{ name: 'sign-in' }"
-                        round
-                        flat
-                        icon="account_circle"
-                        class="header-icon"
-                    />
+                    <q-btn v-else :to="{ name: 'sign-in' }" round flat icon="account_circle" class="header-icon" />
                 </div>
             </q-toolbar>
         </q-header>
@@ -106,13 +87,8 @@ const handleSignOut = async () => {
             </router-view>
         </q-page-container>
 
-        <q-footer class="app-footer small-screen-only" bordered>
-            <q-tabs
-                class="tabs"
-                indicator-color="transparent"
-                active-color="orange"
-                align="justify"
-            >
+        <q-footer v-if="route.meta.requiresAuth && storeAuth.isAuthenticated" class="app-footer" bordered>
+            <q-tabs class="tabs" indicator-color="transparent" active-color="orange" align="justify">
                 <q-route-tab :to="{ name: 'home' }" icon="fa-solid fa-home" />
                 <q-route-tab :to="{ name: 'camera-page' }" icon="fa-solid fa-camera" />
             </q-tabs>
@@ -173,6 +149,7 @@ const handleSignOut = async () => {
     color: $primary
 
 .app-footer
+    display: none
     background: $dark
     backdrop-filter: blur(0.75rem)
     border-top: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
@@ -183,4 +160,8 @@ const handleSignOut = async () => {
 
     &:hover
         background-color: transparent
+
+@media (width <= 55rem)
+    .app-footer
+        display: block
 </style>

@@ -30,7 +30,8 @@ export const useCamera = (post: Ref<Post>) => {
             isCameraActive.value = true
             imageCaptured.value = false
         } catch (error) {
-            console.error(error)
+            console.error(handleError(error))
+
             hasCameraSupport.value = false
             isCameraActive.value = false
         } finally {

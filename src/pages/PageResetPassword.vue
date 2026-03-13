@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import LayoutAuth from 'layouts/LayoutAuth.vue'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useStoreAuth } from 'stores/auth.store'
 import handleError from 'src/utils/handleError.utils'
 import { useQuasar } from 'quasar'
@@ -9,7 +9,8 @@ import { useRouter } from 'vue-router'
 // Common
 const router = useRouter(),
     $q = useQuasar(),
-    storeAuth = useStoreAuth()
+    storeAuth = useStoreAuth(),
+    loading = ref(false)
 
 // Form
 const formData = reactive({
@@ -18,6 +19,8 @@ const formData = reactive({
 })
 
 const handleResetPassword = async () => {
+    loading.value = true
+
     try {
         await storeAuth.resetPassword(formData.newPassword)
 
@@ -34,6 +37,8 @@ const handleResetPassword = async () => {
             type: 'negative',
             message: message ?? 'Error changing password',
         })
+    } finally {
+        loading.value = false
     }
 }
 </script>
@@ -42,7 +47,7 @@ const handleResetPassword = async () => {
     <div class="auth-container">
         <LayoutAuth title="Reset Password" subtitle="Set your new password">
             <template #form>
-                <q-form class="q-gutter-y-md" @submit.prevent="handleResetPassword">
+                <q-form @submit.prevent="handleResetPassword">
                     <q-input
                         v-model="formData.newPassword"
                         label="New Password"
@@ -74,11 +79,16 @@ const handleResetPassword = async () => {
                     />
 
                     <q-btn
+                        class="auth-button full-width q-mt-md"
                         type="submit"
                         label="Reset Password"
-                        class="auth-button full-width q-mt-md"
                         no-caps
-                    />
+                        :loading="loading"
+                    >
+                        <template #loading>
+                            <q-spinner />
+                        </template>
+                    </q-btn>
                 </q-form>
             </template>
 

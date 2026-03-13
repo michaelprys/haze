@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
-import { supabase } from 'src/api/supabaseClient'
 import type { PostPayload, PostApi } from 'src/types/post.types'
 import { getCurrentUser } from 'src/api/auth'
+import { supabase } from 'src/api/supabaseClient'
 
 export const useStorePosts = defineStore('storePosts', () => {
     const publishPost = async (draftPost: PostPayload) => {

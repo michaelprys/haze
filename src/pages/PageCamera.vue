@@ -6,7 +6,7 @@ import ButtonActive from 'components/ButtonActive.vue'
 import { useGeolocation } from 'src/composables/useGeolocation'
 
 // Post
-const { post, handlePublishPost } = usePost()
+const { post, loading, handlePublishPost } = usePost()
 
 // Camera
 const {
@@ -61,11 +61,7 @@ onBeforeUnmount(() => {
         <q-card class="post-card q-pa-lg">
             <div class="camera-wrapper">
                 <div class="camera-frame">
-                    <q-skeleton
-                        v-if="isCameraInitializing"
-                        class="camera-skeleton"
-                        animation="wave"
-                    />
+                    <q-skeleton v-if="isCameraInitializing" class="camera-skeleton" animation="wave" />
 
                     <video
                         v-show="isCameraActive && !imageCaptured"
@@ -84,14 +80,9 @@ onBeforeUnmount(() => {
                         loading="eager"
                     />
 
-                    <div
-                        v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
-                        class="camera-placeholder"
-                    >
+                    <div v-show="!isCameraActive && !post.photoUrl && !imageCaptured" class="camera-placeholder">
                         <div class="placeholder-wrapper">
-                            <span class="placeholder-title">
-                                turn on your camera, or add a memory <br />
-                            </span>
+                            <span> turn on your camera, or add a memory <br /> </span>
                             <span class="placeholder-subtitle"> to capture the moment... </span>
                         </div>
                     </div>
@@ -121,14 +112,7 @@ onBeforeUnmount(() => {
                     />
                 </div>
 
-                <q-file
-                    v-else
-                    v-model="cameraModel"
-                    @update:model-value="getImageSrc"
-                    dense
-                    flat
-                    class="memory-link"
-                >
+                <q-file v-else v-model="cameraModel" @update:model-value="getImageSrc" dense flat class="memory-link">
                     <template #default>
                         <span class="memory-link-text">+ add memory</span>
                     </template>
@@ -145,14 +129,7 @@ onBeforeUnmount(() => {
                 class="q-mt-lg input-style"
             />
 
-            <q-input
-                v-model="post.location"
-                label="Location"
-                dense
-                dark
-                outlined
-                class="q-mt-md input-style"
-            >
+            <q-input v-model="post.location" label="Location" dense dark outlined class="q-mt-md input-style">
                 <template v-slot:append>
                     <q-spinner
                         v-if="locationPending"
@@ -161,17 +138,12 @@ onBeforeUnmount(() => {
                         size="18px"
                     ></q-spinner>
 
-                    <q-btn
-                        v-if="!locationPending && hasGeolocation"
-                        @click="getLocation"
-                        icon="place"
-                        flat
-                    />
+                    <q-btn v-if="!locationPending && hasGeolocation" @click="getLocation" icon="place" flat />
                 </template>
             </q-input>
 
             <div class="q-mt-xl">
-                <ButtonActive @click="handlePublishPost(hasCameraSupport)" label="Publish" />
+                <ButtonActive :loading="loading" @click="handlePublishPost(hasCameraSupport)" label="Publish" />
             </div>
         </q-card>
     </q-page>
@@ -217,7 +189,7 @@ onBeforeUnmount(() => {
     object-fit: cover
     width: 100%
     height: 100%
-    background: linear-gradient(145deg, #4b0082 0%, #9c0f5f 35%, #c71585 70%, #ff4500 100%)
+    background: linear-gradient(135deg, #f0a53e 0%, #f8bd2e 30%, #f06c4c 60%, #f04a46 100%)
     background-blend-mode: overlay
     overflow: hidden
 
@@ -228,16 +200,18 @@ onBeforeUnmount(() => {
     margin-right: 1.5rem
     font-style: italic
     font-family: 'Georgia', 'Times New Roman', serif
-    font-weight: 400
     font-size: 1.05rem
     letter-spacing: 0.025em
+    font-weight: 500
     line-height: 1.45
-    color: #fff7df
+    color: #ffffff
+    text-shadow: 0 2px 8px rgba(0,0,0,0.2), 0 0 12px rgba(0,0,0,0.2)
 
 .placeholder-subtitle
     margin-right: -1.5rem
     font-size: 0.9rem
-    opacity: 0.85
+    opacity: 0.92
+    text-shadow: inherit
 
 .camera-skeleton
     height: 100%
@@ -326,5 +300,7 @@ onBeforeUnmount(() => {
 
 @media(width <= $breakpoint-sm-min)
     .placeholder-wrapper
+        font-size: 0.8rem
+    .placeholder-subtitle
         font-size: 0.7rem
 </style>

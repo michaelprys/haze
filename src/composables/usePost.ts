@@ -9,7 +9,8 @@ import { generateFileName } from 'src/utils/generateFileName.utils'
 export const usePost = () => {
     const router = useRouter(),
         storePosts = useStorePosts(),
-        $q = useQuasar()
+        $q = useQuasar(),
+        loading = ref(false)
 
     const post = ref<Post>({
         id: '',
@@ -20,6 +21,8 @@ export const usePost = () => {
     })
 
     const handlePublishPost = async (hasCameraSupport: boolean) => {
+        loading.value = true
+
         if (!post.value.photoFile) {
             $q.notify({
                 type: 'negative',
@@ -57,11 +60,14 @@ export const usePost = () => {
                 type: 'negative',
                 message: message ?? 'Cannot publish image',
             })
+        } finally {
+            loading.value = false
         }
     }
 
     return {
         post,
+        loading,
         generateUniqueFileName: generateFileName,
         handlePublishPost,
     }

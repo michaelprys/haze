@@ -15,16 +15,25 @@ img
     max-width: 60.9375rem
     margin: 0 auto
 
+// Transitions
 .fade-enter-active,
 .fade-leave-active
     transition: opacity 0.15s ease
-
 
 .fade-enter-from,
 .fade-leave-to
     opacity: 0
 
+// Quasar validation hint fix
+.q-field__bottom--animated
+    transform: translateY(0%)
+    position: static
+    padding-bottom: 1rem
 
+.q-field--with-bottom
+    padding-bottom: 0
+
+// Breakpoints
 .small-screen-only
     @media (width <= $breakpoint-xs-max)
         display: block

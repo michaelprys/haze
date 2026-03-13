@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import Logo from 'src/assets/logo.webp'
+
 defineProps<{
     title: string
     subtitle: string
@@ -10,13 +12,7 @@ defineProps<{
         <div class="auth-container">
             <div class="text-center">
                 <div class="logo-glow">
-                    <img
-                        class="logo-image"
-                        src="/src/assets/logo.webp"
-                        width="1024"
-                        height="1024"
-                        alt="Hze logo"
-                    />
+                    <img class="logo-image" :src="Logo" width="1024" height="1024" alt="Haze logo" />
                 </div>
 
                 <div class="auth-title">{{ title }}</div>
@@ -88,7 +84,6 @@ defineProps<{
 
 :global(.auth-button:hover)
     box-shadow: 0 0.75rem 1.75rem rgba(255, 80, 0, 0.5)
-
 
 :global(.auth-link)
     color: #ff6d00

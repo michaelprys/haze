@@ -1,38 +1,47 @@
 import { defineStore } from 'pinia'
-import { supabase } from 'src/api/supabaseClient'
 import type { ProfileInfo } from 'src/types/profileInfo.types'
 import { ref } from 'vue'
 import { getCurrentUser } from 'src/api/auth'
+import { supabase } from 'src/api/supabaseClient'
 
 export const useStoreProfile = defineStore(
     'storeProfile',
     () => {
         const profileInfo = ref<ProfileInfo>()
 
-        const updateAvatar = async (avatar: ProfileInfo['avatar']) => {
-            // Get user session
+        const updateAvatar = async (file: File) => {
             const user = await getCurrentUser()
 
-            if (!avatar) throw new Error('ItemAvatar not found')
+            if (!file.type.startsWith('image/')) {
+                throw new Error('Only images allowed')
+            }
 
-            // Upload to 'profiles' bucket
-            const ext = avatar.name.split('.').pop()?.toLowerCase() || 'jpg'
-            const path = `${user.id}/avatar.${ext}`
+            if (file.size > 3 * 1024 * 1024) {
+                throw new Error('File too large (max 3MB)')
+            }
 
-            const { data: storageData, error: storageError } = await supabase.storage
-                .from('avatars')
-                .upload(path, avatar, {
-                    upsert: true,
-                })
+            if (!user) {
+                throw new Error('Not authorized')
+            }
 
-            if (storageError) throw storageError
+            const path = `${user.id}/avatar`
 
-            // Get avatar url
-            const {
-                data: { publicUrl },
-            } = supabase.storage.from('avatars').getPublicUrl(storageData.path)
+            const { error: uploadError } = await supabase.storage.from('avatars').upload(path, file, {
+                upsert: true,
+                contentType: file.type || 'image/jpeg',
+                cacheControl: '3600',
+            })
 
-            const { error: avatarError } = await supabase.from('profiles').upsert(
+            if (uploadError) {
+                throw uploadError
+            }
+
+            const { data: urlData } = supabase.storage.from('avatars').getPublicUrl(path)
+
+            let publicUrl = urlData.publicUrl
+            publicUrl += `?v=${Date.now()}`
+
+            const { error: profileError } = await supabase.from('profiles').upsert(
                 {
                     user_id: user.id,
                     avatar_url: publicUrl,
@@ -40,11 +49,18 @@ export const useStoreProfile = defineStore(
                 { onConflict: 'user_id' },
             )
 
-            if (avatarError) throw avatarError
+            if (profileError) throw profileError
+
+            if (profileInfo.value) {
+                profileInfo.value.avatarUrl = publicUrl
+            }
+
+            return publicUrl
         }
 
         const loadUserInfo = async () => {
             const user = await getCurrentUser()
+            if (!user) throw new Error('Not authorized')
 
             const { data, error } = await supabase
                 .from('profiles')
@@ -57,7 +73,7 @@ export const useStoreProfile = defineStore(
             profileInfo.value = {
                 username: data.username,
                 bio: data.bio,
-                avatarUrl: data.avatar_url,
+                avatarUrl: data.avatar_url || null,
             }
         }
 

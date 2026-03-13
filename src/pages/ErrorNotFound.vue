@@ -7,14 +7,7 @@
 
             <div class="text-subtitle1 q-mt-sm" style="opacity: 0.7">empty as the void</div>
 
-            <q-btn
-                class="q-mt-xl auth-button"
-                color="primary"
-                outline
-                label="Return"
-                no-caps
-                :to="{ name: 'home' }"
-            />
+            <q-btn class="q-mt-xl auth-button" color="primary" outline label="Return" no-caps :to="{ name: 'home' }" />
         </div>
 
         <div class="bg"></div>

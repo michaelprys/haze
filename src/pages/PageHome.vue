@@ -20,8 +20,9 @@ const formattedDate = (value: string) => {
     return date.formatDate(value, 'MMMM D, h:mm A')
 }
 
-// Update avatar
-const avatarModel = ref<File | null>(null)
+// Avatar
+const avatarModel = ref<File | null>(null),
+    initial = storeProfile.profileInfo?.username?.charAt(0)
 
 const handleUpdateAvatar = async () => {
     if (!avatarModel.value) return
@@ -98,30 +99,28 @@ onMounted(async () => {
         <div class="content-container">
             <div class="loading-state text-center q-my-xl" v-if="pending">
                 <q-spinner-dots color="orange" size="4rem" />
-                <div class="q-mt-md text-h6 text-grey-4">Loading your moments...</div>
+                <div class="q-mt-md text-h6 text-grey-4">Loading...</div>
             </div>
             <div class="empty-profile" v-else-if="posts.length === 0">
                 <q-card class="profile-card" flat>
-                    <q-card-section class="text-center q-pt-lg q-pb-lg">
+                    <q-card-section class="flex column items-center text-center q-pt-lg q-pb-lg">
                         <div class="avatar-wrapper q-mb-md">
                             <ItemAvatar
-                                :avatarSrc="storeProfile.profileInfo?.avatarUrl ?? ''"
+                                :initial="initial"
+                                :avatarSrc="storeProfile.profileInfo?.avatarUrl"
                                 @update-avatar="onAvatarUpdate"
                                 @load="onImageLoad"
                             />
                         </div>
 
                         <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
-                        <div class="profile-sub">{{ storeProfile.profileInfo?.bio }}</div>
-
-                        <div class="empty-vibe q-mt-lg q-mb-xl">
-                            <div class="empty-main">quiet for now</div>
-                            <div class="empty-hint accent-line">waiting for a moment</div>
+                        <div class="profile-sub accent-line">
+                            {{ storeProfile.profileInfo?.bio ?? 'No bio yet' }}
                         </div>
 
                         <ButtonActive
                             class="shot-btn"
-                            label="Create post"
+                            label="Create Post"
                             :to="{ name: 'camera-page' }"
                             unelevated
                             rounded
@@ -132,19 +131,14 @@ onMounted(async () => {
             </div>
 
             <div class="feed" v-else>
-                <q-card
-                    v-for="post in posts"
-                    :key="post.id"
-                    class="post-card q-mb-lg"
-                    flat
-                    bordered
-                >
+                <q-card v-for="post in posts" :key="post.id" class="post-card q-mb-lg" flat bordered>
                     <q-item class="q-my-sm post-header">
                         <q-item-section avatar top>
                             <q-avatar size="3rem">
                                 <q-img
-                                    class="post-avatar"
-                                    :src="storeProfile.profileInfo?.avatarUrl ?? ''"
+                                    v-if="storeProfile.profileInfo?.avatarUrl"
+                                    :src="storeProfile.profileInfo?.avatarUrl"
+                                    :initial="initial"
                                     alt="Post image"
                                     @load="onImageLoad"
                                 >
@@ -152,13 +146,15 @@ onMounted(async () => {
                                         <q-skeleton type="QAvatar" width="100%" height="100%" />
                                     </template>
                                 </q-img>
+
+                                <div class="post-avatar-placeholder" v-else>
+                                    {{ initial }} <q-icon v-if="!initial" name="person" size="32" />
+                                </div>
                             </q-avatar>
                         </q-item-section>
 
                         <q-item-section class="header-text">
-                            <q-item-label class="post-username">{{
-                                storeProfile.profileInfo?.username
-                            }}</q-item-label>
+                            <q-item-label class="post-username">{{ storeProfile.profileInfo?.username }}</q-item-label>
                             <q-item-label class="caption">
                                 {{ post.caption }}
                             </q-item-label>
@@ -190,29 +186,25 @@ onMounted(async () => {
 
             <div class="profile large-screen-only" v-if="posts.length > 0">
                 <q-card class="profile-card" flat bordered>
-                    <q-card-section class="text-center">
+                    <q-card-section class="flex column items-center text-center">
                         <ItemAvatar
+                            :initial="initial"
                             :avatarSrc="storeProfile.profileInfo?.avatarUrl ?? ''"
                             @update-avatar="onAvatarUpdate"
                         />
 
-                        <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
-                        <div class="profile-sub">
-                            {{ storeProfile.profileInfo?.bio || 'No bio yet' }}
+                        <div class="q-mt-sm">
+                            <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
+                            <div class="profile-sub">
+                                {{ storeProfile.profileInfo?.bio || 'No bio yet' }}
+                            </div>
                         </div>
                     </q-card-section>
 
                     <q-separator />
 
                     <q-card-section class="text-center q-py-md">
-                        <ButtonActive
-                            label="Create Post"
-                            :to="{ name: 'camera-page' }"
-                            flat
-                            no-caps
-                            dense
-                            unelevated
-                        />
+                        <ButtonActive label="Create Post" :to="{ name: 'camera-page' }" flat no-caps dense unelevated />
                     </q-card-section>
                 </q-card>
             </div>
@@ -262,11 +254,12 @@ onMounted(async () => {
 
 .empty-profile
     width: 100%
-    max-width: 30rem
+    max-width: 36rem
     height: 100%
     display: flex
     align-items: center
     justify-content: center
+    padding: 1.5rem
 
 .profile
     flex: 0 0 22rem
@@ -286,7 +279,7 @@ onMounted(async () => {
     text-shadow: 0 0.0625rem 0.25rem rgba(0,0,0,0.8)
 
 .profile-sub
-    font-size: 0.8rem
+    font-size: 0.9rem
     color: #c8a070
     font-weight: 300
     letter-spacing: 0.0625rem
@@ -307,24 +300,12 @@ onMounted(async () => {
         content: "No Photo"
         opacity: 0.7
 
-.empty-vibe
-    text-align: center
-    font-weight: 300
-
 .empty-main
     font-size: 1.45rem
     line-height: 1.4
     color: #c0c0ff
     margin-bottom: 0.5rem
     letter-spacing: -0.01875rem
-
-.empty-hint
-    font-size: 1.05rem
-    line-height: 1.5
-    color: #ffaa60
-    opacity: 0.9
-    font-weight: 400
-    letter-spacing: 0.0125rem
 
 .accent-line
     color: #ffaa60
@@ -345,6 +326,7 @@ onMounted(async () => {
     transition: all 0.28s ease
     text-transform: uppercase
     line-height: 1.1
+    margin-top: 1.8rem
 
     .q-icon
         font-size: 1.35rem
@@ -384,9 +366,16 @@ onMounted(async () => {
 .post-header
     align-items: flex-start
 
-.post-avatar
+.post-avatar-placeholder
+    display: grid
+    place-items: center
+    background: linear-gradient(145deg, #fce8e0 0%, #f9d6c2 40%, #f5bfa0 70%, #f0a67f 100%)
+    font-weight: 700
+    font-size: 2rem
     width: 100%
     height: 100%
+    color: #7a5c44
+    font-size: 1.5rem
 
 .header-text
     display: flex
@@ -413,28 +402,16 @@ onMounted(async () => {
     position: sticky
     top: 6rem
 
-@media (width <= 68.75rem)
-    .content-container
-        flex-direction: column-reverse
-        align-items: center
-        gap: 3rem
-
-    .profile
-        flex: initial
-
-    .profile.large-screen-only
-        position: static
-
-@media (width <= $breakpoint-xs-max)
+@media (width <= 55rem)
     .profile.large-screen-only
         display: none
 
-    .empty-profile
-        padding: 1rem
+        .empty-profile
+            padding: 1rem
 
-    .profile-name
-        font-size: 1.8rem
+        .profile-name
+            font-size: 1.8rem
 
-    .empty-vibe
-        font-size: 1.05rem
+        .empty-hint
+            font-size: 1.05rem
 </style>

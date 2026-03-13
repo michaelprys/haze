@@ -7,5 +7,6 @@ const supabasePublishableKey = import.meta.env.VITE_PUBLISHABLE_KEY
 export const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey, {
     auth: {
         persistSession: true,
+        detectSessionInUrl: false,
     },
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useTemplateRef, reactive } from 'vue'
+import { useTemplateRef, reactive, ref } from 'vue'
 import LayoutAuth from 'layouts/LayoutAuth.vue'
 import { useStoreAuth } from 'stores/auth.store'
 import { useQuasar } from 'quasar'
@@ -11,7 +11,8 @@ import type { QForm } from 'quasar'
 // Common
 const router = useRouter(),
     $q = useQuasar(),
-    storeAuth = useStoreAuth()
+    storeAuth = useStoreAuth(),
+    loading = ref(false)
 
 // Form
 const signUpForm = useTemplateRef<QForm>('signUpForm'),
@@ -28,6 +29,8 @@ const handleSignUp = async () => {
     signUpForm.value.resetValidation()
 
     const success = await signUpForm.value.validate()
+
+    loading.value = true
 
     if (!success) {
         $q.notify({
@@ -56,7 +59,7 @@ const handleSignUp = async () => {
 
         $q.notify({
             type: 'positive',
-            message: 'Signed up successfully! Please check your inbox and confirm email',
+            message: 'Signed up successfully! Plёease check your inbox and confirm email',
             timeout: 6000,
             icon: 'mail',
         })
@@ -69,6 +72,8 @@ const handleSignUp = async () => {
             type: 'negative',
             message: message ?? 'Error signing up',
         })
+    } finally {
+        loading.value = false
     }
 }
 </script>
@@ -77,7 +82,7 @@ const handleSignUp = async () => {
     <div class="auth-container">
         <LayoutAuth title="Create Account" subtitle="Sign up to get started">
             <template #form>
-                <q-form class="q-gutter-y-md" ref="signUpForm" @submit.prevent="handleSignUp">
+                <q-form ref="signUpForm" @submit.prevent="handleSignUp">
                     <q-input
                         v-model="formData.email"
                         label="Email"
@@ -89,8 +94,7 @@ const handleSignUp = async () => {
                         class="auth-input"
                         :rules="[
                             (val) => !!val || 'Email is required',
-                            (val, rules) =>
-                                rules.email(val) || 'Please enter a valid email address',
+                            (val, rules) => rules.email(val) || 'Please enter a valid email address',
                         ]"
                     />
 
@@ -107,9 +111,7 @@ const handleSignUp = async () => {
                             (val) => !!val || 'Username is required',
                             (val) => (val && val.length >= 3) || 'Minimum 3 characters',
                             (val) => (val && val.length <= 20) || 'Maximum 20 characters',
-                            (val) =>
-                                /^[a-zA-Z0-9_]+$/.test(val) ||
-                                'Only letters, numbers and underscore allowed',
+                            (val) => /^[a-zA-Z0-9_]+$/.test(val) || 'Only letters, numbers and underscore allowed',
                         ]"
                     />
 
@@ -143,12 +145,11 @@ const handleSignUp = async () => {
                         ]"
                     />
 
-                    <q-btn
-                        class="auth-button full-width q-mt-md"
-                        type="submit"
-                        label="Sign Up"
-                        no-caps
-                    />
+                    <q-btn class="auth-button full-width" type="submit" label="Sign Up" no-caps :loading="loading">
+                        <template #loading>
+                            <q-spinner />
+                        </template>
+                    </q-btn>
                 </q-form>
             </template>
 
