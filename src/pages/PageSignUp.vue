@@ -59,7 +59,7 @@ const handleSignUp = async () => {
 
         $q.notify({
             type: 'positive',
-            message: 'Signed up successfully! Plёease check your inbox and confirm email',
+            message: 'Signed up successfully! Please check your inbox and confirm email',
             timeout: 6000,
             icon: 'mail',
         });

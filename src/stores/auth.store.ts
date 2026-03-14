@@ -76,11 +76,17 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         return data;
     };
 
-    const resetPassword = async (password: string) => {
-        const { error } = await supabase.auth.updateUser({
+    const resetPassword = async (password: string, token: string) => {
+        const { error: sessionError } = await supabase.auth.setSession({
+            access_token: token,
+            refresh_token: token,
+        });
+        if (sessionError) throw sessionError;
+
+        const { error: updateUserError } = await supabase.auth.updateUser({
             password,
         });
-        if (error) throw error;
+        if (updateUserError) throw updateUserError;
     };
 
     return {

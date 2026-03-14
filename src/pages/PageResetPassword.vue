@@ -5,12 +5,14 @@ import { useStoreAuth } from 'stores/auth.store';
 import handleError from 'src/utils/handleError.utils';
 import { useQuasar } from 'quasar';
 import { useRouter } from 'vue-router';
+import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
 
 // Common
 const router = useRouter(),
     $q = useQuasar(),
     storeAuth = useStoreAuth(),
-    loading = ref(false);
+    loading = ref(false),
+    tokenInUrl = getRecoveryToken();
 
 // Form
 const formData = reactive({
@@ -19,10 +21,18 @@ const formData = reactive({
 });
 
 const handleResetPassword = async () => {
+    if (!tokenInUrl) {
+        $q.notify({
+            type: 'negative',
+            message: 'Recovery token missing. Please request a new reset link',
+        });
+        return;
+    }
+
     loading.value = true;
 
     try {
-        await storeAuth.resetPassword(formData.newPassword);
+        await storeAuth.resetPassword(formData.newPassword, tokenInUrl);
 
         $q.notify({
             type: 'positive',

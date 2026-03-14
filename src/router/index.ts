@@ -8,6 +8,7 @@ import {
 import routes from './routes';
 import { useStoreAuth } from 'stores/auth.store';
 import { supabase } from 'src/api/supabaseClient';
+import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
 
 /*
  * If not building with SSR mode, you can
@@ -35,9 +36,9 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         history: createHistory(process.env.VUE_ROUTER_BASE),
     });
 
-    const storeAuth = useStoreAuth();
+    Router.beforeEach(async (to) => {
+        const storeAuth = useStoreAuth();
 
-    Router.beforeEach(async (to, _, next) => {
         if (!storeAuth.isAuthenticated) {
             try {
                 const { data } = await supabase.auth.getUser();
@@ -50,22 +51,35 @@ export default defineRouter(function (/* { store, ssrContext } */) {
             }
         }
 
-        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth);
-        const confirmOnly = to.matched.some((q) => q.meta.confirmOnly);
+        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth),
+            confirmOnly = to.matched.some((r) => r.meta.confirmOnly),
+            guestOnly = to.matched.some((r) => r.meta.guestOnly),
+            tokenInUrl = getRecoveryToken();
+
+        if (to.name === 'reset-password' && !tokenInUrl) {
+            return {
+                name: 'forgot-password',
+                replace: true,
+            };
+        }
 
         if (!storeAuth.isAuthenticated && requiresAuth) {
-            return next({
+            return {
                 name: 'sign-in',
                 query: { next: to.fullPath },
                 replace: true,
-            });
+            };
+        }
+
+        if (storeAuth.isAuthenticated && guestOnly) {
+            return { name: 'home' };
         }
 
         if (storeAuth.isAuthenticated && confirmOnly) {
-            return next();
+            return true;
         }
 
-        next();
+        return true;
     });
 
     return Router;

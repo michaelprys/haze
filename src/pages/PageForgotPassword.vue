@@ -43,7 +43,8 @@ const handleRequestPasswordReset = async () => {
 
         $q.notify({
             type: 'positive',
-            message: 'Reset link sent. If the email exists, you will receive it shortly',
+            message:
+                "Reset link sent! Check your inbox or spam. In this test mode, if the button isn't clickable, mark it as safe in your browser to continue",
         });
 
         startTimer();
