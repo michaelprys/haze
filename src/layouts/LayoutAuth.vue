@@ -1,98 +1,136 @@
 <script setup lang="ts">
-import Logo from 'src/assets/logo.webp'
+import Logo from 'src/assets/logo.webp';
 
 defineProps<{
-    title: string
-    subtitle: string
-}>()
+    title: string;
+    subtitle: string;
+}>();
 </script>
 
 <template>
-    <q-page class="auth-page flex flex-center">
-        <div class="auth-container">
-            <div class="text-center">
-                <div class="logo-glow">
-                    <img class="logo-image" :src="Logo" width="1024" height="1024" alt="Haze logo" />
+    <q-page class="auth">
+        <div class="auth__container">
+            <div class="auth__header">
+                <div class="auth__logo-wrapper">
+                    <img
+                        class="auth__logo"
+                        alt="Haze logo"
+                        height="1024"
+                        :src="Logo"
+                        width="1024"
+                    />
                 </div>
 
-                <div class="auth-title">{{ title }}</div>
-                <div class="auth-subtitle">{{ subtitle }}</div>
+                <div class="auth__title">{{ title }}</div>
+                <div class="auth__subtitle">{{ subtitle }}</div>
             </div>
 
-            <q-card class="auth-card q-mt-lg" flat bordered>
+            <q-card bordered class="auth__card q-mt-lg" flat>
                 <q-card-section>
                     <slot name="form" />
                 </q-card-section>
             </q-card>
 
-            <div class="bottom-text text-center q-mt-lg">
+            <div class="auth__footer q-mt-lg">
                 <slot name="footer" />
             </div>
         </div>
     </q-page>
 </template>
 
-<style scoped lang="sass">
-.auth-page
-    min-height: 100svh
+<style lang="scss" scoped>
+.auth {
+    display: grid;
+    min-height: 100svh;
+    place-items: center;
 
-.auth-container
-    width: 100%
-    max-width: 30rem
-    padding: 2rem
+    &__container {
+        max-width: 30rem;
+        padding: 2rem;
+        width: 100%;
+    }
 
-.auth-title
-    font-size: 1.8rem
-    font-weight: 700
-    color: #ffffff
+    &__header {
+        text-align: center;
+    }
 
-.auth-subtitle
-    font-size: 0.9rem
-    color: #777
+    &__logo-wrapper {
+        background: rgb(255 149 0 / 10%);
+        border-radius: 1.25rem;
+        box-shadow: 0 0 0.9375rem rgb(255 149 0 / 40%);
+        display: inline-flex;
+    }
 
-.logo-glow
-    display: inline-flex
-    background: rgba(255, 149, 0, 0.1)
-    border-radius: 1.25rem
-    box-shadow: 0 0 0.9375rem rgba(255, 149, 0, 0.4)
+    &__logo {
+        height: 5rem;
+        margin-left: 0.0625rem;
+        margin-top: 0.3125rem;
+        width: 5rem;
+    }
 
-.logo-image
-    width: 5rem
-    height: 5rem
-    margin-top: 0.3125rem
-    margin-left: 0.0625rem
+    &__title {
+        color: rgb(255 255 255 / 100%);
+        font-size: 1.8rem;
+        font-weight: 700;
+    }
 
-.auth-card
-    width: 100%
-    background-color: #121212
-    border-radius: 1.25rem
-    border: 1px solid rgba(255, 120, 0, 0.15)
-    box-shadow: 0 0.9375rem 2.5rem rgba(0, 0, 0, 0.6)
+    &__subtitle {
+        color: rgb(119 119 119 / 100%);
+        font-size: 0.9rem;
+    }
 
-.bottom-text
-    color: #777
-    font-size: 0.85rem
+    &__card {
+        background-color: rgb(18 18 18 / 100%);
+        border: 1px solid rgb(255 120 0 / 15%);
+        border-radius: 1.25rem;
+        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
+        width: 100%;
+    }
 
-:global(.auth-button)
-    height: 2.75rem
-    border-radius: 0.75rem
-    font-weight: 600
-    letter-spacing: 0.03125rem
-    background: linear-gradient(135deg, #ff9500, #ff3a00)
-    box-shadow: 0 0.5rem 1.25rem rgba(255, 80, 0, 0.35)
-    transition: all 0.25s ease
+    &__footer {
+        color: rgb(119 119 119 / 100%);
+        font-size: 0.85rem;
+        text-align: center;
+    }
 
-:global(.auth-button:hover)
-    box-shadow: 0 0.75rem 1.75rem rgba(255, 80, 0, 0.5)
+    :deep() {
+        .auth-button {
+            background: linear-gradient(135deg, #ff9500, #ff3a00);
+            border-radius: 0.75rem;
+            height: 2.75rem;
+            letter-spacing: 0.03125rem;
+            transition:
+                transform 0.2s ease,
+                box-shadow 0.2s ease,
+                background-position 2s ease;
+            width: 100%;
 
-:global(.auth-link)
-    color: #ff6d00
-    font-weight: 600
-    cursor: pointer
-    margin-left: 0.25rem
-    transition: 0.2s
-    text-decoration: none
+            &:hover {
+                box-shadow: 0 0.75rem 1.75rem rgb(255 80 0 / 50%);
+            }
+        }
 
-:global(.auth-link:hover)
-    color: #ff3a00
+        .auth-link {
+            color: #ff9500;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 0.25rem;
+            text-decoration: none;
+            transition: 0.2s;
+
+            &:hover {
+                color: #ff3a00;
+            }
+        }
+
+        .q-field__control {
+            background: rgb(255 255 255 / 2%);
+            border-radius: 0.75rem;
+        }
+
+        .q-field__label {
+            color: #aaa;
+        }
+    }
+}
 </style>

@@ -1,50 +1,50 @@
 <script setup lang="ts">
-import { useStoreAuth } from 'stores/auth.store'
-import LayoutAuth from 'layouts/LayoutAuth.vue'
-import type { SignInPayload } from 'src/types/auth.types'
-import { useQuasar } from 'quasar'
-import { useTemplateRef, reactive, onMounted, ref } from 'vue'
-import type { QForm } from 'quasar'
-import handleError from 'src/utils/handleError.utils'
-import { useRouter } from 'vue-router'
-import { useRoute } from 'vue-router'
+import { useStoreAuth } from 'stores/auth.store';
+import LayoutAuth from 'layouts/LayoutAuth.vue';
+import type { SignInPayload } from 'src/types/auth.types';
+import { useQuasar } from 'quasar';
+import { useTemplateRef, reactive, onMounted, ref } from 'vue';
+import type { QForm } from 'quasar';
+import handleError from 'src/utils/handleError.utils';
+import { useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 // Common
 const router = useRouter(),
     route = useRoute(),
     $q = useQuasar(),
     storeAuth = useStoreAuth(),
-    loading = ref(false)
+    loading = ref(false);
 
 // Form
 const signInForm = useTemplateRef<QForm>('signInForm'),
     formData = reactive({
         email: '',
         password: '',
-    })
+    });
 
 const handleSignIn = async () => {
-    if (!signInForm.value) return
+    if (!signInForm.value) return;
 
-    signInForm.value.resetValidation()
+    signInForm.value.resetValidation();
 
-    const success = await signInForm.value.validate()
+    const success = await signInForm.value.validate();
 
     if (!success) {
         $q.notify({
             type: 'negative',
             message: '',
-        })
+        });
     }
 
-    loading.value = true
+    loading.value = true;
 
     try {
         const payload: SignInPayload = {
             email: formData.email,
             password: formData.password,
-        }
-        const response = await storeAuth.signIn(payload)
+        };
+        const response = await storeAuth.signIn(payload);
 
         if (response) {
             $q.notify({
@@ -52,84 +52,90 @@ const handleSignIn = async () => {
                 message: 'Signed in successfully!',
                 timeout: 3000,
                 icon: 'mail',
-            })
+            });
 
             if (route.query.next) {
-                await router.push(route.query.next as string)
+                await router.push(route.query.next as string);
             } else {
-                await router.push({ name: 'home' })
+                await router.push({ name: 'home' });
             }
         }
     } catch (error) {
-        const message = handleError(error)
+        const message = handleError(error);
 
         $q.notify({
             type: 'negative',
             message: message ?? 'Error signing in',
-        })
+        });
     } finally {
-        loading.value = false
+        loading.value = false;
     }
-}
+};
 
 onMounted(async () => {
-    const hashParams = new URLSearchParams(window.location.hash.slice(1))
-    const queryType = route.query.type || hashParams.get('type')
+    const hashParams = new URLSearchParams(window.location.hash.slice(1));
+    const queryType = route.query.type || hashParams.get('type');
 
     if (queryType === 'signup' || queryType === 'email') {
         $q.notify({
             type: 'positive',
             message: 'Email confirmed, sign in to get started',
             timeout: 4500,
-        })
+        });
 
-        await router.replace({ hash: '' })
+        await router.replace({ hash: '' });
     }
-})
+});
 </script>
 
 <template>
-    <LayoutAuth title="Welcome Back" subtitle="Sign in to continue">
+    <LayoutAuth subtitle="Sign in to continue" title="Welcome Back">
         <template #form>
-            <q-form ref="signInForm" @submit.prevent="handleSignIn">
+            <q-form ref="signInForm" class="signin-form" @submit.prevent="handleSignIn">
                 <q-input
                     v-model="formData.email"
-                    label="Email"
-                    type="email"
-                    outlined
-                    dense
-                    color="primary"
                     autocomplete="email"
                     class="auth-input"
+                    color="primary"
+                    dense
+                    label="Email"
+                    outlined
                     :rules="[
                         (val) => !!val || 'Email is required',
                         (val, rules) => rules.email(val) || 'Please enter a valid email address',
                     ]"
+                    type="email"
                 />
 
                 <q-input
                     v-model="formData.password"
-                    label="Password"
-                    type="password"
-                    outlined
-                    dense
-                    color="primary"
                     autocomplete="current-password"
                     class="auth-input"
+                    color="primary"
+                    dense
+                    label="Password"
+                    outlined
                     :rules="[
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
+                    type="password"
                 />
 
-                <q-btn :loading="loading" class="auth-button full-width" type="submit" label="Sign In" no-caps>
+                <q-btn class="auth-button" label="Sign In" :loading="loading" no-caps type="submit">
                     <template #loading>
                         <q-spinner />
                     </template>
                 </q-btn>
 
-                <div class="row items-center justify-end q-mt-lg">
-                    <q-btn class="forgot-btn" :to="{ name: 'forgot-password' }" flat label="Forgot password?" no-caps />
+                <div class="signin-form__footer q-mt-lg">
+                    <q-btn
+                        class="signin-form__footer-button"
+                        flat
+                        label="Forgot password?"
+                        no-caps
+                        :to="{ name: 'forgot-password' }"
+                    />
                 </div>
             </q-form>
         </template>
@@ -141,16 +147,16 @@ onMounted(async () => {
     </LayoutAuth>
 </template>
 
-<style lang="sass" scoped>
-.forgot-btn
-    color: #ff9500
-    font-size: 0.75rem
+<style lang="scss" scoped>
+.signin-form {
+    &__footer {
+        display: flex;
+        justify-content: end;
+    }
 
-.auth-input
-    :deep(.q-field__control)
-        background: rgba(255, 255, 255, 0.02)
-        border-radius: 0.75rem
-
-    :deep(.q-field__label)
-        color: #aaa
+    &__footer-button {
+        color: #ff9500;
+        font-size: 0.75rem;
+    }
+}
 </style>

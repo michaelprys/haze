@@ -1,16 +1,19 @@
 <script setup lang="ts"></script>
 
 <template>
-    <div class="bg"><slot /></div>
+    <div class="bg">
+        <slot />
+    </div>
 </template>
 
-<style lang="sass" scoped>
-.bg
-    position: absolute
-    inset: 0
-    padding: 1rem
-    background: linear-gradient(170deg, #111111 0%, #121212 40%, #141414 70%, #16120a 90%, #111111 100%)
-    background-size: cover
-    width: 100%
-    height: 100%
+<style lang="scss" scoped>
+.bg {
+    background: linear-gradient(170deg, #111 0%, #121212 40%, #141414 70%, #16120a 90%, #111 100%);
+    background-size: cover;
+    height: 100%;
+    inset: 0;
+    padding: 1rem;
+    position: absolute;
+    width: 100%;
+}
 </style>

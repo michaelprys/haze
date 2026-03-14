@@ -1,0 +1,17 @@
+{
+    "extends": [
+        "stylelint-config-standard",
+        "stylelint-config-standard-scss",
+        "stylelint-config-recommended-vue/scss"
+    ],
+    "plugins": ["stylelint-order"],
+    "rules": {
+        "max-nesting-depth": 3,
+        "no-descending-specificity": null,
+        "keyframes-name-pattern": null,
+        "number-max-precision": 5,
+        "order/properties-alphabetical-order": true,
+        "color-function-notation": "modern",
+        "selector-class-pattern": null
+    }
+}

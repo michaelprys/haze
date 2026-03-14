@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted } from 'vue'
-import { useCamera } from 'src/composables/useCamera'
-import { usePost } from 'src/composables/usePost'
-import ButtonActive from 'components/ButtonActive.vue'
-import { useGeolocation } from 'src/composables/useGeolocation'
+import { onBeforeUnmount, onMounted, ref } from 'vue';
+import { useCamera } from 'src/composables/useCamera';
+import { usePost } from 'src/composables/usePost';
+import ButtonActive from 'components/ButtonActive.vue';
+import { useGeolocation } from 'src/composables/useGeolocation';
+import type { QForm } from 'quasar';
 
 // Post
-const { post, loading, handlePublishPost } = usePost()
+const { post, loading, handlePublishPost } = usePost();
 
 // Camera
 const {
@@ -23,284 +24,410 @@ const {
     resumeCamera,
     getImageSrc,
     checkDevice,
-} = useCamera(post)
+} = useCamera(post);
 
 // Camera loading
+const formRef = ref<QForm | null | undefined>(null);
 
 const onDeviceChange = () => {
-    isCameraInitializing.value = true
-    deactivateCamera()
-    void checkDevice().finally(() => (isCameraInitializing.value = false))
-}
+    isCameraInitializing.value = true;
+    deactivateCamera();
+    void checkDevice().finally(() => (isCameraInitializing.value = false));
+};
 
 const handleDeviceChange = () => {
-    void onDeviceChange()
-}
+    void onDeviceChange();
+};
 
 // Geolocation
-const { locationPending, hasGeolocation, getLocation } = useGeolocation(post)
+const { locationPending, hasGeolocation, getLocation } = useGeolocation(post);
 
 // Hooks
 onMounted(() => {
-    void initCamera()
+    void initCamera();
 
-    navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange)
-})
+    navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
+});
 
 onBeforeUnmount(() => {
-    navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange)
+    post.value = {
+        id: '',
+        caption: '',
+        location: '',
+        photoFile: null,
+        photoUrl: '',
+        takenAt: new Date().toISOString(),
+    };
+
+    navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
 
     if (hasCameraSupport.value) {
-        deactivateCamera()
+        deactivateCamera();
     }
-})
+});
 </script>
 
 <template>
-    <q-page class="haze-bg q-pa-md relative">
-        <q-card class="post-card q-pa-lg">
-            <div class="camera-wrapper">
-                <div class="camera-frame">
-                    <q-skeleton v-if="isCameraInitializing" class="camera-skeleton" animation="wave" />
+    <q-page class="camera haze-bg q-pa-md relative">
+        <q-card class="camera__card q-pa-lg">
+            <q-form
+                @submit.prevent="handlePublishPost(hasCameraSupport, formRef)"
+                class="camera__wrapper"
+                ref="formRef"
+            >
+                <div class="camera__frame">
+                    <q-skeleton
+                        v-if="isCameraInitializing"
+                        animation="wave"
+                        class="camera__skeleton"
+                    />
 
                     <video
                         v-show="isCameraActive && !imageCaptured"
                         ref="videoRef"
+                        class="camera__shot"
                         autoplay
                         playsinline
-                        class="camera-shot"
                     />
-                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera-shot" />
+                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera__shot" />
 
                     <q-img
                         v-if="!hasCameraSupport && post.photoUrl"
-                        :src="post.photoUrl"
-                        class="camera-shot"
+                        class="camera__shot"
                         fit="cover"
                         loading="eager"
+                        :src="post.photoUrl"
                     />
 
-                    <div v-show="!isCameraActive && !post.photoUrl && !imageCaptured" class="camera-placeholder">
-                        <div class="placeholder-wrapper">
+                    <div
+                        v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
+                        class="camera__placeholder"
+                    >
+                        <div class="camera__placeholder-wrapper">
                             <span> turn on your camera, or add a memory <br /> </span>
-                            <span class="placeholder-subtitle"> to capture the moment... </span>
+                            <span class="camera__placeholder-subtitle">
+                                to capture the moment...
+                            </span>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="text-center q-mt-lg">
-                <div v-if="hasCameraSupport">
-                    <q-btn
-                        v-if="hasCameraSupport && !imageCaptured"
-                        round
-                        icon="camera_alt"
-                        size="lg"
-                        class="camera-btn"
-                        unelevated
-                        @click="captureImage"
-                    />
+                <div class="camera__buttons">
+                    <div class="camera__buttons-wrapper" v-if="hasCameraSupport">
+                        <q-btn
+                            v-if="hasCameraSupport && !imageCaptured"
+                            class="camera__capture-button"
+                            icon="camera_alt"
+                            round
+                            size="lg"
+                            unelevated
+                            @click="captureImage"
+                        />
 
-                    <q-btn
-                        v-else-if="imageCaptured"
-                        round
-                        icon="replay"
-                        size="lg"
-                        class="camera-btn"
-                        unelevated
-                        @click="resumeCamera"
-                    />
+                        <q-btn
+                            v-else-if="imageCaptured"
+                            class="camera__capture-button"
+                            icon="replay"
+                            round
+                            size="lg"
+                            unelevated
+                            @click="resumeCamera"
+                        />
+                    </div>
+
+                    <q-file
+                        v-else
+                        v-model="cameraModel"
+                        class="camera__filepicker q-mt-lg"
+                        dense
+                        flat
+                        @update:model-value="getImageSrc"
+                    >
+                        <template #default>
+                            <span class="camera__filepicker-text">+ add memory</span>
+                        </template>
+                    </q-file>
                 </div>
 
-                <q-file v-else v-model="cameraModel" @update:model-value="getImageSrc" dense flat class="memory-link">
-                    <template #default>
-                        <span class="memory-link-text">+ add memory</span>
+                <q-input
+                    v-model="post.caption"
+                    class="camera__input q-mt-lg"
+                    dark
+                    dense
+                    label="Caption"
+                    outlined
+                    type="textarea"
+                    :rules="[
+                        (val) => !!val || 'Caption is required',
+                        (val) => val.length <= 200 || 'Maximum 200 characters',
+                    ]"
+                />
+
+                <q-input
+                    v-model="post.location"
+                    class="camera__input"
+                    dark
+                    dense
+                    label="Location"
+                    outlined
+                    :rules="[(val) => !!val || 'Location is required']"
+                >
+                    <template #append>
+                        <q-spinner
+                            v-if="locationPending"
+                            color="orange"
+                            size="18px"
+                            style="margin-right: 0.45rem"
+                        />
+
+                        <q-btn
+                            v-if="!locationPending && hasGeolocation"
+                            class="camera__geo-button"
+                            flat
+                            @click.stop="getLocation"
+                            icon="place"
+                        />
                     </template>
-                </q-file>
-            </div>
+                </q-input>
 
-            <q-input
-                v-model="post.caption"
-                label="Caption"
-                dense
-                dark
-                outlined
-                type="textarea"
-                class="q-mt-lg input-style"
-            />
-
-            <q-input v-model="post.location" label="Location" dense dark outlined class="q-mt-md input-style">
-                <template v-slot:append>
-                    <q-spinner
-                        v-if="locationPending"
-                        style="margin-right: 1.2rem"
-                        color="orange"
-                        size="18px"
-                    ></q-spinner>
-
-                    <q-btn v-if="!locationPending && hasGeolocation" @click="getLocation" icon="place" flat />
-                </template>
-            </q-input>
-
-            <div class="q-mt-xl">
-                <ButtonActive :loading="loading" @click="handlePublishPost(hasCameraSupport)" label="Publish" />
-            </div>
+                <div class="camera__publish-button">
+                    <ButtonActive label="Publish" :loading="loading" type="submit" />
+                </div>
+            </q-form>
         </q-card>
     </q-page>
 </template>
 
-<style lang="sass" scoped>
-.haze-bg
-    min-height: 100svh
-    display: flex
-    justify-content: center
-    align-items: flex-start
-    padding-top: 1.75rem
+<style lang="scss" scoped>
+.camera {
+    &.haze-bg {
+        align-items: flex-start;
+        display: flex;
+        justify-content: center;
+        min-height: 100svh;
+        padding-top: 1.75rem;
+    }
 
-.post-card
-    border-radius: 1.5rem
-    box-shadow: 0 1.25rem 1.75rem rgba(0, 0, 0, 0.3)
-    width: 100%
-    max-width: 45rem
+    &__card {
+        background-color: #0a0a0a;
+        border-radius: 1.5rem;
+        box-shadow: 0 1.25rem 1.75rem rgb(0 0 0 / 15%);
+        max-width: 45rem;
+        padding: 1.5rem;
+        width: 100%;
+    }
 
-.camera-frame
-    position: relative
-    overflow: hidden
-    aspect-ratio: 3 / 2
-    border-radius: 1.5rem
-    width: 100%
-    max-width: 35rem
-    margin: 0 auto
-    background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%)
-    box-shadow:  0 0.875rem 2.5rem rgba(0, 0, 0, 0.8),  0 0 0 0.0625rem rgba(255, 140, 0, 0.08)
+    &__wrapper {
+        width: 100%;
+    }
 
-.camera-shot
-    position: absolute
-    inset: 0
-    z-index: 1
-    object-fit: cover
+    &__frame {
+        aspect-ratio: 3 / 2;
+        background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%);
+        border-radius: 1.5rem;
+        box-shadow:
+            0 0.875rem 2.5rem rgb(0 0 0 / 80%),
+            0 0 0 0.0625rem rgb(255 140 0 / 8%);
+        margin: 0 auto;
+        max-width: 35rem;
+        overflow: hidden;
+        position: relative;
+        width: 100%;
+    }
 
-.camera-placeholder
-    display: grid
-    place-items: center
-    position: absolute
-    inset: 0
-    z-index: 0
-    object-fit: cover
-    width: 100%
-    height: 100%
-    background: linear-gradient(135deg, #f0a53e 0%, #f8bd2e 30%, #f06c4c 60%, #f04a46 100%)
-    background-blend-mode: overlay
-    overflow: hidden
+    &__shot {
+        inset: 0;
+        object-fit: cover;
+        position: absolute;
+        z-index: 1;
+    }
 
-.placeholder-wrapper
-    display: flex
-    flex-direction: column
-    align-items: flex-end
-    margin-right: 1.5rem
-    font-style: italic
-    font-family: 'Georgia', 'Times New Roman', serif
-    font-size: 1.05rem
-    letter-spacing: 0.025em
-    font-weight: 500
-    line-height: 1.45
-    color: #ffffff
-    text-shadow: 0 2px 8px rgba(0,0,0,0.2), 0 0 12px rgba(0,0,0,0.2)
+    &__placeholder {
+        background: linear-gradient(135deg, #f0a53e 0%, #f8bd2e 30%, #f06c4c 60%, #f04a46 100%);
+        background-blend-mode: overlay;
+        display: grid;
+        inset: 0;
+        object-fit: cover;
+        overflow: hidden;
+        place-items: center;
+        position: absolute;
+        z-index: 0;
+    }
 
-.placeholder-subtitle
-    margin-right: -1.5rem
-    font-size: 0.9rem
-    opacity: 0.92
-    text-shadow: inherit
+    &__placeholder-wrapper {
+        align-items: flex-end;
+        color: #fff;
+        display: flex;
+        flex-direction: column;
+        font-family: Georgia, 'Times New Roman', serif;
+        font-size: 1.05rem;
+        font-style: italic;
+        font-weight: 500;
+        letter-spacing: 0.025em;
+        line-height: 1.45;
+        margin-right: 1.5rem;
+        text-shadow:
+            0 2px 8px rgb(0 0 0 / 20%),
+            0 0 12px rgb(0 0 0 / 20%);
+    }
 
-.camera-skeleton
-    height: 100%
+    &__placeholder-subtitle {
+        font-size: 0.9rem;
+        margin-right: -1.5rem;
+        opacity: 0.92;
+        text-shadow: inherit;
+    }
 
-.post-image
-    width: 100%
-    border-radius: 1.5rem
-    max-height: 25rem
+    &__skeleton {
+        height: 100%;
+    }
 
-.camera-btn
-    background: linear-gradient(135deg, rgba(255, 122, 0, 0.8), rgba(255, 60, 0, 0.8))
-    color: white
-    transition: transform 0.2s ease
+    &__buttons {
+        margin-top: 1rem;
+        width: 100%;
+    }
 
-    &:hover
-        transform: scale(1.1)
+    &__buttons-wrapper {
+        display: flex;
+        justify-content: center;
+        margin-top: 1.5rem;
+    }
 
-:deep(.memory-link)
-    max-width: 13.75rem
-    align-items: center
-    .q-field__native
-        display: none
+    &__capture-button {
+        background: linear-gradient(235deg, #d98868, #d95a4f);
+        color: white;
+        transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
+    }
 
-    .q-field__control::before,
-    .q-field__control::after
-        display: none
+    &__filepicker {
+        align-items: center;
+        max-width: 13.75rem;
 
-    .q-field__control
-        background: transparent
-        box-shadow: none
-        padding: 0
-        min-height: auto
+        :deep() {
+            .q-field__native {
+                display: none;
+            }
 
-.memory-link-text
-    display: flex
-    align-items: center
-    cursor: pointer
-    font-size: 1rem
-    font-weight: 500
-    letter-spacing: 0.05em
-    color: #ff9a3c
-    transition: all 0.25s ease
-    text-shadow: 0 0 0.375rem rgba(255, 122, 0, 0.35)
+            .q-field__control::before,
+            .q-field__control::after {
+                display: none;
+            }
 
-    &:hover
-        color: #ffb15c
-        text-shadow: 0 0
+            .q-field__control {
+                background: transparent;
+                box-shadow: none;
+                min-height: auto;
+                padding: 0;
+            }
+        }
+    }
 
-:deep(.input-style)
-    .q-field__control
-        background: #1b1b1b
-        border-radius: 0.875rem
+    &__filepicker-text {
+        align-items: center;
+        color: #ff9a3c;
+        cursor: pointer;
+        display: flex;
+        font-size: 1rem;
+        font-weight: 500;
+        letter-spacing: 0.05em;
+        text-shadow: 0 0 0.375rem rgb(255 122 0 / 35%);
+        transition: all 0.25s ease;
 
-    .q-field__label
-        color: #ff9a3c
+        &:hover {
+            color: #ffb15c;
+            text-shadow: 0 0;
+        }
+    }
 
-    .q-field__control::before,
-    .q-field__control::after
-        border-color: rgba(255, 154, 60, 0.3)
+    &__button-hover:hover {
+        transform: scale(1.1);
+    }
 
-    textarea
-        scrollbar-width: thin
-        scrollbar-color: rgba(255,154,60,0.45) transparent
+    &__link-text:hover {
+        color: #ffb15c;
+        text-shadow: 0 0;
+    }
 
-        &::-webkit-scrollbar
-            width: 0.375rem
+    &__input {
+        :deep() {
+            .q-field__control {
+                background: rgb(255 255 255 / 2%);
+                border-radius: 0.75rem;
+            }
 
-        &::-webkit-scrollbar-track
-            background: transparent
+            .q-field__label {
+                color: #aaa;
+            }
+        }
+    }
 
-        &::-webkit-scrollbar-thumb
-            background: rgba(255,154,60,0.45)
-            border-radius: 62.4375rem
+    &__geo-button {
+        background: linear-gradient(135deg, #404040, rgb(102 102 102 / 50%));
+        border-radius: 0.75rem;
+        box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 50%);
+        color: white;
+        max-width: 2.3rem;
+        transition:
+            box-shadow 0.2s ease,
+            filter 0.2s ease;
 
-        &::-webkit-scrollbar-thumb:hover
-            background: rgba(255,154,60,0.7)
+        &:hover {
+            box-shadow: 0 0.5rem 1.2rem rgb(0 0 0 / 60%);
+            filter: brightness(1.05);
+        }
 
-.post-btn
-    background: linear-gradient(90deg, #ff7a00, #ff3c00, #000)
-    color: white
-    font-weight: 700
-    border-radius: 62.4375rem
-    letter-spacing: 0.0625rem
-    text-transform: uppercase
-    transition: all 0.3s ease
+        &:active {
+            box-shadow: 0 0.2rem 0.5rem rgb(0 0 0 / 40%);
+        }
+    }
 
-@media(width <= $breakpoint-sm-min)
-    .placeholder-wrapper
-        font-size: 0.8rem
-    .placeholder-subtitle
-        font-size: 0.7rem
+    &__field-control {
+        background: #1b1b1b;
+        border-radius: 0.875rem;
+    }
+
+    &__label {
+        color: #ff9a3c;
+    }
+
+    &__field-border {
+        border-color: rgb(255 154 60 / 30%);
+    }
+
+    &__textarea-scrollbar {
+        scrollbar-color: rgb(255 154 60 / 45%) transparent;
+        scrollbar-width: thin;
+    }
+
+    &__textarea-thumb {
+        background: rgb(255 154 60 / 45%);
+        border-radius: 62.4375rem;
+    }
+
+    &__textarea-thumb-hover:hover {
+        background: rgb(255 154 60 / 70%);
+    }
+
+    &__post-button {
+        background: linear-gradient(90deg, #ff7a00, #ff3c00, #000);
+        border-radius: 62.4375rem;
+        color: white;
+        font-weight: 700;
+        letter-spacing: 0.0625rem;
+        text-transform: uppercase;
+        transition: all 0.3s ease;
+    }
+
+    @media (max-width: $breakpoint-sm-min) {
+        &__placeholder-wrapper {
+            font-size: 0.8rem;
+        }
+
+        &__placeholder-subtitle {
+            font-size: 0.7rem;
+        }
+    }
+}
 </style>

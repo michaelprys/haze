@@ -1,11 +1,11 @@
-import { supabase } from 'src/api/supabaseClient'
+import { supabase } from 'src/api/supabaseClient';
 
 export const getCurrentUser = async () => {
     const {
         data: { user },
-    } = await supabase.auth.getUser()
+    } = await supabase.auth.getUser();
 
-    if (!user) throw new Error('Not authenticated')
+    if (!user) throw new Error('Not authenticated');
 
-    return user
-}
+    return user;
+};

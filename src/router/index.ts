@@ -1,8 +1,13 @@
-import { defineRouter } from '#q-app/wrappers'
-import { createMemoryHistory, createRouter, createWebHashHistory, createWebHistory } from 'vue-router'
-import routes from './routes'
-import { useStoreAuth } from 'stores/auth.store'
-import { supabase } from 'src/api/supabaseClient'
+import { defineRouter } from '#q-app/wrappers';
+import {
+    createMemoryHistory,
+    createRouter,
+    createWebHashHistory,
+    createWebHistory,
+} from 'vue-router';
+import routes from './routes';
+import { useStoreAuth } from 'stores/auth.store';
+import { supabase } from 'src/api/supabaseClient';
 
 /*
  * If not building with SSR mode, you can
@@ -18,7 +23,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         ? createMemoryHistory
         : process.env.VUE_ROUTER_MODE === 'history'
           ? createWebHistory
-          : createWebHashHistory
+          : createWebHashHistory;
 
     const Router = createRouter({
         scrollBehavior: () => ({ left: 0, top: 0 }),
@@ -28,40 +33,40 @@ export default defineRouter(function (/* { store, ssrContext } */) {
         // quasar.conf.js -> build -> vueRouterMode
         // quasar.conf.js -> build -> publicPath
         history: createHistory(process.env.VUE_ROUTER_BASE),
-    })
+    });
 
-    const storeAuth = useStoreAuth()
+    const storeAuth = useStoreAuth();
 
     Router.beforeEach(async (to, _, next) => {
         if (!storeAuth.isAuthenticated) {
             try {
-                const { data } = await supabase.auth.getUser()
+                const { data } = await supabase.auth.getUser();
 
                 if (data.user) {
-                    storeAuth.user = data.user ?? null
+                    storeAuth.user = data.user ?? null;
                 }
             } catch {
-                void 0
+                void 0;
             }
         }
 
-        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth)
-        const confirmOnly = to.matched.some((q) => q.meta.confirmOnly)
+        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth);
+        const confirmOnly = to.matched.some((q) => q.meta.confirmOnly);
 
         if (!storeAuth.isAuthenticated && requiresAuth) {
             return next({
                 name: 'sign-in',
                 query: { next: to.fullPath },
                 replace: true,
-            })
+            });
         }
 
         if (storeAuth.isAuthenticated && confirmOnly) {
-            return next()
+            return next();
         }
 
-        next()
-    })
+        next();
+    });
 
-    return Router
-})
+    return Router;
+});

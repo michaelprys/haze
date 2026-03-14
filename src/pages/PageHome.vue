@@ -1,82 +1,82 @@
 <script setup lang="ts">
-import { date } from 'quasar'
-import { onMounted, ref } from 'vue'
-import ButtonActive from 'components/ButtonActive.vue'
-import { useQuasar } from 'quasar'
-import { useStoreProfile } from 'stores/profile.store'
-import handleError from 'src/utils/handleError.utils'
-import { useStorePosts } from 'src/stores/posts.store'
-import type { Post } from 'src/types/post.types'
-import ItemAvatar from 'components/ItemAvatar.vue'
+import { date } from 'quasar';
+import { onMounted, ref } from 'vue';
+import ButtonActive from 'components/ButtonActive.vue';
+import { useQuasar } from 'quasar';
+import { useStoreProfile } from 'stores/profile.store';
+import handleError from 'src/utils/handleError.utils';
+import { useStorePosts } from 'src/stores/posts.store';
+import type { Post } from 'src/types/post.types';
+import ItemAvatar from 'components/ItemAvatar.vue';
 
 const storeProfile = useStoreProfile(),
     storePosts = useStorePosts(),
-    $q = useQuasar()
+    $q = useQuasar();
 
 // Posts
-const posts = ref<Post[]>([])
+const posts = ref<Post[]>([]);
 
 const formattedDate = (value: string) => {
-    return date.formatDate(value, 'MMMM D, h:mm A')
-}
+    return date.formatDate(value, 'MMMM D, h:mm A');
+};
 
 // Avatar
 const avatarModel = ref<File | null>(null),
-    initial = storeProfile.profileInfo?.username?.charAt(0)
+    initial = storeProfile.profileInfo?.username?.charAt(0);
 
 const handleUpdateAvatar = async () => {
-    if (!avatarModel.value) return
+    if (!avatarModel.value) return;
 
     try {
-        await storeProfile.updateAvatar(avatarModel.value)
+        await storeProfile.updateAvatar(avatarModel.value);
 
         $q.notify({
             type: 'positive',
-            message: 'ItemAvatar updated successfully',
-        })
+            message: 'Avatar updated successfully',
+        });
     } catch (error) {
-        const message = handleError(error)
+        const message = handleError(error);
 
         $q.notify({
             type: 'negative',
             message: message ?? 'Error uploading avatar',
-        })
+        });
     } finally {
-        avatarModel.value = null
+        avatarModel.value = null;
     }
-}
+};
 
 const onAvatarUpdate = async (file: File) => {
-    avatarModel.value = file
-    await handleUpdateAvatar()
-}
+    avatarModel.value = file;
+    await handleUpdateAvatar();
+};
 
-// Load posts
-const pending = ref(true)
+// Posts
+const pending = ref(true);
 
 // Skeleton
 const showSkeleton = ref(false),
     MIN_SKELETON = 500,
-    THRESHOLD = 200
-let skeletonTimer: ReturnType<typeof setTimeout> | null = null
+    THRESHOLD = 200;
+let skeletonTimer: ReturnType<typeof setTimeout> | null = null;
 
 const onImageLoad = () => {
-    if (skeletonTimer) clearTimeout(skeletonTimer)
+    if (skeletonTimer) clearTimeout(skeletonTimer);
 
     skeletonTimer = setTimeout(() => {
-        showSkeleton.value = true
+        showSkeleton.value = true;
 
         setTimeout(() => {
-            showSkeleton.value = false
-        }, MIN_SKELETON)
-    }, THRESHOLD)
-}
+            showSkeleton.value = false;
+        }, MIN_SKELETON);
+    }, THRESHOLD);
+};
 
 onMounted(async () => {
     try {
-        await storeProfile.loadUserInfo()
+        await storeProfile.loadUserInfo();
 
-        const apiPosts = await storePosts.loadPosts()
+        const apiPosts = await storePosts.loadPosts();
 
         posts.value = apiPosts.map((p) => ({
             id: p.id,
@@ -85,333 +85,351 @@ onMounted(async () => {
             photoFile: null,
             photoUrl: p.image_url,
             takenAt: p.taken_at,
-        }))
+        }));
     } catch (error) {
-        console.error(handleError(error))
+        console.error(handleError(error));
     } finally {
-        pending.value = false
+        pending.value = false;
     }
-})
+});
 </script>
 
 <template>
-    <q-page class="flex flex-center q-pa-md">
-        <div class="content-container">
-            <div class="loading-state text-center q-my-xl" v-if="pending">
+    <q-page class="profile q-pa-md">
+        <div class="profile__container">
+            <div v-if="pending" class="profile__loading">
                 <q-spinner-dots color="orange" size="4rem" />
-                <div class="q-mt-md text-h6 text-grey-4">Loading...</div>
+                <div class="profile__loading-text">Loading your moments...</div>
             </div>
-            <div class="empty-profile" v-else-if="posts.length === 0">
-                <q-card class="profile-card" flat>
-                    <q-card-section class="flex column items-center text-center q-pt-lg q-pb-lg">
-                        <div class="avatar-wrapper q-mb-md">
+
+            <template v-else>
+                <div v-if="posts.length === 0" class="profile__empty">
+                    <section class="user-card user-card--hero">
+                        <div class="user-card__avatar-wrapper">
                             <ItemAvatar
+                                :avatar-src="storeProfile.profileInfo?.avatarUrl"
                                 :initial="initial"
-                                :avatarSrc="storeProfile.profileInfo?.avatarUrl"
                                 @update-avatar="onAvatarUpdate"
-                                @load="onImageLoad"
                             />
                         </div>
-
-                        <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
-                        <div class="profile-sub accent-line">
+                        <h1 class="user-card__name">{{ storeProfile.profileInfo?.username }}</h1>
+                        <p class="user-card__bio user-card__bio--accent">
                             {{ storeProfile.profileInfo?.bio ?? 'No bio yet' }}
-                        </div>
-
+                        </p>
                         <ButtonActive
-                            class="shot-btn"
+                            class="user-card__action-btn"
                             label="Create Post"
                             :to="{ name: 'camera-page' }"
-                            unelevated
-                            rounded
-                            dense
                         />
-                    </q-card-section>
-                </q-card>
-            </div>
+                    </section>
+                </div>
 
-            <div class="feed" v-else>
-                <q-card v-for="post in posts" :key="post.id" class="post-card q-mb-lg" flat bordered>
-                    <q-item class="q-my-sm post-header">
-                        <q-item-section avatar top>
-                            <q-avatar size="3rem">
+                <div v-else class="profile__feed feed">
+                    <article v-for="post in posts" :key="post.id" class="post-card">
+                        <header class="post-card__header">
+                            <q-avatar size="3rem" class="post-card__avatar">
                                 <q-img
                                     v-if="storeProfile.profileInfo?.avatarUrl"
-                                    :src="storeProfile.profileInfo?.avatarUrl"
-                                    :initial="initial"
-                                    alt="Post image"
-                                    @load="onImageLoad"
+                                    :src="storeProfile.profileInfo.avatarUrl"
                                 >
                                     <template #loading>
-                                        <q-skeleton type="QAvatar" width="100%" height="100%" />
+                                        <q-skeleton width="100%" height="100%" type="QAvatar" />
                                     </template>
                                 </q-img>
-
-                                <div class="post-avatar-placeholder" v-else>
-                                    {{ initial }} <q-icon v-if="!initial" name="person" size="32" />
+                                <div v-else class="post-card__avatar-placeholder">
+                                    {{ initial }}
                                 </div>
                             </q-avatar>
-                        </q-item-section>
+                            <div class="post-card__user-info">
+                                <span class="post-card__username">{{
+                                    storeProfile.profileInfo?.username
+                                }}</span>
+                                <p class="post-card__caption">{{ post.caption }}</p>
+                            </div>
+                        </header>
 
-                        <q-item-section class="header-text">
-                            <q-item-label class="post-username">{{ storeProfile.profileInfo?.username }}</q-item-label>
-                            <q-item-label class="caption">
-                                {{ post.caption }}
-                            </q-item-label>
-                        </q-item-section>
-                    </q-item>
+                        <q-separator dark />
 
-                    <q-separator />
-
-                    <q-img :src="post.photoUrl" class="post-image" @load="onImageLoad">
-                        <template #loading>
-                            <q-skeleton width="100%" height="100%" />
-                        </template>
-
-                        <template #error>
-                            <div class="post-placeholder" />
-                        </template>
-                    </q-img>
-
-                    <q-card-section>
-                        <div class="location">
-                            {{ post.location }}
+                        <div class="post-card__media">
+                            <q-img
+                                :src="post.photoUrl"
+                                class="post-card__image"
+                                @load="onImageLoad"
+                            >
+                                <template #loading>
+                                    <q-skeleton width="100%" height="100%" />
+                                </template>
+                                <template #error>
+                                    <div class="post-card__image-error">
+                                        <span class="post-card__error-icon">✧･ﾟ</span>
+                                        <span class="post-card__error-text">lost image</span>
+                                    </div>
+                                </template>
+                            </q-img>
                         </div>
-                        <div class="date">
-                            {{ formattedDate(post.takenAt) }}
-                        </div>
-                    </q-card-section>
-                </q-card>
-            </div>
 
-            <div class="profile large-screen-only" v-if="posts.length > 0">
-                <q-card class="profile-card" flat bordered>
-                    <q-card-section class="flex column items-center text-center">
-                        <ItemAvatar
-                            :initial="initial"
-                            :avatarSrc="storeProfile.profileInfo?.avatarUrl ?? ''"
-                            @update-avatar="onAvatarUpdate"
-                        />
+                        <footer class="post-card__footer">
+                            <div class="post-card__location">{{ post.location }}</div>
+                            <div class="post-card__date">{{ formattedDate(post.takenAt) }}</div>
+                        </footer>
+                    </article>
+                </div>
 
-                        <div class="q-mt-sm">
-                            <div class="profile-name">{{ storeProfile.profileInfo?.username }}</div>
-                            <div class="profile-sub">
-                                {{ storeProfile.profileInfo?.bio || 'No bio yet' }}
+                <aside v-if="posts.length > 0" class="profile__sidebar">
+                    <div class="user-card">
+                        <div class="user-card__content">
+                            <ItemAvatar
+                                :avatar-src="storeProfile.profileInfo?.avatarUrl ?? ''"
+                                :initial="initial"
+                                @update-avatar="onAvatarUpdate"
+                            />
+                            <div class="user-card__info">
+                                <div class="user-card__name">
+                                    {{ storeProfile.profileInfo?.username ?? 'User' }}
+                                </div>
+                                <div class="user-card__bio">
+                                    {{ storeProfile.profileInfo?.bio || 'No bio yet' }}
+                                </div>
                             </div>
                         </div>
-                    </q-card-section>
 
-                    <q-separator />
+                        <q-separator class="q-my-sm" dark />
 
-                    <q-card-section class="text-center q-py-md">
-                        <ButtonActive label="Create Post" :to="{ name: 'camera-page' }" flat no-caps dense unelevated />
-                    </q-card-section>
-                </q-card>
-            </div>
+                        <ButtonActive
+                            flat
+                            no-caps
+                            label="Create Post"
+                            class="full-width"
+                            :to="{ name: 'camera-page' }"
+                        />
+                    </div>
+                </aside>
+            </template>
         </div>
     </q-page>
 </template>
 
-<style lang="sass" scoped>
-.q-img__content > .post-placeholder
-    position: absolute
-    inset: 0
-    width: 100%
-    height: 100%
-    z-index: 22
-    background: linear-gradient(160deg, #0d0d0d 0%, #342316 45%, #1a0f0a 70%, #0d0d0d 100%)
-    display: flex
-    flex-direction: column
-    align-items: center
-    justify-content: center
-    gap: 0.8rem
-    font-family: Georgia, serif
-    color: #ffab6e
+<style lang="scss" scoped>
+$color-bg: #0d0d0d;
+$color-accent: #ff9c30;
+$color-border: rgb(255 160 50 / 15%);
+$color-text-muted: #b08040;
 
-    &::before
-        content: "✧･ﾟ"
-        font-size: 5.8rem
-        letter-spacing: -0.18em
-        opacity: 0.38
-        color: #ffc18a
-        text-shadow: 0 0 15px rgba(255, 154, 94, 0.5), 0 0 30px rgba(255, 120, 60, 0.25)
+.profile {
+    display: grid;
+    place-items: center;
 
-    &::after
-        content: "lost image"
-        font-size: 1.18rem
-        font-style: italic
-        letter-spacing: 0.09em
-        opacity: 0.78
-        color: #ffbb90
+    &__container {
+        display: flex;
+        align-items: flex-start;
+        gap: 4rem;
+        justify-content: center;
+        max-width: 75rem;
+        width: 100%;
+    }
 
-.content-container
-    width: 100%
-    max-width: 75rem
-    display: flex
-    justify-content: center
-    align-items: flex-start
-    gap: 4rem
+    &__loading {
+        margin: 5rem 0;
+        text-align: center;
 
-.empty-profile
-    width: 100%
-    max-width: 36rem
-    height: 100%
-    display: flex
-    align-items: center
-    justify-content: center
-    padding: 1.5rem
+        &-text {
+            color: #9e9e9e;
+            font-size: 1.25rem;
+            margin-top: 1rem;
+        }
+    }
 
-.profile
-    flex: 0 0 22rem
+    &__empty {
+        max-width: 32rem;
+        width: 100%;
+    }
 
-.profile-card
-    background-color: #0d0d0d
-    border-radius: 1.75rem
-    border: 1px solid rgba(255, 160, 50, 0.22)
-    backdrop-filter: blur(1.125rem)
-    box-shadow: 0 1.875rem 6.25rem rgba(0,0,0,0.92), 0 0 0 0.0625rem rgba(255, 160, 50, 0.08) inset
-    width: 100%
+    &__feed {
+        flex: 1;
+        max-width: 40rem;
+    }
 
-.profile-name
-    font-size: 1.5rem
-    font-weight: 700
-    margin-bottom: 0.3rem
-    text-shadow: 0 0.0625rem 0.25rem rgba(0,0,0,0.8)
+    &__sidebar {
+        flex: 0 0 22rem;
+        position: sticky;
+        top: 6rem;
 
-.profile-sub
-    font-size: 0.9rem
-    color: #c8a070
-    font-weight: 300
-    letter-spacing: 0.0625rem
+        @media (width <= 55rem) {
+            display: none;
+        }
+    }
+}
 
-.no-photo-overlay
-    position: absolute
-    inset: 0
-    background: linear-gradient(135deg, #1a1a1a, #0d0d0d)
-    display: flex
-    align-items: center
-    justify-content: center
-    color: #666
-    font-size: 1.4rem
-    font-weight: 500
-    text-shadow: 0 0.0625rem 0.25rem #000
+.user-card {
+    align-items: center;
+    backdrop-filter: blur(18px);
+    background-color: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: 1.75rem;
+    box-shadow: 0 30px 100px rgb(0 0 0 / 90%);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    text-align: center;
 
-    &::before
-        content: "No Photo"
-        opacity: 0.7
+    &--hero {
+        width: 100%;
+    }
 
-.empty-main
-    font-size: 1.45rem
-    line-height: 1.4
-    color: #c0c0ff
-    margin-bottom: 0.5rem
-    letter-spacing: -0.01875rem
+    &__name {
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        margin-top: 1rem;
+    }
 
-.accent-line
-    color: #ffaa60
-    font-weight: 500
-    text-shadow: 0 0 0.5rem rgba(255, 170, 96, 0.4)
+    &__bio {
+        color: #c8a070;
+        font-size: 0.9rem;
+        font-weight: 300;
+        margin-top: 0.5rem;
 
-.shot-btn
-    background: linear-gradient(90deg, #ffbe30, #ff7a00, #ffbe30, #ff7a00)
-    background-size: 300% 100%
-    animation: gradientFlow 4s ease infinite
-    color: #ffffff
-    font-weight: 800
-    font-size: 1.1rem
-    letter-spacing: 0.03125rem
-    padding: 0.75rem 2.2rem
-    border-radius: 62.4375rem
-    box-shadow: 0 0.3125rem 0.9375rem rgba(255, 130, 0, 0.45)
-    transition: all 0.28s ease
-    text-transform: uppercase
-    line-height: 1.1
-    margin-top: 1.8rem
+        &--accent {
+            color: $color-accent;
+            font-weight: 500;
+        }
+    }
 
-    .q-icon
-        font-size: 1.35rem
-        margin-left: 0.7rem
-        transition: transform 0.3s ease
+    &__action-btn {
+        animation: gradientFlow 4s ease infinite;
+        background: linear-gradient(90deg, #ffbe30, #ff7a00);
+        background-size: 200% auto;
+        border-radius: 50px;
+        font-weight: 800;
+        margin-top: 0.5rem;
+        text-transform: uppercase;
+    }
+}
 
-    &:hover .q-icon
-        transform: translateX(0.25rem)
+.post-card {
+    background-color: $color-bg;
+    border: 1px solid $color-border;
+    border-radius: 1.5rem;
+    margin-bottom: 2rem;
+    overflow: hidden;
+    transition: transform 0.3s ease;
 
-@keyframes gradientFlow
-    0%
-        background-position: 0 50%
-    50%
-        background-position: 100% 50%
-    100%
-        background-position: 0 50%
+    &__media {
+        aspect-ratio: 16/9;
+        background: #111;
+        overflow: hidden;
+        position: relative;
+    }
 
-.feed
-    width: 100%
-    max-width: 40rem
+    &__skeleton {
+        background: rgb(255 255 255 / 5%);
+        height: 100%;
+        width: 100%;
+    }
 
-.post-card
-    background-color: #0d0d0d
-    border-radius: 1.5rem
-    border: 1px solid rgba(255, 160, 50, 0.15)
-    box-shadow: 0 1.25rem 5rem rgba(0,0,0,0.8)
+    &__skeleton-overlay {
+        background: $color-bg;
+        inset: 0;
+        position: absolute;
+        z-index: 10;
+    }
 
-.post-image
-    width: 100%
-    max-height: 28rem
-    aspect-ratio: 16/9
+    &__image {
+        display: block;
+        height: 100%;
+        object-fit: cover;
+        width: 100%;
+    }
 
-.post-username
-    font-weight: 600
-    color: #ffe8c0
+    &__header {
+        align-items: center;
+        display: flex;
+        gap: 1rem;
+        padding: 1rem;
+    }
 
-.post-header
-    align-items: flex-start
+    &__user-info {
+        display: flex;
+        flex-direction: column;
+    }
 
-.post-avatar-placeholder
-    display: grid
-    place-items: center
-    background: linear-gradient(145deg, #fce8e0 0%, #f9d6c2 40%, #f5bfa0 70%, #f0a67f 100%)
-    font-weight: 700
-    font-size: 2rem
-    width: 100%
-    height: 100%
-    color: #7a5c44
-    font-size: 1.5rem
+    &__username {
+        color: #ffe8c0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
 
-.header-text
-    display: flex
-    flex-direction: column
-    align-items: flex-start
+    &__caption {
+        color: #eee;
+        font-size: 0.9rem;
+        margin: 0;
+    }
 
-.caption
-    font-size: 1rem
-    margin-top: 0.25rem
-    word-break: break-word
+    &__media {
+        aspect-ratio: 16/9;
+        background: #111;
+        position: relative;
+    }
 
-.location
-    color: #ff9c30
-    font-size: 0.9rem
+    &__image-error {
+        align-items: center;
+        background: linear-gradient(160deg, #0d0d0d, #1a0f0a);
+        color: $color-accent;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        justify-content: center;
+        width: 100%;
+    }
 
-.date
-    color: #b08040
-    font-size: 0.78rem
-    margin-top: 0.3rem
+    &__error-icon {
+        font-size: 4rem;
+        opacity: 0.4;
+    }
 
+    &__error-text {
+        font-style: italic;
+        letter-spacing: 0.1em;
+        opacity: 0.8;
+    }
 
-.profile.large-screen-only
-    width: 24rem
-    position: sticky
-    top: 6rem
+    &__footer {
+        padding: 1rem;
+    }
 
-@media (width <= 55rem)
-    .profile.large-screen-only
-        display: none
+    &__location {
+        color: $color-accent;
+        font-size: 0.85rem;
+    }
 
-        .empty-profile
-            padding: 1rem
+    &__date {
+        color: $color-text-muted;
+        font-size: 0.75rem;
+        margin-top: 0.25rem;
+    }
 
-        .profile-name
-            font-size: 1.8rem
+    &__avatar-placeholder {
+        background: linear-gradient(145deg, #fce8e0, #f0a67f);
+        color: #7a5c44;
+        display: grid;
+        font-weight: bold;
+        height: 100%;
+        place-items: center;
+        width: 100%;
+    }
+}
 
-        .empty-hint
-            font-size: 1.05rem
+@keyframes gradientFlow {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
 </style>

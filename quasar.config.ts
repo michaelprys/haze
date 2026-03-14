@@ -1,8 +1,8 @@
 // Configuration for your app
 // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file
 
-import { defineConfig } from '#q-app/wrappers'
-import { fileURLToPath } from 'node:url'
+import { defineConfig } from '#q-app/wrappers';
+import { fileURLToPath } from 'node:url';
 
 export default defineConfig((ctx) => {
     return {
@@ -12,10 +12,10 @@ export default defineConfig((ctx) => {
         // app boot file (/src/boot)
         // --> boot files are part of "main.js"
         // https://v2.quasar.dev/quasar-cli-vite/boot-files
-        boot: ['i18n', 'axios'],
+        boot: ['axios'],
 
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#css
-        css: ['app.sass'],
+        css: ['app.scss'],
 
         // https://github.com/quasarframework/quasar/tree/dev/extras
         extras: [
@@ -65,28 +65,12 @@ export default defineConfig((ctx) => {
 
             vitePlugins: [
                 [
-                    '@intlify/unplugin-vue-i18n/vite',
-                    {
-                        // if you want to composables Vue I18n Legacy API, you need to set `compositionOnly: false`
-                        // compositionOnly: false,
-
-                        // if you want to composables named tokens in your Vue I18n messages, such as 'Hello {name}',
-                        // you need to set `runtimeOnly: false`
-                        // runtimeOnly: false,
-
-                        ssr: ctx.modeName === 'ssr',
-
-                        // you need to set i18n resource including paths !
-                        include: [fileURLToPath(new URL('./src/i18n', import.meta.url))],
-                    },
-                ],
-
-                [
                     'vite-plugin-checker',
                     {
                         vueTsc: true,
                         eslint: {
-                            lintCommand: 'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
+                            lintCommand:
+                                'eslint -c ./eslint.config.js "./src*/**/*.{ts,js,mjs,cjs,vue}"',
                             useFlatConfig: true,
                         },
                     },
@@ -234,5 +218,5 @@ export default defineConfig((ctx) => {
              */
             extraScripts: [],
         },
-    }
-})
+    };
+});

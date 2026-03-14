@@ -1,167 +1,197 @@
 <script setup lang="ts">
-import Logo from 'src/assets/logo.webp'
-
-// import { ref } from 'vue'
-// import { Dark } from 'quasar'
-import { useStoreAuth } from 'stores/auth.store'
-import { useQuasar } from 'quasar'
-import handleError from 'src/utils/handleError.utils'
-import { useRoute, useRouter } from 'vue-router'
-import ItemBackground from 'components/ItemBackground.vue'
+import Logo from 'src/assets/logo.webp';
+import { useStoreAuth } from 'stores/auth.store';
+import { useQuasar } from 'quasar';
+import handleError from 'src/utils/handleError.utils';
+import { useRoute, useRouter } from 'vue-router';
+import ItemBackground from 'components/ItemBackground.vue';
 
 const router = useRouter(),
     route = useRoute(),
     $q = useQuasar(),
-    storeAuth = useStoreAuth()
-//  isDark = ref(Dark.isActive)
+    storeAuth = useStoreAuth();
 
 const handleSignOut = async () => {
     try {
-        await storeAuth.signOut()
+        await storeAuth.signOut();
 
         $q.notify({
             type: 'positive',
             message: 'Signed out successfully',
-        })
+        });
 
-        await router.push({ name: 'sign-in' })
+        await router.push({ name: 'sign-in' });
     } catch (error) {
-        const message = handleError(error)
+        const message = handleError(error);
         $q.notify({
             type: 'negative',
             message: message ?? 'Error signing out',
-        })
+        });
     }
-}
-
-// const toggleTheme = () => {
-//     Dark.set(!Dark.isActive)
-//     isDark.value = Dark.isActive
-// }
+};
 </script>
 
 <template>
-    <q-layout view="lHh Lpr lFf" class="app-layout">
-        <q-header class="app-header" bordered height-hint="4rem">
-            <q-toolbar class="container" style="height: 4rem; min-height: 4rem">
-                <q-btn class="logo-btn no-hover-effect" :ripple="false" :to="{ name: 'home' }" flat dense>
-                    <img :src="Logo" width="1024" class="logo" alt="Haze logo" />
+    <q-layout class="main" view="lHh Lpr lFf">
+        <q-header class="main__header" bordered height-hint="4rem">
+            <q-toolbar class="main__container">
+                <q-btn
+                    class="main__logo no-hover-effect"
+                    dense
+                    flat
+                    :ripple="false"
+                    :to="{ name: 'home' }"
+                >
+                    <img class="main__logo-img" alt="Haze logo" :src="Logo" width="1024" />
                 </q-btn>
 
                 <q-space />
 
-                <q-btn :to="{ name: 'home' }" class="title no-hover-effect" :ripple="false" no-caps flat>Haze</q-btn>
+                <q-btn
+                    class="main__title no-hover-effect"
+                    flat
+                    no-caps
+                    :ripple="false"
+                    :to="{ name: 'home' }"
+                    >Haze</q-btn
+                >
 
                 <q-space />
 
-                <div class="flex">
-                    <!--                    <q-btn-->
-                    <!--                        round-->
-                    <!--                        flat-->
-                    <!--                        :icon="isDark ? 'light_mode' : 'dark_mode'"-->
-                    <!--                        class="header-icon"-->
-                    <!--                        @click="toggleTheme"-->
-                    <!--                    />-->
-
+                <div class="main__header-buttons">
                     <q-btn
                         v-if="storeAuth.isAuthenticated"
-                        @click="handleSignOut"
-                        round
+                        class="main__header-icon"
                         flat
                         icon="logout"
-                        class="header-icon"
+                        round
+                        @click="handleSignOut"
                     />
 
-                    <q-btn v-else :to="{ name: 'sign-in' }" round flat icon="account_circle" class="header-icon" />
+                    <q-btn
+                        v-else
+                        class="main__header-icon"
+                        flat
+                        icon="account_circle"
+                        round
+                        :to="{ name: 'sign-in' }"
+                    />
                 </div>
             </q-toolbar>
         </q-header>
 
-        <q-page-container class="page-container">
+        <q-page-container class="main__page-container">
             <ItemBackground />
 
-            <router-view v-slot="{ Component, route }">
-                <transition name="fade" mode="out-in" appear>
-                    <component :is="Component" :key="route.path" />
+            <router-view v-slot="{ Component, route: currentRoute }">
+                <transition appear mode="out-in" name="fade">
+                    <component :is="Component" :key="currentRoute.path" />
                 </transition>
             </router-view>
         </q-page-container>
 
-        <q-footer v-if="route.meta.requiresAuth && storeAuth.isAuthenticated" class="app-footer" bordered>
-            <q-tabs class="tabs" indicator-color="transparent" active-color="orange" align="justify">
-                <q-route-tab :to="{ name: 'home' }" icon="fa-solid fa-home" />
-                <q-route-tab :to="{ name: 'camera-page' }" icon="fa-solid fa-camera" />
+        <q-footer
+            v-if="route.meta.requiresAuth && storeAuth.isAuthenticated"
+            bordered
+            class="main__footer"
+        >
+            <q-tabs
+                class="main__footer-tabs"
+                active-color="orange"
+                align="justify"
+                indicator-color="transparent"
+            >
+                <q-route-tab icon="fa-solid fa-home" :to="{ name: 'home' }" />
+                <q-route-tab icon="fa-solid fa-camera" :to="{ name: 'camera-page' }" />
             </q-tabs>
         </q-footer>
     </q-layout>
 </template>
 
-<style lang="sass" scoped>
-.page-container
-    background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%)
-    min-height: 100svh
+<style lang="scss" scoped>
+.main {
+    &__header {
+        backdrop-filter: blur(0.75rem);
+        background: $dark;
+        border-bottom: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
 
-.app-header
-    display: flex
-    justify-content: center
-    align-items: center
-    min-height: 5rem
-    background: $dark
-    backdrop-filter: blur(0.75rem)
-    border-bottom: 0.0625rem solid rgba(var(--q-primary), 0.2)
+        &-buttons {
+            display: flex;
+        }
 
-.app-header .q-toolbar
-    min-height: 4rem
-    align-items: center
+        &-icon {
+            color: $primary;
+        }
+    }
 
-.logo
-    width: 4.375rem
-    transition: transform 0.3s ease
+    &__toolbar {
+        height: 4rem;
+        min-height: 4rem;
+    }
 
-.logo-btn:hover .logo
-    transform: scale(1.05)
+    &__logo {
+        min-width: auto;
+        padding: 0.25rem;
 
-.logo-btn
-    padding: 0.25rem
-    min-width: auto
+        &:hover .main__logo-img {
+            transform: scale(1.05);
+        }
 
-.logo-btn img
-    margin-left: 0.1875rem
-    margin-top: 0.3125rem
+        &-img {
+            transition: transform 0.3s ease;
+            width: 4.375rem;
+        }
+    }
 
-.title
-    position: absolute
-    left: 50%
-    top: 50%
-    transform: translate(-50%, -50%)
-    font-size: 1.5rem
-    font-family: 'Streamster', sans-serif
-    letter-spacing: 0.125rem
-    line-height: 1
-    color: $primary
-    transition: text-shadow 0.2s ease
-    will-change: text-shadow
+    &__title {
+        color: $primary;
+        font-family: Streamster, sans-serif;
+        font-size: 1.5rem;
+        left: 50%;
+        letter-spacing: 0.125rem;
+        line-height: 1;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        transition: text-shadow 0.2s ease;
+        will-change: text-shadow;
 
-    &:hover
-        text-shadow: 0 0 0 rgba(255, 120, 0, 1), 0 0 0.375rem rgba(255, 90, 0, 0.9), 0 0 0.625rem rgba(255, 60, 0, 0)
+        &:hover {
+            text-shadow:
+                0 0 0 rgb(255 120 0 / 100%),
+                0 0 0.375rem rgb(255 90 0 / 90%),
+                0 0 0.625rem rgb(255 60 0 / 0%);
+        }
+    }
 
-.header-icon
-    color: $primary
+    &__footer {
+        backdrop-filter: blur(0.75rem);
+        background: $dark;
+        border-top: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
+        display: none;
 
-.app-footer
-    display: none
-    background: $dark
-    backdrop-filter: blur(0.75rem)
-    border-top: 0.0625rem solid rgba(var(--q-primary-rgb), 0.2)
+        &-tabs {
+            width: 100%;
+        }
+    }
 
-.no-hover-effect
-    :deep(.q-focus-helper)
-        display: none
+    &__page-container {
+        background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%);
+        min-height: 100svh;
+    }
 
-    &:hover
-        background-color: transparent
+    @media (width <= 55rem) {
+        display: block;
+    }
+}
 
-@media (width <= 55rem)
-    .app-footer
-        display: block
+.no-hover-effect {
+    &:hover {
+        background-color: transparent;
+    }
+
+    :deep(.q-focus-helper) {
+        display: none;
+    }
+}
 </style>

@@ -1,111 +1,138 @@
 <script setup lang="ts">
-import { useStoreProfile } from 'stores/profile.store'
+import { useStoreProfile } from 'stores/profile.store';
 
-const storeProfile = useStoreProfile()
+const storeProfile = useStoreProfile();
 
 defineProps<{
-    avatarSrc: string | null | undefined
-}>()
+    avatarSrc: string | null | undefined;
+}>();
 
-const emit = defineEmits<{ (e: 'update-avatar', file: File): void }>()
+const emit = defineEmits<{ (e: 'update-avatar', file: File): void }>();
 
 const onFileChange = (value: File | File[] | null) => {
-    const file = Array.isArray(value) ? value[0] : value
-    if (!file) return
-    emit('update-avatar', file)
-}
+    const file = Array.isArray(value) ? value[0] : value;
+    if (!file) return;
+    emit('update-avatar', file);
+};
 
-const initial = storeProfile.profileInfo?.username?.charAt(0)
+const initial = storeProfile.profileInfo?.username?.charAt(0);
 </script>
 
 <template>
-    <div class="avatar-wrapper">
-        <q-avatar class="avatar" size="90px">
-            <q-img v-if="avatarSrc" :src="avatarSrc" fit="cover" style="width: 100%; height: 100%">
+    <div class="avatar">
+        <q-avatar class="avatar__wrapper" size="90px">
+            <q-img v-if="avatarSrc" class="avatar__img" fit="cover" :src="avatarSrc">
                 <template #loading>
-                    <q-skeleton type="QAvatar" width="100%" height="100%" />
+                    <q-skeleton height="100%" type="QAvatar" width="100%" />
                 </template>
 
                 <template #error>
-                    <div class="avatar-placeholder">
+                    <div class="avatar__placeholder">
                         {{ initial }}
                         <q-icon v-if="!initial" name="person" size="32" />
                     </div>
                 </template>
             </q-img>
 
-            <div v-else class="avatar-placeholder">
+            <div v-else class="avatar__placeholder">
                 {{ initial }} <q-icon v-if="!initial" name="person" size="32" />
             </div>
         </q-avatar>
 
         <q-file
-            :model-value="null"
-            @update:model-value="onFileChange"
             borderless
+            class="avatar__overlay"
             dense
+            :model-value="null"
             no-thumbnails
-            class="avatar-overlay"
+            @update:model-value="onFileChange"
         >
-            <q-icon name="edit" class="overlay-icon" />
+            <q-icon class="avatar__overlay-icon" name="edit" />
         </q-file>
     </div>
 </template>
 
-<style lang="sass" scoped>
-.avatar-wrapper
-    position: relative
-    border-radius: 50%
-    width: 8rem
-    height: 8rem
+<style lang="scss" scoped>
+.avatar {
+    border-radius: 50%;
+    height: 8rem;
+    position: relative;
+    width: 8rem;
 
-.avatar
-    position: absolute
-    top: 50%
-    left: 50%
-    transform: translateX(-50%) translateY(-50%)
-    width: 100%
-    height: 100%
+    &__wrapper {
+        height: 100%;
+        left: 50%;
+        position: absolute;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        width: 100%;
+    }
 
-.avatar-overlay
-    position: absolute
-    inset: 0
-    border-radius: 50%
-    display: flex
-    align-items: center
-    justify-content: center
-    background: linear-gradient(135deg, rgba(255,160,140,0.65) 0%, rgba(255,120,100,0.65) 50%, rgba(220,80,60,0.65) 100%)
-    opacity: 0
-    transition: opacity .3s ease
-    cursor: pointer
+    &__img {
+        height: 100%;
+        width: 100%;
+    }
 
-.overlay-icon
-    right: -1.5rem
-    font-size: 1.625rem
-    color: white
-    filter: drop-shadow(0 0 0.4375rem #ffaa60)
-    transform: scale(0.85)
-    transition: all .25s ease
-    cursor: pointer
+    &__overlay {
+        align-items: center;
+        background: linear-gradient(
+            135deg,
+            rgb(255 160 140 / 65%) 0%,
+            rgb(255 120 100 / 65%) 50%,
+            rgb(220 80 60 / 65%) 100%
+        );
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        inset: 0;
+        justify-content: center;
+        opacity: 0;
+        position: absolute;
+        transition: opacity 0.3s ease;
 
-.avatar-wrapper:hover .avatar-overlay
-    opacity: 1
+        &:hover {
+            opacity: 1;
+        }
+    }
 
-.avatar-wrapper:hover .overlay-icon
-    transform: scale(1.1)
+    &__overlay-icon {
+        color: white;
+        cursor: pointer;
+        filter: drop-shadow(0 0 0.4375rem #ffaa60);
+        font-size: 1.625rem;
+        right: -1.5rem;
+        transform: scale(0.85);
+        transition: all 0.25s ease;
+    }
 
-.avatar-placeholder
-    display: flex
-    align-items: center
-    justify-content: center
-    width: 100%
-    height: 100%
-    border-radius: 50%
-    background: linear-gradient(145deg, #fce8e0 0%, #f9d6c2 40%, #f5bfa0 70%, #f0a67f 100%)
-    box-shadow: 0 0 1rem rgba(250,210,180,0.3), 0 0 0.15rem rgba(240,200,160,0.15) inset
-    color: #7a5c44
-    font-weight: 700
-    font-size: 2rem
-    text-shadow: 0 0 0.3rem rgba(250,210,190,0.5), 0 0 0.6rem rgba(240,200,170,0.25)
-    line-height: 1
+    &__placeholder {
+        align-items: center;
+        background: linear-gradient(145deg, #fce8e0 0%, #f9d6c2 40%, #f5bfa0 70%, #f0a67f 100%);
+        border-radius: 50%;
+        box-shadow:
+            0 0 1rem rgb(250 210 180 / 30%),
+            0 0 0.15rem rgb(240 200 160 / 15%) inset;
+        color: #7a5c44;
+        display: flex;
+        font-size: 2rem;
+        font-weight: 700;
+        height: 100%;
+        justify-content: center;
+        line-height: 1;
+        text-shadow:
+            0 0 0.3rem rgb(250 210 190 / 50%),
+            0 0 0.6rem rgb(240 200 170 / 25%);
+        width: 100%;
+    }
+
+    &:hover {
+        &__overlay {
+            opacity: 1;
+        }
+
+        &__overlay-icon {
+            transform: scale(1.1);
+        }
+    }
+}
 </style>

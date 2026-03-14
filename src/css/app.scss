@@ -1,0 +1,62 @@
+@font-face {
+    font-display: swap;
+    font-family: Streamster;
+    font-style: normal;
+    font-weight: normal;
+    src:
+        url('fonts/Streamster.woff2') format('woff2'),
+        url('fonts/Streamster.woff') format('woff');
+}
+
+body {
+    font-family: 'Courier New', sans-serif;
+}
+
+img {
+    display: block;
+}
+
+.container {
+    margin: 0 auto;
+    max-width: 60.9375rem;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+    transition: opacity 0.15s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+    opacity: 0;
+}
+
+.q-field__bottom--animated {
+    padding-bottom: 1rem;
+    position: static;
+    transform: translateY(0%);
+}
+
+.q-field--with-bottom {
+    padding-bottom: 0;
+}
+
+.small-screen-only {
+    @media (max-width: $breakpoint-xs-max) {
+        display: block;
+    }
+
+    @media (min-width: $breakpoint-sm-min) {
+        display: none;
+    }
+}
+
+.large-screen-only {
+    @media (max-width: $breakpoint-xs-max) {
+        display: none;
+    }
+
+    @media (min-width: $breakpoint-sm-min) {
+        display: block;
+    }
+}
