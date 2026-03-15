@@ -2,7 +2,7 @@
 import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { useCamera } from 'src/composables/useCamera';
 import { usePost } from 'src/composables/usePost';
-import ButtonActive from 'components/ButtonActive.vue';
+import ButtonActive from 'components/common/ButtonActive.vue';
 import { useGeolocation } from 'src/composables/useGeolocation';
 import type { QForm } from 'quasar';
 
@@ -88,6 +88,10 @@ onBeforeUnmount(() => {
                         class="camera__shot"
                         autoplay
                         playsinline
+                        :style="{
+                            opacity: isCameraActive ? 1 : 0,
+                            transition: 'opacity 0.3s ease',
+                        }"
                     />
                     <canvas v-show="imageCaptured" ref="canvasRef" class="camera__shot" />
 
@@ -102,6 +106,10 @@ onBeforeUnmount(() => {
                     <div
                         v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
                         class="camera__placeholder"
+                        :style="{
+                            opacity: isCameraActive ? 0 : 1,
+                            transition: 'opacity 0.3s ease',
+                        }"
                     >
                         <div class="camera__placeholder-wrapper">
                             <span> turn on your camera, or add a memory <br /> </span>
@@ -223,16 +231,17 @@ onBeforeUnmount(() => {
 
     &__frame {
         aspect-ratio: 3 / 2;
-        background: linear-gradient(180deg, #181818 0%, #0f0f0f 100%);
+        background: linear-gradient(180deg, #1e1e1e 0%, #141414 100%);
         border-radius: 1.5rem;
         box-shadow:
-            0 0.875rem 2.5rem rgb(0 0 0 / 80%),
-            0 0 0 0.0625rem rgb(255 140 0 / 8%);
+            0 1rem 2.5rem rgb(0 0 0 / 85%),
+            0 0 0 0.125rem rgb(255 140 0 / 12%);
         margin: 0 auto;
         max-width: 35rem;
         overflow: hidden;
         position: relative;
         width: 100%;
+        border: 2px solid rgba(255, 154, 60, 0.3);
     }
 
     &__shot {
@@ -294,11 +303,23 @@ onBeforeUnmount(() => {
     }
 
     &__capture-button {
-        background: linear-gradient(235deg, #d98868, #d95a4f);
+        background: linear-gradient(235deg, #ff9a3c, #ff6b3c, #f04a46);
         color: white;
+        box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.5);
         transition:
             transform 0.2s ease,
-            box-shadow 0.2s ease;
+            box-shadow 0.2s ease,
+            filter 0.2s ease;
+
+        &:hover {
+            filter: brightness(1.15);
+            transform: scale(1.05);
+        }
+
+        &:active {
+            filter: brightness(0.9);
+            transform: scale(0.95);
+        }
     }
 
     &__filepicker {
@@ -364,22 +385,28 @@ onBeforeUnmount(() => {
     }
 
     &__geo-button {
-        background: linear-gradient(135deg, #404040, rgb(102 102 102 / 50%));
+        background: linear-gradient(135deg, #5a5a5a, #2c2c2c);
         border-radius: 0.75rem;
-        box-shadow: 0 0.25rem 0.75rem rgb(0 0 0 / 50%);
-        color: white;
-        max-width: 2.3rem;
+        box-shadow: 0 0.25rem 0.6rem rgba(0, 0, 0, 0.5);
+        color: #ff9a3c;
+        width: 2.4rem;
+        height: 2.4rem;
+        min-width: 2.4rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-left: 0.3rem;
         transition:
             box-shadow 0.2s ease,
             filter 0.2s ease;
 
         &:hover {
-            box-shadow: 0 0.5rem 1.2rem rgb(0 0 0 / 60%);
-            filter: brightness(1.05);
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.6);
+            filter: brightness(1.1);
         }
 
         &:active {
-            box-shadow: 0 0.2rem 0.5rem rgb(0 0 0 / 40%);
+            box-shadow: 0 0.15rem 0.4rem rgba(0, 0, 0, 0.4);
         }
     }
 
@@ -427,6 +454,13 @@ onBeforeUnmount(() => {
 
         &__placeholder-subtitle {
             font-size: 0.7rem;
+        }
+
+        &__geo-button {
+            max-width: 2.5rem;
+            min-width: 2.5rem;
+            height: 2.5rem;
+            font-size: 0.9rem;
         }
     }
 }

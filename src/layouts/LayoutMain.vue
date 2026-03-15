@@ -4,7 +4,7 @@ import { useStoreAuth } from 'stores/auth.store';
 import { useQuasar } from 'quasar';
 import handleError from 'src/utils/handleError.utils';
 import { useRoute, useRouter } from 'vue-router';
-import ItemBackground from 'components/ItemBackground.vue';
+import ItemBackground from 'components/common/ItemBackground.vue';
 
 const router = useRouter(),
     route = useRoute(),
@@ -173,15 +173,15 @@ const handleSignOut = async () => {
         &-tabs {
             width: 100%;
         }
+
+        @media (width <= 55rem) {
+            display: block;
+        }
     }
 
     &__page-container {
         background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%);
         min-height: 100svh;
-    }
-
-    @media (width <= 55rem) {
-        display: block;
     }
 }
 

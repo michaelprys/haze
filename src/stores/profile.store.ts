@@ -7,7 +7,26 @@ import { supabase } from 'src/api/supabaseClient';
 export const useStoreProfile = defineStore(
     'storeProfile',
     () => {
-        const profileInfo = ref<ProfileInfo>();
+        const profileInfo = ref<ProfileInfo | null>(null);
+
+        const loadUserInfo = async () => {
+            const user = await getCurrentUser();
+            if (!user) throw new Error('Not authorized');
+
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('username, bio, avatar_url')
+                .eq('user_id', user.id)
+                .single();
+
+            if (error) throw error;
+
+            profileInfo.value = {
+                username: data.username ?? null,
+                bio: data.bio ?? null,
+                avatarUrl: data.avatar_url ?? null,
+            };
+        };
 
         const updateAvatar = async (file: File) => {
             const user = await getCurrentUser();
@@ -60,26 +79,38 @@ export const useStoreProfile = defineStore(
             return publicUrl;
         };
 
-        const loadUserInfo = async () => {
-            const user = await getCurrentUser();
-            if (!user) throw new Error('Not authorized');
-
-            const { data, error } = await supabase
+        const updateUsername = async (username: ProfileInfo['username']) => {
+            const { error } = await supabase
                 .from('profiles')
-                .select('username, bio, avatar_url')
-                .eq('user_id', user.id)
-                .single();
+                .update({ username })
+                .eq('user_id', (await getCurrentUser())?.id);
 
             if (error) throw error;
 
-            profileInfo.value = {
-                username: data.username,
-                bio: data.bio,
-                avatarUrl: data.avatar_url || null,
-            };
+            if (profileInfo.value) {
+                profileInfo.value.username = username;
+            }
         };
 
-        return { profileInfo, updateAvatar, loadUserInfo };
+        const updateBio = async (bio: ProfileInfo['bio']) => {
+            const user = await getCurrentUser();
+            if (!user) throw new Error('Not authorized');
+
+            const trimmedBio = (bio ?? '').slice(0, 120);
+
+            const { error } = await supabase
+                .from('profiles')
+                .update({ bio: trimmedBio })
+                .eq('user_id', user.id);
+
+            if (error) throw error;
+
+            if (profileInfo.value) {
+                profileInfo.value.bio = trimmedBio;
+            }
+        };
+
+        return { profileInfo, loadUserInfo, updateUsername, updateBio, updateAvatar };
     },
-    { persist: {} },
+    { persist: true },
 );

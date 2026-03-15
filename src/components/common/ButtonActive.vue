@@ -8,7 +8,7 @@ defineProps({
 </script>
 
 <template>
-    <q-btn class="create-button" :icon="icon" :label="label" :loading="loading" :to="to" unelevated>
+    <q-btn class="button" :icon="icon" :label="label" :loading="loading" :to="to" unelevated>
         <template #loading>
             <q-spinner />
         </template>
@@ -16,7 +16,7 @@ defineProps({
 </template>
 
 <style lang="scss" scoped>
-.create-button {
+.button {
     animation: gradient 5s ease infinite;
     background: linear-gradient(135deg, #ffb347, #ff7a00, #ff3d00, #ffb347);
     background-size: 400% 400%;
