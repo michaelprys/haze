@@ -8,10 +8,10 @@ import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
  * @see https://pinia.vuejs.org/core-concepts/plugins.html#typing-new-store-properties
  */
 declare module 'pinia' {
-    // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-    export interface PiniaCustomProperties {
-        // add your custom properties here, if any
-    }
+  // eslint-disable-next-line @typescript-eslint/no-empty-object-type
+  export interface PiniaCustomProperties {
+    // add your custom properties here, if any
+  }
 }
 
 /*
@@ -24,11 +24,11 @@ declare module 'pinia' {
  */
 
 export default defineStore((/* { ssrContext } */) => {
-    const pinia = createPinia();
+  const pinia = createPinia();
 
-    // You can add Pinia plugins here
-    // pinia.composables(SomePiniaPlugin)
-    pinia.use(piniaPluginPersistedState);
+  // You can add Pinia plugins here
+  // pinia.composables(SomePiniaPlugin)
+  pinia.use(piniaPluginPersistedState);
 
-    return pinia;
+  return pinia;
 });

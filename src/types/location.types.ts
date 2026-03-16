@@ -1,6 +1,6 @@
 export type Location = {
-    address: {
-        city: string;
-        country: string;
-    };
+  address: {
+    city: string;
+    country: string;
+  };
 };

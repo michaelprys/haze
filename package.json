@@ -19,7 +19,6 @@
     "dependencies": {
         "@quasar/extras": "^1.17.0",
         "@supabase/supabase-js": "^2.98.0",
-        "axios": "^1.13.6",
         "pinia": "^3.0.4",
         "pinia-plugin-persistedstate": "^4.7.1",
         "quasar": "^2.18.6",
