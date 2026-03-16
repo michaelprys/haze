@@ -11,7 +11,7 @@ import { onMounted, ref } from 'vue';
 const storeProfile = useStoreProfile(),
     storePosts = useStorePosts(),
     loadingPosts = ref(true),
-    initial = storeProfile.profileInfo?.username?.charAt(0);
+    initial = storeProfile.profileInfo?.username?.charAt(0).toUpperCase();
 
 const modalActive = ref(false),
     selectedPost = ref<Post['id']>('');

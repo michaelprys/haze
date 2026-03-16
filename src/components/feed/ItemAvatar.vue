@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
 import { useQuasar } from 'quasar';
-import { useStoreProfile } from 'stores/profile.store';
 import handleError from 'src/utils/handleError.utils';
+import { useStoreProfile } from 'stores/profile.store';
+import { computed, ref } from 'vue';
 
 defineProps<{
     avatarSrc: string | null | undefined;
@@ -134,7 +134,7 @@ const handleFileChange = async (file: File | null) => {
 
     &__overlay {
         align-items: center;
-        background: rgb(0 0 0 / 45%);
+        //background: rgb(0 0 0 / 45%);
         display: flex;
         inset: 0;
         justify-content: center;

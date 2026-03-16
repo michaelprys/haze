@@ -1,7 +1,7 @@
 <script setup lang="ts">
+import { date } from 'quasar';
 import type { Post } from 'src/types/post.types';
 import { useStoreProfile } from 'stores/profile.store';
-import { date } from 'quasar';
 
 const props = withDefaults(
     defineProps<{
@@ -218,8 +218,8 @@ const emit = defineEmits(['showModal']);
     }
 
     &__avatar-placeholder {
-        background: linear-gradient(145deg, #fce8e0, #f0a67f);
-        color: #7a5c44;
+        background: linear-gradient(145deg, #444, #222);
+        color: #ffe8c0;
         display: grid;
         font-weight: bold;
         height: 100%;
