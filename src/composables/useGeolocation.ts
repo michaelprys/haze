@@ -6,59 +6,59 @@ import { delay } from 'src/utils/delay.utils';
 import { useQuasar } from 'quasar';
 
 export const useGeolocation = (post: Ref<Post>) => {
-  const locationPending = ref(false),
-    latitude = ref<number | null>(null),
-    longitude = ref<number | null>(null),
-    hasGeolocation = computed(() => 'geolocation' in navigator),
-    $q = useQuasar();
+    const locationPending = ref(false),
+        latitude = ref<number | null>(null),
+        longitude = ref<number | null>(null),
+        hasGeolocation = computed(() => 'geolocation' in navigator),
+        $q = useQuasar();
 
-  const getLocation = async () => {
-    try {
-      locationPending.value = true;
+    const getLocation = async () => {
+        try {
+            locationPending.value = true;
 
-      const position = await new Promise<GeolocationPosition>((resolve, reject) => {
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 });
-      });
+            const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 7000 });
+            });
 
-      latitude.value = position.coords.latitude;
-      longitude.value = position.coords.longitude;
+            latitude.value = position.coords.latitude;
+            longitude.value = position.coords.longitude;
 
-      await getPreciseLocation(position);
-    } catch (error) {
-      console.error('Geolocation not found: ', error);
+            await getPreciseLocation(position);
+        } catch (error) {
+            console.error('Geolocation not found: ', error);
 
-      $q.notify({
-        type: 'negative',
-        message: 'Could not find the location',
-      });
-    } finally {
-      await delay(500);
-      locationPending.value = false;
-    }
-  };
+            $q.notify({
+                type: 'negative',
+                message: 'Could not find the location',
+            });
+        } finally {
+            await delay(500);
+            locationPending.value = false;
+        }
+    };
 
-  const getPreciseLocation = async (position: GeolocationPosition) => {
-    const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`;
+    const getPreciseLocation = async (position: GeolocationPosition) => {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${position.coords.latitude}&lon=${position.coords.longitude}`;
 
-    try {
-      const response = await fetch(url);
+        try {
+            const response = await fetch(url);
 
-      if (!response.ok) throw new Error(response.statusText);
+            if (!response.ok) throw new Error(response.statusText);
 
-      const data: Location = await response.json();
+            const data: Location = await response.json();
 
-      post.value.location = `${data.address.city}, ${data.address.country}`;
-    } catch (error) {
-      console.error(error);
-    }
-  };
+            post.value.location = `${data.address.city}, ${data.address.country}`;
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-  return {
-    locationPending,
-    latitude,
-    longitude,
-    hasGeolocation,
-    getLocation,
-    getPreciseLocation,
-  };
+    return {
+        locationPending,
+        latitude,
+        longitude,
+        hasGeolocation,
+        getLocation,
+        getPreciseLocation,
+    };
 };

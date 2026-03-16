@@ -1,8 +1,11 @@
+import type { Database } from 'app/database.types';
 import { defineStore } from 'pinia';
 import { getCurrentUser } from 'src/api/auth';
 import { supabase } from 'src/api/supabaseClient';
-import type { Post, PostApi, PostPayload } from 'src/types/post.types';
+import type { Post, PostPayload } from 'src/types/post.types';
 import { ref } from 'vue';
+
+type PostRow = Database['public']['Tables']['posts']['Row'];
 
 export const useStorePosts = defineStore('storePosts', () => {
     const posts = ref<Post[]>([]);
@@ -43,23 +46,67 @@ export const useStorePosts = defineStore('storePosts', () => {
     };
 
     // Fetch posts
-    const loadPosts = async (): Promise<PostApi[]> => {
+    const PAGE_SIZE = 2,
+        offset = ref(0),
+        hasMore = ref(false);
+
+    const mapPostRowToPost = (p: PostRow): Post => ({
+        id: p.id,
+        caption: p.caption ?? '',
+        location: p.location ?? '',
+        photoFile: null,
+        photoUrl: p.image_url,
+        takenAt: p.taken_at,
+    });
+
+    const loadPosts = async (): Promise<void> => {
         const user = await getCurrentUser();
 
-        const { data, error } = await supabase.from('posts').select('*').eq('user_id', user.id);
+        const { data: postData, error: postError } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('taken_at', { ascending: false })
+            .range(0, PAGE_SIZE - 1);
 
-        if (error) throw error;
+        if (postError) throw postError;
 
-        posts.value = data.map((p) => ({
-            id: p.id,
-            caption: p.caption ?? '',
-            location: p.location ?? '',
-            photoFile: null,
-            photoUrl: p.image_url,
-            takenAt: p.taken_at,
-        }));
+        posts.value = (postData ?? []).map(mapPostRowToPost);
 
-        return data;
+        offset.value = PAGE_SIZE;
+        hasMore.value = (postData?.length ?? 0) === PAGE_SIZE;
+    };
+
+    // Load more posts
+    const loadMore = async () => {
+        if (!hasMore.value) return;
+
+        const user = await getCurrentUser(),
+            from = offset.value,
+            to = from + PAGE_SIZE - 1;
+
+        const { data: moreData, error: errorMorePosts } = await supabase
+            .from('posts')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('taken_at', { ascending: false })
+            .range(from, to);
+
+        if (errorMorePosts) throw errorMorePosts;
+
+        if (!moreData?.length) {
+            hasMore.value = false;
+
+            return;
+        }
+
+        posts.value.push(...moreData.map(mapPostRowToPost));
+
+        offset.value += moreData.length;
+
+        if (moreData.length < PAGE_SIZE) {
+            hasMore.value = false;
+        }
     };
 
     // Extract file name
@@ -69,35 +116,9 @@ export const useStorePosts = defineStore('storePosts', () => {
         return url.split('/post-media/')[1] || '';
     };
 
-    // Delete post
-    const deletePost = async (postId: Post['id']) => {
-        const user = await getCurrentUser();
-        if (!user) throw new Error('Not authenticated');
-
-        const response = supabase.from('posts');
-
-        // Get image url
-        const { data: imageRow, error: fetchError } = await response
-            .select('image_url')
-            .eq('id', postId)
-            .eq('user_id', user.id)
-            .maybeSingle();
-
-        if (fetchError) throw fetchError;
-        if (!imageRow?.image_url) return;
-
-        // Delete post
-        const { error: deleteError } = await response
-            .delete()
-            .eq('id', postId)
-            .eq('user_id', user.id);
-
-        if (deleteError) throw deleteError;
-
-        posts.value = posts.value.filter((post) => post.id !== postId);
-
-        // Remove from Storage
-        const fileName = extractFileName(imageRow?.image_url);
+    // Remove from Storage
+    const deletePostImage = async (post: PostRow) => {
+        const fileName = extractFileName(post?.image_url);
 
         if (fileName) {
             const { error: storageError } = await supabase.storage
@@ -108,5 +129,35 @@ export const useStorePosts = defineStore('storePosts', () => {
         }
     };
 
-    return { posts, publishPost, loadPosts, deletePost };
+    // Delete post
+    const deletePost = async (postId: Post['id']) => {
+        const user = await getCurrentUser();
+        if (!user) throw new Error('Not authenticated');
+
+        const response = supabase.from('posts');
+
+        // Get image url
+        const { data: post, error: fetchError } = await response
+            .select('image_url')
+            .eq('id', postId)
+            .eq('user_id', user.id)
+            .maybeSingle<PostRow>();
+
+        if (fetchError) throw fetchError;
+        if (!post?.image_url) return;
+
+        // Delete post
+        const { error: deleteError } = await response
+            .delete()
+            .eq('id', postId)
+            .eq('user_id', user.id);
+
+        if (deleteError) throw deleteError;
+
+        if (post) await deletePostImage(post);
+
+        posts.value = posts.value.filter((post) => post.id !== postId);
+    };
+
+    return { posts, hasMore, publishPost, loadPosts, loadMore, deletePost };
 });
