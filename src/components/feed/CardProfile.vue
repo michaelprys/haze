@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import ItemAvatar from 'components/feed/ItemAvatar.vue';
-import { useStoreProfile } from 'stores/profile.store';
 import ButtonActive from 'components/common/ButtonActive.vue';
+import ItemAvatar from 'components/feed/ItemAvatar.vue';
 import ItemUserInfo from 'components/feed/ItemUserInfo.vue';
+import { useStoreProfile } from 'stores/profile.store';
 
 withDefaults(
     defineProps<{
@@ -17,12 +17,17 @@ const storeProfile = useStoreProfile();
 <template>
     <aside class="sidebar">
         <div class="sidebar__content">
+            <q-skeleton
+                v-if="storeProfile.isLoading"
+                width="80px"
+                height="80px"
+                class="rounded-full"
+            />
             <ItemAvatar
-                v-if="storeProfile.profileInfo && storeProfile.profileInfo.avatarUrl"
-                :avatar-src="storeProfile.profileInfo.avatarUrl"
+                v-else
+                :avatar-src="storeProfile.profileInfo?.avatarUrl"
                 :initial="initial"
             />
-            <q-skeleton v-else width="80px" height="80px" class="rounded-full" />
 
             <ItemUserInfo v-if="storeProfile.profileInfo" />
 

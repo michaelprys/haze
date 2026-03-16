@@ -1,17 +1,14 @@
-import { defineStore } from 'pinia';
-import type {
-    SignUpPayload,
-    SignInPayload,
-    RequestPasswordResetPayload,
-} from 'src/types/auth.types';
-import { computed, ref } from 'vue';
 import type { User } from '@supabase/supabase-js';
-import handleError from 'src/utils/handleError.utils';
+import { defineStore } from 'pinia';
 import { supabase } from 'src/api/supabaseClient';
+import type { SignInPayload, SignUpPayload } from 'src/types/auth.types';
+import handleError from 'src/utils/handleError.utils';
+import { computed, ref } from 'vue';
 
 export const useStoreAuth = defineStore('storeAuth', () => {
     const user = ref<User | null>(null),
-        isAuthenticated = computed(() => !!user.value);
+        isAuthenticated = computed(() => !!user.value),
+        redirectTo = import.meta.env.VITE_APP_URL;
 
     void (async () => {
         try {
@@ -38,6 +35,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
                 data: {
                     username: username ?? null,
                 },
+                emailRedirectTo: `${redirectTo}/auth/sign-in`,
             },
         });
         if (signUpError) throw new Error(signUpError.message);
@@ -65,12 +63,11 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         user.value = null;
     };
 
-    const requestPasswordReset = async (payload: RequestPasswordResetPayload) => {
-        const { email, redirectTo } = payload;
-
+    const requestPasswordReset = async (email: string) => {
         const { data, error } = await supabase.auth.resetPasswordForEmail(email, {
-            redirectTo,
+            redirectTo: `${redirectTo}/auth/reset-password`,
         });
+
         if (error) throw error;
 
         return data;

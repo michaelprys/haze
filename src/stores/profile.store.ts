@@ -1,31 +1,38 @@
 import { defineStore } from 'pinia';
-import type { ProfileInfo } from 'src/types/profileInfo.types';
-import { ref } from 'vue';
 import { getCurrentUser } from 'src/api/auth';
 import { supabase } from 'src/api/supabaseClient';
+import type { ProfileInfo } from 'src/types/profileInfo.types';
+import { ref } from 'vue';
 
 export const useStoreProfile = defineStore(
     'storeProfile',
     () => {
-        const profileInfo = ref<ProfileInfo | null>(null);
+        const profileInfo = ref<ProfileInfo | null>(null),
+            isLoading = ref(false);
 
         const loadUserInfo = async () => {
-            const user = await getCurrentUser();
-            if (!user) throw new Error('Not authorized');
+            isLoading.value = true;
 
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('username, bio, avatar_url')
-                .eq('user_id', user.id)
-                .single();
+            try {
+                const user = await getCurrentUser();
+                if (!user) throw new Error('Not authorized');
 
-            if (error) throw error;
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('username, bio, avatar_url')
+                    .eq('user_id', user.id)
+                    .single();
 
-            profileInfo.value = {
-                username: data.username ?? null,
-                bio: data.bio ?? null,
-                avatarUrl: data.avatar_url ?? null,
-            };
+                if (error) throw error;
+
+                profileInfo.value = {
+                    username: data.username ?? null,
+                    bio: data.bio ?? null,
+                    avatarUrl: data.avatar_url ?? null,
+                };
+            } finally {
+                isLoading.value = false;
+            }
         };
 
         const updateAvatar = async (file: File) => {
@@ -110,7 +117,7 @@ export const useStoreProfile = defineStore(
             }
         };
 
-        return { profileInfo, loadUserInfo, updateUsername, updateBio, updateAvatar };
+        return { profileInfo, isLoading, loadUserInfo, updateUsername, updateBio, updateAvatar };
     },
     { persist: true },
 );

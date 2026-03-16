@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import LayoutAuth from 'layouts/LayoutAuth.vue';
 import { useQuasar } from 'quasar';
-import type { RequestPasswordResetPayload } from 'src/types/auth.types';
 import handleError from 'src/utils/handleError.utils';
 import { useStoreAuth } from 'stores/auth.store';
 import { ref } from 'vue';
@@ -9,7 +8,6 @@ import { ref } from 'vue';
 const $q = useQuasar(),
     storeAuth = useStoreAuth(),
     email = ref(''),
-    redirectTo = `${import.meta.env.VITE_APP_URL}/auth/reset-password`,
     loading = ref(false);
 
 // Timer
@@ -33,13 +31,8 @@ const startTimer = () => {
 const handleRequestPasswordReset = async () => {
     loading.value = true;
 
-    const payload: RequestPasswordResetPayload = {
-        email: email.value,
-        redirectTo,
-    };
-
     try {
-        await storeAuth.requestPasswordReset(payload);
+        await storeAuth.requestPasswordReset(email.value);
 
         $q.notify({
             type: 'positive',
