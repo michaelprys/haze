@@ -9,7 +9,7 @@ import { ref } from 'vue';
 const $q = useQuasar(),
     storeAuth = useStoreAuth(),
     email = ref(''),
-    redirectTo = `${window.location.origin}/auth/reset-password`,
+    redirectTo = `${import.meta.env.VITE_APP_URL}/auth/reset-password`,
     loading = ref(false);
 
 // Timer
