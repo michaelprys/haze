@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import CardPost from 'components/feed/CardPost.vue';
-import CardProfile from 'components/feed/CardProfile.vue';
-import ModalPost from 'components/feed/ModalPost.vue';
+import PostCard from 'components/post/PostCard.vue';
+import PostModal from 'components/post/PostModal.vue';
+import ProfileCard from 'components/profile/ProfileCard.vue';
 import { useStorePosts } from 'src/stores/posts.store';
 import type { Post } from 'src/types/post.types';
 import handleError from 'src/utils/handleError.utils';
@@ -49,18 +49,17 @@ onMounted(async () => {
         <div v-else class="dashboard__container">
             <section class="dashboard__content">
                 <div v-if="storePosts.posts.length <= 0" class="dashboard__empty">
-                    <CardProfile />
+                    <ProfileCard />
                 </div>
 
                 <div v-else>
                     <q-infinite-scroll @load="onPostLoad" :offset="250">
-                        <CardPost
+                        <PostCard
                             v-for="post in storePosts.posts"
                             :key="post.id"
                             :post="post"
                             :initial="initial"
-                            @show-modal="handleShowModal(post.id)"
-                        />
+                            @show-modal="handleShowModal" />
 
                         <template #loading>
                             <div class="row justify-center q-my-md">
@@ -72,11 +71,11 @@ onMounted(async () => {
             </section>
 
             <aside v-if="storePosts.posts.length > 0" class="dashboard__sidebar">
-                <CardProfile />
+                <ProfileCard />
             </aside>
         </div>
 
-        <ModalPost v-model="modalActive" @delete-post="storePosts.deletePost(selectedPost)" />
+        <PostModal v-model="modalActive" @delete-post="storePosts.deletePost(selectedPost)" />
     </q-page>
 </template>
 
@@ -86,23 +85,23 @@ onMounted(async () => {
     place-items: center;
 
     &__loading {
-        margin: 5rem 0;
         text-align: center;
+        margin: 5rem 0;
 
         &-text {
-            color: #9e9e9e;
-            font-size: 1.25rem;
             margin-top: 1rem;
+            font-size: 1.25rem;
+            color: #9e9e9e;
         }
     }
 
     &__container {
-        align-items: flex-start;
         display: flex;
-        gap: 4rem;
         justify-content: center;
+        align-items: flex-start;
         max-width: 75rem;
         width: 100%;
+        gap: 4rem;
     }
 
     &__content {
@@ -111,15 +110,15 @@ onMounted(async () => {
     }
 
     &__empty {
-        margin: 0 auto;
         max-width: 32rem;
         width: 100%;
+        margin: 0 auto;
     }
 
     &__sidebar {
-        flex-shrink: 0;
         position: sticky;
         top: 6rem;
+        flex-shrink: 0;
         width: 20rem;
 
         @media (width <= 55rem) {

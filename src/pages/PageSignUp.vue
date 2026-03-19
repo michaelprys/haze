@@ -94,8 +94,7 @@ const handleSignUp = async () => {
                         (val) => !!val || 'Email is required',
                         (val, rules) => rules.email(val) || 'Please enter a valid email address',
                     ]"
-                    type="email"
-                />
+                    type="email" />
 
                 <q-input
                     v-model="formData.username"
@@ -113,8 +112,7 @@ const handleSignUp = async () => {
                             /^[a-zA-Z0-9_]+$/.test(val) ||
                             'Only letters, numbers and underscore allowed',
                     ]"
-                    type="text"
-                />
+                    type="text" />
 
                 <q-input
                     v-model="formData.password"
@@ -128,8 +126,7 @@ const handleSignUp = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
-                    type="password"
-                />
+                    type="password" />
 
                 <q-input
                     v-model="formData.confirmPassword"
@@ -143,8 +140,7 @@ const handleSignUp = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val === formData.password || 'Passwords do not match',
                     ]"
-                    type="password"
-                />
+                    type="password" />
 
                 <q-btn class="auth-button" label="Sign Up" :loading="loading" no-caps type="submit">
                     <template #loading>

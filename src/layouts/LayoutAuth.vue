@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import Logo from 'src/assets/logo.webp';
+import Logo from 'assets/images/logo.webp';
 
 defineProps<{
     title: string;
@@ -15,10 +15,11 @@ defineProps<{
                     <img
                         class="auth__logo"
                         alt="Haze logo"
-                        height="1024"
                         :src="Logo"
-                        width="1024"
-                    />
+                        width="80"
+                        height="80"
+                        loading="eager"
+                        fetchpriority="high" />
                 </div>
 
                 <div class="auth__title">{{ title }}</div>
@@ -41,13 +42,13 @@ defineProps<{
 <style lang="scss" scoped>
 .auth {
     display: grid;
-    min-height: 100svh;
     place-items: center;
+    min-height: 100svh;
 
     &__container {
         max-width: 30rem;
-        padding: 2rem;
         width: 100%;
+        padding: 2rem;
     }
 
     &__header {
@@ -55,55 +56,55 @@ defineProps<{
     }
 
     &__logo-wrapper {
+        display: inline-flex;
+        box-shadow: 0 0 0.9375rem rgb(255 149 0 / 40%);
         background: rgb(255 149 0 / 10%);
         border-radius: 1.25rem;
-        box-shadow: 0 0 0.9375rem rgb(255 149 0 / 40%);
-        display: inline-flex;
     }
 
     &__logo {
-        height: 5rem;
-        margin-left: 0.0625rem;
-        margin-top: 0.3125rem;
         width: 5rem;
+        height: 5rem;
+        margin-top: 0.3125rem;
+        margin-left: 0.0625rem;
     }
 
     &__title {
-        color: rgb(255 255 255 / 100%);
         font-size: 1.8rem;
         font-weight: 700;
+        color: rgb(255 255 255 / 100%);
     }
 
     &__subtitle {
-        color: rgb(119 119 119 / 100%);
         font-size: 0.9rem;
+        color: rgb(119 119 119 / 100%);
     }
 
     &__card {
+        width: 100%;
+        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
         background-color: rgb(18 18 18 / 100%);
         border: 1px solid rgb(255 120 0 / 15%);
         border-radius: 1.25rem;
-        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
-        width: 100%;
     }
 
     &__footer {
-        color: rgb(119 119 119 / 100%);
         font-size: 0.85rem;
+        color: rgb(119 119 119 / 100%);
         text-align: center;
     }
 
     :deep() {
         .auth-button {
-            background: linear-gradient(135deg, #ff9500, #ff3a00);
-            border-radius: 0.75rem;
+            width: 100%;
             height: 2.75rem;
             letter-spacing: 0.03125rem;
+            background: linear-gradient(135deg, #ff9500, #ff3a00);
+            border-radius: 0.75rem;
             transition:
                 transform 0.2s ease,
                 box-shadow 0.2s ease,
                 background-position 2s ease;
-            width: 100%;
 
             &:hover {
                 box-shadow: 0 0.75rem 1.75rem rgb(255 80 0 / 50%);
@@ -111,12 +112,12 @@ defineProps<{
         }
 
         .auth-link {
+            font-weight: 600;
             color: #ff9500;
             cursor: pointer;
-            font-weight: 600;
+            transition: 0.2s;
             margin-left: 0.25rem;
             text-decoration: none;
-            transition: 0.2s;
 
             &:hover {
                 color: #ff3a00;

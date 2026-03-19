@@ -83,8 +83,7 @@ watch(
             <div
                 class="profile-info__field"
                 :class="{ 'profile-info__field--editing': isEditing.username }"
-                @click="!isEditing.username && startEdit('username')"
-            >
+                @click="!isEditing.username && startEdit('username')">
                 <div v-if="!isEditing.username" class="profile-info__display">
                     <span class="profile-info__text profile-info__text--username">
                         {{ fields.username }}
@@ -101,20 +100,17 @@ watch(
                     class="profile-info__input profile-info__input--username"
                     @blur="handleUpdateUsername"
                     @keyup.enter="handleUpdateUsername"
-                    @keyup.esc="isEditing.username = false"
-                />
+                    @keyup.esc="isEditing.username = false" />
             </div>
 
             <div
                 class="profile-info__field"
                 :class="{ 'profile-info__field--editing': isEditing.bio }"
-                @click="!isEditing.bio && startEdit('bio')"
-            >
+                @click="!isEditing.bio && startEdit('bio')">
                 <div v-if="!isEditing.bio" class="profile-info__display">
                     <span
                         class="profile-info__text profile-info__text--bio"
-                        :class="{ 'profile-info__text--empty': !fields.bio }"
-                    >
+                        :class="{ 'profile-info__text--empty': !fields.bio }">
                         {{ fields.bio || 'Add a bio' }}
                     </span>
                 </div>
@@ -130,8 +126,7 @@ watch(
                     class="profile-info__input profile-info__input--bio"
                     @blur="handleUpdateBio"
                     @keyup.enter="handleUpdateBio"
-                    @keyup.esc="isEditing.bio = false"
-                />
+                    @keyup.esc="isEditing.bio = false" />
             </div>
         </div>
     </div>
@@ -144,22 +139,22 @@ watch(
     width: 100%;
 
     &__content {
-        align-items: center;
         display: flex;
         flex-direction: column;
-        gap: 2px;
+        align-items: center;
         max-width: 240px;
         width: 100%;
+        gap: 2px;
     }
 
     &__field {
+        width: 100%;
+        padding: 6px 10px;
+        cursor: pointer;
+        transition: background 0.2s ease;
+        overflow: hidden;
         border: 1px solid transparent;
         border-radius: 8px;
-        cursor: pointer;
-        overflow: hidden;
-        padding: 6px 10px;
-        transition: background 0.2s ease;
-        width: 100%;
 
         &:hover:not(&--editing) {
             background: rgb(255 255 255 / 4%);
@@ -180,23 +175,23 @@ watch(
 
     &__text {
         display: block;
+        width: 100%;
         line-height: 1.3;
         text-align: center;
-        width: 100%;
 
         &--username {
-            color: #ffe8c0;
             font-size: 1.15rem;
             font-weight: 600;
+            white-space: nowrap;
+            color: #ffe8c0;
             overflow: hidden;
             text-overflow: ellipsis;
-            white-space: nowrap;
         }
 
         &--bio {
-            color: #c8a070;
             font-size: 0.85rem;
             font-weight: 300;
+            color: #c8a070;
             overflow-wrap: anywhere;
         }
 
@@ -210,22 +205,22 @@ watch(
         width: 100%;
 
         &--username {
-            margin-top: 0.5rem;
-            color: #ffe8c0;
             font-size: 1.15rem;
             font-weight: 600;
+            color: #ffe8c0;
+            margin-top: 0.5rem;
         }
 
         &--bio {
-            color: #c8a070;
             font-size: 0.85rem;
             font-weight: 300;
+            color: #c8a070;
         }
 
         :deep(.q-field__control) {
-            background: transparent !important;
-            height: auto;
             min-height: unset;
+            height: auto;
+            background: transparent !important;
 
             &::before,
             &::after {
@@ -234,12 +229,12 @@ watch(
         }
 
         :deep(.q-field__native) {
-            color: inherit;
+            padding: 0;
             font-family: inherit;
             font-size: inherit;
             font-weight: inherit;
             line-height: 1.3;
-            padding: 0;
+            color: inherit;
             text-align: center;
         }
 

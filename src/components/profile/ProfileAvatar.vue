@@ -70,8 +70,7 @@ const handleFileChange = async (file: File | null) => {
                 :model-value="null"
                 borderless
                 dense
-                @update:model-value="handleFileChange"
-            />
+                @update:model-value="handleFileChange" />
         </div>
     </div>
 </template>
@@ -82,11 +81,11 @@ const handleFileChange = async (file: File | null) => {
     justify-content: center;
 
     &__wrapper {
-        border-radius: 50%;
-        height: 7.5rem;
-        overflow: hidden;
         position: relative;
         width: 7.5rem;
+        height: 7.5rem;
+        overflow: hidden;
+        border-radius: 50%;
 
         &:hover {
             .user-avatar__overlay {
@@ -100,71 +99,71 @@ const handleFileChange = async (file: File | null) => {
     }
 
     &__content {
-        background: #2a2a2a;
-        height: 100%;
         width: 100%;
+        height: 100%;
+        background: #2a2a2a;
     }
 
     &__img {
-        height: 100%;
         width: 100%;
+        height: 100%;
     }
 
     &__placeholder {
-        align-items: center;
-        background: linear-gradient(145deg, #444, #222);
-        color: #ffe8c0;
         display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+        height: 100%;
         font-size: 2.2rem;
         font-weight: 600;
-        height: 100%;
-        justify-content: center;
-        width: 100%;
+        background: linear-gradient(145deg, #444, #222);
+        color: #ffe8c0;
     }
 
     &__loading {
-        align-items: center;
-        background: rgb(0 0 0 / 50%);
         display: flex;
-        inset: 0;
         justify-content: center;
+        align-items: center;
         position: absolute;
+        inset: 0;
         z-index: 2;
+        background: rgb(0 0 0 / 50%);
     }
 
     &__overlay {
-        align-items: center;
-        //background: rgb(0 0 0 / 45%);
+        // background: rgb(0 0 0 / 45%);
         display: flex;
-        inset: 0;
         justify-content: center;
+        align-items: center;
+        position: absolute;
+        inset: 0;
+        z-index: 1;
         opacity: 0;
         pointer-events: none;
-        position: absolute;
         transition: opacity 0.25s ease;
-        z-index: 1;
     }
 
     &__icon {
-        color: #fff;
-        font-size: 26px;
         transform: translateY(6px);
+        font-size: 26px;
+        color: #fff;
         transition: transform 0.25s ease;
     }
 
     &__input {
-        cursor: pointer;
-        inset: 0;
-        opacity: 0;
         position: absolute;
+        inset: 0;
         z-index: 3;
+        opacity: 0;
+        cursor: pointer;
 
         :deep(.q-field__control),
         :deep(.q-field__native),
         :deep(.q-field__inner) {
-            height: 100% !important;
             min-height: 100% !important;
             width: 100% !important;
+            height: 100% !important;
         }
     }
 }

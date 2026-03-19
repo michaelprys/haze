@@ -17,13 +17,13 @@ defineProps({
 
 <style lang="scss" scoped>
 .button {
-    animation: gradient 5s ease infinite;
+    width: 100%;
+    font-weight: 600;
     background: linear-gradient(135deg, #ffb347, #ff7a00, #ff3d00, #ffb347);
     background-size: 400% 400%;
-    border-radius: 62.4375rem;
     color: white;
-    font-weight: 600;
-    width: 100%;
+    animation: gradient 5s ease infinite;
+    border-radius: 62.4375rem;
 }
 
 @keyframes gradient {

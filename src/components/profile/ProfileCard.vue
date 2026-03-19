@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import ButtonActive from 'components/common/ButtonActive.vue';
-import ItemAvatar from 'components/feed/ItemAvatar.vue';
-import ItemUserInfo from 'components/feed/ItemUserInfo.vue';
+import BaseButton from 'components/base/BaseButton.vue';
+import ProfileAvatar from 'components/profile/ProfileAvatar.vue';
+import ProfileUserInfo from 'components/profile/ProfileUserInfo.vue';
 import { useStoreProfile } from 'stores/profile.store';
 
 withDefaults(
@@ -21,23 +21,20 @@ const storeProfile = useStoreProfile();
                 v-if="storeProfile.isLoading"
                 width="80px"
                 height="80px"
-                class="rounded-full"
-            />
-            <ItemAvatar
+                class="rounded-full" />
+            <ProfileAvatar
                 v-else
                 :avatar-src="storeProfile.profileInfo?.avatarUrl"
-                :initial="initial"
-            />
+                :initial="initial" />
 
-            <ItemUserInfo v-if="storeProfile.profileInfo" />
+            <ProfileUserInfo v-if="storeProfile.profileInfo" />
 
-            <ButtonActive
+            <BaseButton
                 class="q-mt-sm"
                 flat
                 no-caps
                 label="Create Post"
-                :to="{ name: 'camera-page' }"
-            />
+                :to="{ name: 'camera-page' }" />
         </div>
     </aside>
 </template>
@@ -51,18 +48,18 @@ const storeProfile = useStoreProfile();
     top: 6rem;
 
     &__content {
+        display: flex;
+        flex-direction: column;
         align-items: center;
+        width: 100%;
+        gap: 0.5rem;
+        padding: 1.5em;
+        box-shadow: 0 30px 100px rgb(0 0 0 / 90%);
         backdrop-filter: blur(18px);
+        text-align: center;
         background-color: $color-bg;
         border: 1px solid $color-border;
         border-radius: 1.75rem;
-        box-shadow: 0 30px 100px rgb(0 0 0 / 90%);
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-        padding: 1.5em;
-        text-align: center;
-        width: 100%;
     }
 }
 </style>

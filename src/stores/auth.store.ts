@@ -1,6 +1,6 @@
 import type { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
-import { supabase } from 'src/api/supabaseClient';
+import { supabase } from 'src/api/supabase.api';
 import type { SignInPayload, SignUpPayload } from 'src/types/auth.types';
 import handleError from 'src/utils/handleError.utils';
 import { computed, ref } from 'vue';

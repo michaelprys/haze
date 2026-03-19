@@ -13,8 +13,7 @@
                 label="Return"
                 no-caps
                 outline
-                :to="{ name: 'home' }"
-            />
+                :to="{ name: 'home' }" />
         </div>
 
         <div class="section__bg"></div>
@@ -24,19 +23,19 @@
 <style lang="scss" scoped>
 .section {
     display: grid;
-    min-height: 100svh;
     place-items: center;
     position: relative;
+    min-height: 100svh;
     text-align: center;
 
     &__bg {
-        background-image: url('src/assets/cosmos.avif');
-        background-size: cover;
-        filter: contrast(2) grayscale(1);
-        inset: 0;
-        opacity: 0.2;
-        pointer-events: none;
         position: absolute;
+        inset: 0;
+        filter: contrast(2) grayscale(1);
+        opacity: 0.2;
+        background-image: url('images/cosmos.avif');
+        background-size: cover;
+        pointer-events: none;
     }
 }
 </style>

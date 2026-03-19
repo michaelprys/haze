@@ -1,7 +1,7 @@
 import type { Database } from 'app/database.types';
 import { defineStore } from 'pinia';
-import { getCurrentUser } from 'src/api/auth';
-import { supabase } from 'src/api/supabaseClient';
+import { getCurrentUser } from 'src/api/auth.api';
+import { supabase } from 'src/api/supabase.api';
 import type { Post, PostPayload } from 'src/types/post.types';
 import { ref } from 'vue';
 

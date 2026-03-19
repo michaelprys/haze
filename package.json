@@ -3,17 +3,18 @@
     "version": "0.0.1",
     "description": "A space where people express themselves",
     "productName": "Haze",
-    "author": "musha09cz@gmail.com <musha09cz@gmail.com>",
+    "author": "prysiazhnyi.dev@gmail.com <prysiazhnyi.dev@gmail.com>",
     "type": "module",
     "private": true,
     "scripts": {
-        "lint": "eslint -c ./eslint.config.js \"./src/**/*.{ts,js,cjs,mjs,vue}\"",
-        "lint:fix": "eslint --fix -c ./eslint.config.js \"./src/**/*.{ts,js,cjs,mjs,vue}\"",
+        "type-check": "vue-tsc --noEmit",
+        "lint": "eslint \"src/**/*.{ts,js,cjs,mjs,vue}\"",
+        "lint:fix": "eslint --fix \"src/**/*.{ts,js,cjs,mjs,vue}\"",
         "style:lint:fix": "stylelint \"src/**/*.{vue,scss,css}\" --fix",
         "format": "prettier --write \"src/**/*.{ts,vue,scss,css,js}\"",
         "test": "echo \"No test specified\" && exit 0",
         "dev": "quasar dev",
-        "build": "pnpm run lint:fix && pnpm run style:lint:fix && pnpm run format && quasar build",
+        "build": "bun lint:fix && bun style:lint:fix && bun format && quasar build",
         "postinstall": "quasar prepare"
     },
     "dependencies": {
@@ -22,7 +23,6 @@
         "pinia": "^3.0.4",
         "pinia-plugin-persistedstate": "^4.7.1",
         "quasar": "^2.18.6",
-        "stylelint-order": "^8.0.0",
         "vue": "^3.5.29",
         "vue-router": "^5.0.3"
     },
@@ -43,8 +43,8 @@
         "stylelint": "^17.4.0",
         "stylelint-config-recommended-scss": "^17.0.0",
         "stylelint-config-recommended-vue": "^1.6.1",
-        "stylelint-config-standard": "^40.0.0",
         "stylelint-config-standard-scss": "^17.0.0",
+        "stylelint-order": "^8.1.1",
         "stylelint-scss": "^7.0.0",
         "typescript": "^5.9.3",
         "vite-plugin-checker": "^0.12.0",
@@ -52,9 +52,7 @@
         "vue-tsc": "^3.2.5"
     },
     "engines": {
-        "node": "^28 || ^26 || ^24 || ^22 || ^20",
-        "npm": ">= 6.13.4",
-        "yarn": ">= 1.21.1",
-        "pnpm": ">= 10.0.0"
+        "node": ">=20.0.0",
+        "bun": ">=1.1.0"
     }
 }

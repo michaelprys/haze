@@ -19,7 +19,9 @@ const formattedDate = (value: string) => {
     return date.formatDate(value, 'MMMM D, h:mm A');
 };
 
-const emit = defineEmits(['showModal']);
+const emit = defineEmits<{
+    (e: 'showModal', postId: string): void;
+}>();
 </script>
 
 <template>
@@ -30,8 +32,7 @@ const emit = defineEmits(['showModal']);
                     <q-img
                         class="card-post__avatar-image"
                         v-if="storeProfile.profileInfo?.avatarUrl"
-                        :src="storeProfile.profileInfo.avatarUrl"
-                    >
+                        :src="storeProfile.profileInfo.avatarUrl">
                         <template #loading>
                             <q-skeleton width="100%" height="100%" type="QAvatar" />
                         </template>
@@ -45,12 +46,11 @@ const emit = defineEmits(['showModal']);
                         <q-skeleton
                             v-if="!storeProfile.profileInfo"
                             width="14rem"
-                            height="1.5rem"
-                        />
+                            height="1.5rem" />
 
-                        <span v-else class="card-post__username">{{
-                            storeProfile.profileInfo?.username
-                        }}</span>
+                        <span v-else class="card-post__username">
+                            {{ storeProfile.profileInfo?.username }}
+                        </span>
                     </div>
 
                     <div class="q-mt-sm">
@@ -68,8 +68,7 @@ const emit = defineEmits(['showModal']);
                 unelevated
                 icon="close"
                 size="10px"
-                @click="emit('showModal')"
-            />
+                @click="emit('showModal', props.post.id)" />
         </header>
 
         <q-separator dark />
@@ -113,42 +112,42 @@ const emit = defineEmits(['showModal']);
 @use 'src/css/custom.variables.scss' as *;
 
 .card-post {
+    margin-bottom: 2rem;
+    overflow: hidden;
     background-color: $color-bg;
     border: 1px solid $color-border;
     border-radius: 1.5rem;
-    margin-bottom: 2rem;
-    overflow: hidden;
     transition: transform 0.3s ease;
 
     &__skeleton {
-        background: rgb(255 255 255 / 5%);
-        height: 100%;
         width: 100%;
+        height: 100%;
+        background: rgb(255 255 255 / 5%);
     }
 
     &__skeleton-overlay {
-        background: $color-bg;
-        inset: 0;
         position: absolute;
+        inset: 0;
         z-index: 10;
+        background: $color-bg;
     }
 
     &__image {
         display: block;
+        width: 100%;
         height: 100%;
         object-fit: cover;
-        width: 100%;
     }
 
     &__header {
-        align-items: center;
         display: flex;
         justify-content: space-between;
+        align-items: center;
     }
 
     &__wrapper {
-        align-items: center;
         display: flex;
+        align-items: center;
         gap: 1rem;
         padding: 1rem;
     }
@@ -159,32 +158,32 @@ const emit = defineEmits(['showModal']);
     }
 
     &__username {
-        color: #ffe8c0;
         font-size: 1rem;
         font-weight: 600;
+        color: #ffe8c0;
     }
 
     &__caption {
-        color: #eee;
-        font-size: 0.9rem;
         margin: 0;
+        font-size: 0.9rem;
+        color: #eee;
     }
 
     &__media {
+        position: relative;
         aspect-ratio: 16/9;
         background: #111;
-        position: relative;
     }
 
     &__image-error {
-        align-items: center;
-        background: linear-gradient(160deg, #0d0d0d, #1a0f0a);
-        color: $color-accent;
         display: flex;
         flex-direction: column;
-        height: 100%;
         justify-content: center;
+        align-items: center;
         width: 100%;
+        height: 100%;
+        background: linear-gradient(160deg, #0d0d0d, #1a0f0a);
+        color: $color-accent;
     }
 
     &__error-icon {
@@ -203,50 +202,50 @@ const emit = defineEmits(['showModal']);
     }
 
     &__location {
-        color: $color-accent;
         font-size: 0.85rem;
+        color: $color-accent;
     }
 
     &__date {
-        color: $color-text-muted;
         font-size: 0.75rem;
+        color: $color-text-muted;
     }
 
     &__avatar-image {
-        height: 100%;
         width: 100%;
+        height: 100%;
     }
 
     &__avatar-placeholder {
-        background: linear-gradient(145deg, #444, #222);
-        color: #ffe8c0;
         display: grid;
-        font-weight: bold;
-        height: 100%;
         place-items: center;
         width: 100%;
+        height: 100%;
+        font-weight: bold;
+        background: linear-gradient(145deg, #444, #222);
+        color: #ffe8c0;
     }
 
     &__delete-button {
+        width: 1.75rem;
+        height: 1.75rem;
         backdrop-filter: blur(0.25rem);
         background: rgb(255 255 255 / 5%);
-        border: 1px solid rgb(255 255 255 / 3%);
         color: rgb(255 255 255 / 30%);
-        height: 1.75rem;
-        margin-right: 1.5rem;
         transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        width: 1.75rem;
+        margin-right: 1.5rem;
+        border: 1px solid rgb(255 255 255 / 3%);
 
         &:hover {
-            background: rgb(255 77 79 / 8%);
-            border-color: rgb(255 77 79 / 20%);
-            color: #ff4d4f;
             transform: scale(1.1);
+            background: rgb(255 77 79 / 8%);
+            color: #ff4d4f;
+            border-color: rgb(255 77 79 / 20%);
         }
 
         &:active {
-            background: rgb(255 77 79 / 15%);
             transform: scale(0.9);
+            background: rgb(255 77 79 / 15%);
         }
 
         :deep(.q-icon) {

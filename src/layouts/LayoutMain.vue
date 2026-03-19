@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Logo from 'src/assets/logo.webp';
-import { useStoreAuth } from 'stores/auth.store';
+import Logo from 'assets/images/logo.webp';
+import BaseBackground from 'components/base/BaseBackground.vue';
 import { useQuasar } from 'quasar';
 import handleError from 'src/utils/handleError.utils';
+import { useStoreAuth } from 'stores/auth.store';
 import { useRoute, useRouter } from 'vue-router';
-import ItemBackground from 'components/common/ItemBackground.vue';
 
 const router = useRouter(),
     route = useRoute(),
@@ -40,9 +40,15 @@ const handleSignOut = async () => {
                     dense
                     flat
                     :ripple="false"
-                    :to="{ name: 'home' }"
-                >
-                    <img class="main__logo-img" alt="Haze logo" :src="Logo" width="1024" />
+                    :to="{ name: 'home' }">
+                    <img
+                        class="main__logo-img"
+                        alt="Haze logo"
+                        :src="Logo"
+                        width="70"
+                        height="70"
+                        loading="eager"
+                        fetchpriority="high" />
                 </q-btn>
 
                 <q-space />
@@ -52,9 +58,9 @@ const handleSignOut = async () => {
                     flat
                     no-caps
                     :ripple="false"
-                    :to="{ name: 'home' }"
-                    >Haze</q-btn
-                >
+                    :to="{ name: 'home' }">
+                    Haze
+                </q-btn>
 
                 <q-space />
 
@@ -65,8 +71,7 @@ const handleSignOut = async () => {
                         flat
                         icon="logout"
                         round
-                        @click="handleSignOut"
-                    />
+                        @click="handleSignOut" />
 
                     <q-btn
                         v-else
@@ -74,14 +79,13 @@ const handleSignOut = async () => {
                         flat
                         icon="account_circle"
                         round
-                        :to="{ name: 'sign-in' }"
-                    />
+                        :to="{ name: 'sign-in' }" />
                 </div>
             </q-toolbar>
         </q-header>
 
         <q-page-container class="main__page-container">
-            <ItemBackground />
+            <BaseBackground />
 
             <router-view v-slot="{ Component, route: currentRoute }">
                 <transition appear mode="out-in" name="fade">
@@ -93,14 +97,12 @@ const handleSignOut = async () => {
         <q-footer
             v-if="route.meta.requiresAuth && storeAuth.isAuthenticated"
             bordered
-            class="main__footer"
-        >
+            class="main__footer">
             <q-tabs
                 class="main__footer-tabs"
                 active-color="orange"
                 align="justify"
-                indicator-color="transparent"
-            >
+                indicator-color="transparent">
                 <q-route-tab icon="fa-solid fa-home" :to="{ name: 'home' }" />
                 <q-route-tab icon="fa-solid fa-camera" :to="{ name: 'camera-page' }" />
             </q-tabs>
@@ -125,8 +127,8 @@ const handleSignOut = async () => {
     }
 
     &__toolbar {
-        height: 4rem;
         min-height: 4rem;
+        height: 4rem;
     }
 
     &__logo {
@@ -138,22 +140,23 @@ const handleSignOut = async () => {
         }
 
         &-img {
-            transition: transform 0.3s ease;
             width: 4.375rem;
+            height: 4.375rem;
+            transition: transform 0.3s ease;
         }
     }
 
     &__title {
-        color: $primary;
+        position: absolute;
+        transform: translate(-50%, -50%);
         font-family: Streamster, sans-serif;
         font-size: 1.5rem;
-        left: 50%;
-        letter-spacing: 0.125rem;
         line-height: 1;
-        position: absolute;
-        top: 50%;
-        transform: translate(-50%, -50%);
+        letter-spacing: 0.125rem;
+        color: $primary;
         transition: text-shadow 0.2s ease;
+        top: 50%;
+        left: 50%;
         will-change: text-shadow;
 
         &:hover {
@@ -165,10 +168,10 @@ const handleSignOut = async () => {
     }
 
     &__footer {
+        display: none;
         backdrop-filter: blur(0.75rem);
         background: $dark;
         border-top: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
-        display: none;
 
         &-tabs {
             width: 100%;
@@ -180,8 +183,8 @@ const handleSignOut = async () => {
     }
 
     &__page-container {
-        background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%);
         min-height: 100svh;
+        background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%);
     }
 }
 

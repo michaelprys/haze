@@ -1,4 +1,7 @@
 import { defineRouter } from '#q-app/wrappers';
+import { supabase } from 'src/api/supabase.api';
+import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
+import { useStoreAuth } from 'stores/auth.store';
 import {
     createMemoryHistory,
     createRouter,
@@ -6,9 +9,6 @@ import {
     createWebHistory,
 } from 'vue-router';
 import routes from './routes';
-import { useStoreAuth } from 'stores/auth.store';
-import { supabase } from 'src/api/supabaseClient';
-import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
 
 /*
  * If not building with SSR mode, you can

@@ -70,8 +70,7 @@ const handleRequestPasswordReset = async () => {
                     :rules="[
                         (val) => !!val || 'Email is required',
                         (val, rules) => rules.email(val) || 'Please enter a valid email address',
-                    ]"
-                />
+                    ]" />
 
                 <q-btn
                     class="auth-button"
@@ -79,8 +78,7 @@ const handleRequestPasswordReset = async () => {
                     :label="`${seconds > 0 ? `Resend in ${seconds}` : 'Send Reset Link'}`"
                     :loading="loading"
                     no-caps
-                    type="submit"
-                >
+                    type="submit">
                     <template #loading>
                         <q-spinner />
                     </template>

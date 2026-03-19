@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { onBeforeUnmount, onMounted, ref } from 'vue';
-import { useCamera } from 'src/composables/useCamera';
-import { usePost } from 'src/composables/usePost';
-import ButtonActive from 'components/common/ButtonActive.vue';
-import { useGeolocation } from 'src/composables/useGeolocation';
+import BaseButton from 'components/base/BaseButton.vue';
 import type { QForm } from 'quasar';
+import { useCamera } from 'src/composables/useCamera';
+import { useGeolocation } from 'src/composables/useGeolocation';
+import { usePost } from 'src/composables/usePost';
+import { onBeforeUnmount, onMounted, ref } from 'vue';
 
 // Post
 const { post, loading, handlePublishPost } = usePost();
@@ -73,14 +73,12 @@ onBeforeUnmount(() => {
             <q-form
                 @submit.prevent="handlePublishPost(hasCameraSupport, formRef)"
                 class="camera__wrapper"
-                ref="formRef"
-            >
+                ref="formRef">
                 <div class="camera__frame">
                     <q-skeleton
                         v-if="isCameraInitializing"
                         animation="wave"
-                        class="camera__skeleton"
-                    />
+                        class="camera__skeleton" />
 
                     <video
                         v-show="isCameraActive && !imageCaptured"
@@ -91,8 +89,7 @@ onBeforeUnmount(() => {
                         :style="{
                             opacity: isCameraActive ? 1 : 0,
                             transition: 'opacity 0.3s ease',
-                        }"
-                    />
+                        }" />
                     <canvas v-show="imageCaptured" ref="canvasRef" class="camera__shot" />
 
                     <q-img
@@ -100,8 +97,7 @@ onBeforeUnmount(() => {
                         class="camera__shot"
                         fit="cover"
                         loading="eager"
-                        :src="post.photoUrl"
-                    />
+                        :src="post.photoUrl" />
 
                     <div
                         v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
@@ -109,10 +105,12 @@ onBeforeUnmount(() => {
                         :style="{
                             opacity: isCameraActive ? 0 : 1,
                             transition: 'opacity 0.3s ease',
-                        }"
-                    >
+                        }">
                         <div class="camera__placeholder-wrapper">
-                            <span> turn on your camera, or add a memory <br /> </span>
+                            <span>
+                                turn on your camera, or add a memory
+                                <br />
+                            </span>
                             <span class="camera__placeholder-subtitle">
                                 to capture the moment...
                             </span>
@@ -129,8 +127,7 @@ onBeforeUnmount(() => {
                             round
                             size="lg"
                             unelevated
-                            @click="captureImage"
-                        />
+                            @click="captureImage" />
 
                         <q-btn
                             v-else-if="imageCaptured"
@@ -139,8 +136,7 @@ onBeforeUnmount(() => {
                             round
                             size="lg"
                             unelevated
-                            @click="resumeCamera"
-                        />
+                            @click="resumeCamera" />
                     </div>
 
                     <q-file
@@ -149,8 +145,7 @@ onBeforeUnmount(() => {
                         class="camera__filepicker q-mt-lg"
                         dense
                         flat
-                        @update:model-value="getImageSrc"
-                    >
+                        @update:model-value="getImageSrc">
                         <template #default>
                             <span class="camera__filepicker-text">+ add memory</span>
                         </template>
@@ -168,8 +163,7 @@ onBeforeUnmount(() => {
                     :rules="[
                         (val) => !!val || 'Caption is required',
                         (val) => val.length <= 200 || 'Maximum 200 characters',
-                    ]"
-                />
+                    ]" />
 
                 <q-input
                     v-model="post.location"
@@ -178,15 +172,13 @@ onBeforeUnmount(() => {
                     dense
                     label="Location"
                     outlined
-                    :rules="[(val) => !!val || 'Location is required']"
-                >
+                    :rules="[(val) => !!val || 'Location is required']">
                     <template #append>
                         <q-spinner
                             v-if="locationPending"
                             color="orange"
                             size="18px"
-                            style="margin-right: 0.45rem"
-                        />
+                            style="margin-right: 0.45rem" />
 
                         <q-btn
                             v-if="!locationPending && hasGeolocation"
@@ -194,13 +186,12 @@ onBeforeUnmount(() => {
                             flat
                             @mousedown.stop.prevent
                             @click.stop.prevent="getLocation"
-                            icon="place"
-                        />
+                            icon="place" />
                     </template>
                 </q-input>
 
                 <div class="camera__publish-button">
-                    <ButtonActive label="Publish" :loading="loading" type="submit" />
+                    <BaseButton label="Publish" :loading="loading" type="submit" />
                 </div>
             </q-form>
         </q-card>
@@ -210,21 +201,21 @@ onBeforeUnmount(() => {
 <style lang="scss" scoped>
 .camera {
     &.haze-bg {
-        align-items: flex-start;
         display: flex;
         justify-content: center;
+        align-items: flex-start;
         min-height: 100svh;
         padding-top: 1.75rem;
     }
 
     &__card {
+        max-width: 41rem;
+        width: 100%;
+        box-shadow: 0 40px 80px rgb(0 0 0 / 70%);
+        padding: 1.5rem 2rem;
         background-color: #141414;
         border: 1px solid rgb(255 255 255 / 5%);
         border-radius: 2rem;
-        box-shadow: 0 40px 80px rgb(0 0 0 / 70%);
-        max-width: 41rem;
-        padding: 1.5rem 2rem;
-        width: 100%;
     }
 
     &__wrapper {
@@ -232,61 +223,61 @@ onBeforeUnmount(() => {
     }
 
     &__frame {
+        position: relative;
         aspect-ratio: 3 / 2;
-        background: linear-gradient(180deg, #1e1e1e 0%, #141414 100%);
-        border: 2px solid rgb(255 154 60 / 12%);
-        border-radius: 1.5rem;
+        max-width: 35rem;
+        width: 100%;
         box-shadow:
             0 1rem 2.5rem rgb(0 0 0 / 85%),
             0 0 0 0.125rem rgb(255 140 0 / 12%);
+        background: linear-gradient(180deg, #1e1e1e 0%, #141414 100%);
         margin: 0 auto;
-        max-width: 35rem;
         overflow: hidden;
-        position: relative;
-        width: 100%;
+        border: 2px solid rgb(255 154 60 / 12%);
+        border-radius: 1.5rem;
     }
 
     &__shot {
-        inset: 0;
-        object-fit: cover;
         position: absolute;
+        inset: 0;
         z-index: 1;
+        object-fit: cover;
     }
 
     &__placeholder {
-        background: linear-gradient(135deg, #f0a53e 0%, #f8bd2e 30%, #f06c4c 60%, #f04a46 100%);
-        background-blend-mode: overlay;
         display: grid;
-        inset: 0;
-        object-fit: cover;
-        overflow: hidden;
         place-items: center;
         position: absolute;
+        inset: 0;
         z-index: 0;
+        background: linear-gradient(135deg, #f0a53e 0%, #f8bd2e 30%, #f06c4c 60%, #f04a46 100%);
+        object-fit: cover;
+        overflow: hidden;
+        background-blend-mode: overlay;
     }
 
     &__placeholder-wrapper {
-        align-items: flex-end;
-        color: #fff;
         display: flex;
         flex-direction: column;
+        align-items: flex-end;
         font-family: Georgia, 'Times New Roman', serif;
         font-size: 1.05rem;
-        font-style: italic;
         font-weight: 500;
-        letter-spacing: 0.025em;
         line-height: 1.45;
-        margin-right: 1.5rem;
+        letter-spacing: 0.025em;
         text-shadow:
             0 2px 8px rgb(0 0 0 / 20%),
             0 0 12px rgb(0 0 0 / 20%);
+        color: #fff;
+        margin-right: 1.5rem;
+        font-style: italic;
     }
 
     &__placeholder-subtitle {
-        font-size: 0.9rem;
         margin-right: -1.5rem;
-        opacity: 0.92;
+        font-size: 0.9rem;
         text-shadow: inherit;
+        opacity: 0.92;
     }
 
     &__skeleton {
@@ -294,8 +285,8 @@ onBeforeUnmount(() => {
     }
 
     &__buttons {
-        margin-top: 1rem;
         width: 100%;
+        margin-top: 1rem;
     }
 
     &__buttons-wrapper {
@@ -305,8 +296,8 @@ onBeforeUnmount(() => {
     }
 
     &__capture-button {
-        background: linear-gradient(235deg, #ff9a3c, #ff6b3c, #f04a46);
         box-shadow: 0 0.25rem 0.6rem rgb(0 0 0 / 50%);
+        background: linear-gradient(235deg, #ff9a3c, #ff6b3c, #f04a46);
         color: white;
         transition:
             transform 0.2s ease,
@@ -314,13 +305,13 @@ onBeforeUnmount(() => {
             filter 0.2s ease;
 
         &:hover {
-            filter: brightness(1.15);
             transform: scale(1.05);
+            filter: brightness(1.15);
         }
 
         &:active {
-            filter: brightness(0.9);
             transform: scale(0.95);
+            filter: brightness(0.9);
         }
     }
 
@@ -339,28 +330,28 @@ onBeforeUnmount(() => {
             }
 
             .q-field__control {
-                background: transparent;
-                box-shadow: none;
                 min-height: auto;
+                box-shadow: none;
+                background: transparent;
                 padding: 0;
             }
         }
     }
 
     &__filepicker-text {
-        align-items: center;
-        color: #ff9a3c;
-        cursor: pointer;
         display: flex;
+        align-items: center;
         font-size: 1rem;
         font-weight: 500;
         letter-spacing: 0.05em;
         text-shadow: 0 0 0.375rem rgb(255 122 0 / 35%);
+        color: #ff9a3c;
+        cursor: pointer;
         transition: all 0.25s ease;
 
         &:hover {
-            color: #ffb15c;
             text-shadow: 0 0;
+            color: #ffb15c;
         }
     }
 
@@ -369,8 +360,8 @@ onBeforeUnmount(() => {
     }
 
     &__link-text:hover {
-        color: #ffb15c;
         text-shadow: 0 0;
+        color: #ffb15c;
     }
 
     &__input {
@@ -387,10 +378,10 @@ onBeforeUnmount(() => {
     }
 
     &__geo-button {
-        border-radius: 0.5rem;
+        width: 32px;
         height: 32px;
         margin-right: -4px;
-        width: 32px;
+        border-radius: 0.5rem;
 
         :deep(.q-icon) {
             font-size: 1.2rem;
@@ -426,13 +417,13 @@ onBeforeUnmount(() => {
     }
 
     &__post-button {
-        background: linear-gradient(90deg, #ff7a00, #ff3c00, #000);
-        border-radius: 62.4375rem;
-        color: white;
         font-weight: 700;
         letter-spacing: 0.0625rem;
-        text-transform: uppercase;
+        background: linear-gradient(90deg, #ff7a00, #ff3c00, #000);
+        color: white;
         transition: all 0.3s ease;
+        text-transform: uppercase;
+        border-radius: 62.4375rem;
     }
 
     @media (max-width: $breakpoint-sm-min) {
@@ -445,10 +436,10 @@ onBeforeUnmount(() => {
         }
 
         &__geo-button {
-            font-size: 0.9rem;
-            height: 2.5rem;
             max-width: 2.5rem;
             min-width: 2.5rem;
+            height: 2.5rem;
+            font-size: 0.9rem;
         }
     }
 }

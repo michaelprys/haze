@@ -1,13 +1,12 @@
 <script setup lang="ts">
-import { useStoreAuth } from 'stores/auth.store';
 import LayoutAuth from 'layouts/LayoutAuth.vue';
-import type { SignInPayload } from 'src/types/auth.types';
-import { useQuasar } from 'quasar';
-import { useTemplateRef, reactive, onMounted, ref } from 'vue';
 import type { QForm } from 'quasar';
+import { useQuasar } from 'quasar';
+import type { SignInPayload } from 'src/types/auth.types';
 import handleError from 'src/utils/handleError.utils';
-import { useRouter } from 'vue-router';
-import { useRoute } from 'vue-router';
+import { useStoreAuth } from 'stores/auth.store';
+import { onMounted, reactive, ref, useTemplateRef } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 
 // Common
 const router = useRouter(),
@@ -104,8 +103,7 @@ onMounted(async () => {
                         (val) => !!val || 'Email is required',
                         (val, rules) => rules.email(val) || 'Please enter a valid email address',
                     ]"
-                    type="email"
-                />
+                    type="email" />
 
                 <q-input
                     v-model="formData.password"
@@ -119,8 +117,7 @@ onMounted(async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
-                    type="password"
-                />
+                    type="password" />
 
                 <q-btn class="auth-button" label="Sign In" :loading="loading" no-caps type="submit">
                     <template #loading>
@@ -134,8 +131,7 @@ onMounted(async () => {
                         flat
                         label="Forgot password?"
                         no-caps
-                        :to="{ name: 'forgot-password' }"
-                    />
+                        :to="{ name: 'forgot-password' }" />
                 </div>
             </q-form>
         </template>
@@ -155,8 +151,8 @@ onMounted(async () => {
     }
 
     &__footer-button {
-        color: #ff9500;
         font-size: 0.75rem;
+        color: #ff9500;
     }
 }
 </style>

@@ -1,11 +1,11 @@
 @font-face {
-    font-display: swap;
     font-family: Streamster;
-    font-style: normal;
     font-weight: normal;
+    font-style: normal;
     src:
-        url('fonts/Streamster.woff2') format('woff2'),
-        url('fonts/Streamster.woff') format('woff');
+        url('../assets/fonts/Streamster.woff2') format('woff2'),
+        url('../assets/fonts/Streamster.woff') format('woff');
+    font-display: swap;
 }
 
 body {
@@ -17,8 +17,8 @@ img {
 }
 
 .container {
-    margin: 0 auto;
     max-width: 60.9375rem;
+    margin: 0 auto;
 }
 
 .fade-enter-active,
@@ -32,8 +32,8 @@ img {
 }
 
 .q-field__bottom--animated {
-    padding-bottom: 1rem;
     position: static;
+    padding-bottom: 1rem;
     transform: translateY(0%);
 }
 
@@ -42,7 +42,7 @@ img {
 }
 
 .small-screen-only {
-    @media (max-width: $breakpoint-xs-max) {
+    @media (width <= $breakpoint-xs-max) {
         display: block;
     }
 
@@ -52,7 +52,7 @@ img {
 }
 
 .large-screen-only {
-    @media (max-width: $breakpoint-xs-max) {
+    @media (width <= $breakpoint-xs-max) {
         display: none;
     }
 

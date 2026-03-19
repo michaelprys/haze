@@ -69,8 +69,7 @@ const handleResetPassword = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
-                    type="password"
-                />
+                    type="password" />
 
                 <q-input
                     v-model="formData.confirmNewPassword"
@@ -84,16 +83,14 @@ const handleResetPassword = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val === formData.newPassword || 'Passwords do not match',
                     ]"
-                    type="password"
-                />
+                    type="password" />
 
                 <q-btn
                     class="auth-button"
                     label="Reset Password"
                     :loading="loading"
                     no-caps
-                    type="submit"
-                >
+                    type="submit">
                     <template #loading>
                         <q-spinner />
                     </template>
