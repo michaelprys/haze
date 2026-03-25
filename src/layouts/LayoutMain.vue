@@ -66,7 +66,7 @@ const handleSignOut = async () => {
 
                 <div class="main__header-buttons">
                     <q-btn
-                        v-if="storeAuth.isAuthenticated"
+                        v-if="storeAuth.isLoggedIn"
                         class="main__header-icon"
                         flat
                         icon="logout"
@@ -95,7 +95,7 @@ const handleSignOut = async () => {
         </q-page-container>
 
         <q-footer
-            v-if="route.meta.requiresAuth && storeAuth.isAuthenticated"
+            v-if="route.meta.requiresAuth && storeAuth.isLoggedIn"
             bordered
             class="main__footer">
             <q-tabs

@@ -12,7 +12,9 @@ const router = useRouter(),
     $q = useQuasar(),
     storeAuth = useStoreAuth(),
     loading = ref(false),
-    tokenInUrl = getRecoveryToken();
+    tokenInUrl = getRecoveryToken(),
+    isNewPasswordVisible = ref(false),
+    isConfirmNewPasswordVisible = ref(false);
 
 // Form
 const formData = reactive({
@@ -69,7 +71,14 @@ const handleResetPassword = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
-                    type="password" />
+                    :type="isNewPasswordVisible ? 'text' : 'password'">
+                    <template #append>
+                        <q-icon
+                            :name="isNewPasswordVisible ? 'visibility_off' : 'visibility'"
+                            class="cursor-pointer"
+                            @click="isNewPasswordVisible = !isNewPasswordVisible" />
+                    </template>
+                </q-input>
 
                 <q-input
                     v-model="formData.confirmNewPassword"
@@ -83,7 +92,14 @@ const handleResetPassword = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val === formData.newPassword || 'Passwords do not match',
                     ]"
-                    type="password" />
+                    :type="isConfirmNewPasswordVisible ? 'text' : 'password'">
+                    <template #append>
+                        <q-icon
+                            :name="isConfirmNewPasswordVisible ? 'visibility_off' : 'visibility'"
+                            class="cursor-pointer"
+                            @click="isConfirmNewPasswordVisible = !isConfirmNewPasswordVisible" />
+                    </template>
+                </q-input>
 
                 <q-btn
                     class="auth-button"

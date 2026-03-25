@@ -1,5 +1,4 @@
 import { defineRouter } from '#q-app/wrappers';
-import { supabase } from 'src/api/supabase.api';
 import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
 import { useStoreAuth } from 'stores/auth.store';
 import {
@@ -39,22 +38,15 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     Router.beforeEach(async (to) => {
         const storeAuth = useStoreAuth();
 
-        if (!storeAuth.isAuthenticated) {
-            try {
-                const { data } = await supabase.auth.getUser();
-
-                if (data.user) {
-                    storeAuth.user = data.user ?? null;
-                }
-            } catch {
-                void 0;
-            }
+        if (!storeAuth.isAuthChecked) {
+            await storeAuth.checkAuth();
         }
 
-        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth),
-            confirmOnly = to.matched.some((r) => r.meta.confirmOnly),
-            guestOnly = to.matched.some((r) => r.meta.guestOnly),
-            tokenInUrl = getRecoveryToken();
+        const requiresAuth = to.matched.some((r) => r.meta.requiresAuth);
+        const confirmOnly = to.matched.some((r) => r.meta.confirmOnly);
+        const guestOnly = to.matched.some((r) => r.meta.guestOnly);
+
+        const tokenInUrl = getRecoveryToken();
 
         if (to.name === 'reset-password' && !tokenInUrl) {
             return {
@@ -63,7 +55,7 @@ export default defineRouter(function (/* { store, ssrContext } */) {
             };
         }
 
-        if (!storeAuth.isAuthenticated && requiresAuth) {
+        if (!storeAuth.isLoggedIn && requiresAuth) {
             return {
                 name: 'sign-in',
                 query: { next: to.fullPath },
@@ -71,11 +63,14 @@ export default defineRouter(function (/* { store, ssrContext } */) {
             };
         }
 
-        if (storeAuth.isAuthenticated && guestOnly) {
-            return { name: 'home' };
+        if (storeAuth.isLoggedIn && guestOnly) {
+            return {
+                name: 'home',
+                replace: true,
+            };
         }
 
-        if (storeAuth.isAuthenticated && confirmOnly) {
+        if (storeAuth.isLoggedIn && confirmOnly) {
             return true;
         }
 

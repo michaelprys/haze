@@ -2,26 +2,33 @@ import type { User } from '@supabase/supabase-js';
 import { defineStore } from 'pinia';
 import { supabase } from 'src/api/supabase.api';
 import type { SignInPayload, SignUpPayload } from 'src/types/auth.types';
-import handleError from 'src/utils/handleError.utils';
 import { computed, ref } from 'vue';
 
 export const useStoreAuth = defineStore('storeAuth', () => {
-    const user = ref<User | null>(null),
-        isAuthenticated = computed(() => !!user.value),
-        redirectTo = import.meta.env.VITE_APP_URL;
+    const currentUser = ref<User | null>(null);
+    const isLoggedIn = computed(() => Boolean(currentUser.value));
+    const redirectTo = import.meta.env.VITE_APP_URL;
+    const isAuthChecked = ref(false);
 
-    void (async () => {
+    const syncUser = (userData: User | null) => {
+        currentUser.value = userData;
+        isAuthChecked.value = true;
+    };
+
+    const checkAuth = async () => {
+        if (isAuthChecked.value) return;
+
         try {
-            const { data: authState } = await supabase.auth.getUser();
-            user.value = authState.user ?? null;
+            const { data } = await supabase.auth.getUser();
+            syncUser(data.user ?? null);
         } catch (error) {
-            console.error(handleError(error));
-            user.value = null;
+            console.error(error);
+            syncUser(null);
         }
-    })();
+    };
 
     supabase.auth.onAuthStateChange((_, session) => {
-        user.value = session?.user ?? null;
+        syncUser(session?.user ?? null);
     });
 
     const signUp = async (payload: SignUpPayload) => {
@@ -53,6 +60,8 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         });
         if (error) throw error;
 
+        syncUser(data.user);
+
         return data;
     };
 
@@ -60,7 +69,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         const { error } = await supabase.auth.signOut();
         if (error) throw error;
 
-        user.value = null;
+        syncUser(null);
     };
 
     const requestPasswordReset = async (email: string) => {
@@ -86,11 +95,20 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         if (updateUserError) throw updateUserError;
     };
 
+    const signInAnonymously = async () => {
+        const { error } = await supabase.auth.signInAnonymously();
+
+        if (error) throw error;
+    };
+
     return {
-        isAuthenticated,
-        user,
+        isLoggedIn,
+        currentUser,
+        isAuthChecked,
+        checkAuth,
         signUp,
         signIn,
+        signInAnonymously,
         signOut,
         requestPasswordReset,
         resetPassword,

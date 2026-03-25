@@ -1,18 +1,20 @@
 <script setup lang="ts">
-import { useTemplateRef, reactive, ref } from 'vue';
 import LayoutAuth from 'layouts/LayoutAuth.vue';
-import { useStoreAuth } from 'stores/auth.store';
-import { useQuasar } from 'quasar';
-import handleError from 'src/utils/handleError.utils';
-import { useRouter } from 'vue-router';
-import type { SignUpPayload } from 'src/types/auth.types';
 import type { QForm } from 'quasar';
+import { useQuasar } from 'quasar';
+import type { SignUpPayload } from 'src/types/auth.types';
+import handleError from 'src/utils/handleError.utils';
+import { useStoreAuth } from 'stores/auth.store';
+import { reactive, ref, useTemplateRef } from 'vue';
+import { useRouter } from 'vue-router';
 
 // Common
 const router = useRouter(),
     $q = useQuasar(),
     storeAuth = useStoreAuth(),
-    loading = ref(false);
+    loading = ref(false),
+    isPasswordVisible = ref(false),
+    isConfirmPasswordVisible = ref(false);
 
 // Form
 const signUpForm = useTemplateRef<QForm>('signUpForm'),
@@ -126,7 +128,14 @@ const handleSignUp = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val.length >= 6 || 'At least 6 characters',
                     ]"
-                    type="password" />
+                    :type="isPasswordVisible ? 'text' : 'password'">
+                    <template #append>
+                        <q-icon
+                            :name="isPasswordVisible ? 'visibility_off' : 'visibility'"
+                            class="cursor-pointer"
+                            @click="isPasswordVisible = !isPasswordVisible" />
+                    </template>
+                </q-input>
 
                 <q-input
                     v-model="formData.confirmPassword"
@@ -140,7 +149,14 @@ const handleSignUp = async () => {
                         (val) => !!val || 'Password is required',
                         (val) => val === formData.password || 'Passwords do not match',
                     ]"
-                    type="password" />
+                    :type="isConfirmPasswordVisible ? 'text' : 'password'">
+                    <template #append>
+                        <q-icon
+                            :name="isConfirmPasswordVisible ? 'visibility_off' : 'visibility'"
+                            class="cursor-pointer"
+                            @click="isConfirmPasswordVisible = !isConfirmPasswordVisible" />
+                    </template>
+                </q-input>
 
                 <q-btn class="auth-button" label="Sign Up" :loading="loading" no-caps type="submit">
                     <template #loading>
