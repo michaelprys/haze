@@ -35,24 +35,26 @@ const handleSignIn = async (isGuest = false) => {
     targetLoading.value = true;
 
     try {
-        const payload: SignInPayload = isGuest
-            ? { email: 'guest@example.com', password: 'guestpassword123' }
-            : { email: formData.email, password: formData.password };
+        if (isGuest) {
+            await storeAuth.signInAsGuest();
+        } else {
+            const payload: SignInPayload = {
+                email: formData.email,
+                password: formData.password,
+            };
+            await storeAuth.signIn(payload);
+        }
 
-        const response = await storeAuth.signIn(payload);
+        $q.notify({
+            type: 'positive',
+            message: isGuest ? 'Welcome! Entering guest mode...' : 'Signed in successfully!',
+            timeout: 3000,
+        });
 
-        if (response) {
-            $q.notify({
-                type: 'positive',
-                message: isGuest ? 'Welcome! Entering guest mode...' : 'Signed in successfully!',
-                timeout: 3000,
-            });
-
-            if (route.query.next) {
-                await router.push(route.query.next as string);
-            } else {
-                await router.push({ name: 'home' });
-            }
+        if (route.query.next) {
+            await router.push(route.query.next as string);
+        } else {
+            await router.push({ name: 'home' });
         }
     } catch (error) {
         const message = handleError(error);

@@ -168,4 +168,3 @@ const handleFileChange = async (file: File | null) => {
     }
 }
 </style>
-```

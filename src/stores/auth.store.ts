@@ -95,7 +95,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         if (updateUserError) throw updateUserError;
     };
 
-    const signInAnonymously = async () => {
+    const signInAsGuest = async () => {
         const { error } = await supabase.auth.signInAnonymously();
 
         if (error) throw error;
@@ -108,7 +108,7 @@ export const useStoreAuth = defineStore('storeAuth', () => {
         checkAuth,
         signUp,
         signIn,
-        signInAnonymously,
+        signInAsGuest,
         signOut,
         requestPasswordReset,
         resetPassword,
