@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { useStoreProfile } from 'stores/profile.store';
+import handleError from 'src/utils/handleError.utils';
+import { nextTick, ref, watch } from 'vue';
 import type { QInput } from 'quasar';
 import { useQuasar } from 'quasar';
-import handleError from 'src/utils/handleError.utils';
-import { useStoreProfile } from 'stores/profile.store';
-import { nextTick, ref, watch } from 'vue';
 
 const storeProfile = useStoreProfile();
 const $q = useQuasar();
@@ -32,6 +32,7 @@ const handleUpdateUsername = async () => {
     if (!newValue || newValue === oldValue) {
         fields.value.username = oldValue;
         isEditing.value.username = false;
+
         return;
     }
     loading.value.username = true;
@@ -53,6 +54,7 @@ const handleUpdateBio = async () => {
     if (newValue === oldValue) {
         fields.value.bio = oldValue;
         isEditing.value.bio = false;
+
         return;
     }
     loading.value.bio = true;

@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import LayoutAuth from 'layouts/LayoutAuth.vue';
-import { useQuasar } from 'quasar';
 import handleError from 'src/utils/handleError.utils';
 import { useStoreAuth } from 'stores/auth.store';
+import LayoutAuth from 'layouts/LayoutAuth.vue';
+import { useQuasar } from 'quasar';
 import { ref } from 'vue';
 
 const $q = useQuasar(),

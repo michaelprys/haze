@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { useQuasar } from 'quasar';
-import handleError from 'src/utils/handleError.utils';
 import { useStoreProfile } from 'stores/profile.store';
+import handleError from 'src/utils/handleError.utils';
 import { computed, ref } from 'vue';
+import { useQuasar } from 'quasar';
 
 defineProps<{
     avatarSrc: string | null | undefined;

@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import LayoutAuth from 'layouts/LayoutAuth.vue';
-import type { QForm } from 'quasar';
-import { useQuasar } from 'quasar';
 import type { SignUpPayload } from 'src/types/auth.types';
 import handleError from 'src/utils/handleError.utils';
-import { useStoreAuth } from 'stores/auth.store';
 import { reactive, ref, useTemplateRef } from 'vue';
+import { useStoreAuth } from 'stores/auth.store';
+import LayoutAuth from 'layouts/LayoutAuth.vue';
 import { useRouter } from 'vue-router';
+import type { QForm } from 'quasar';
+import { useQuasar } from 'quasar';
 
 // Common
 const router = useRouter(),
@@ -39,6 +39,7 @@ const handleSignUp = async () => {
             type: 'negative',
             message: 'Please fill out the form correctly',
         });
+
         return;
     }
 
@@ -47,6 +48,7 @@ const handleSignUp = async () => {
             type: 'positive',
             message: "Passwords don't match",
         });
+
         return;
     }
 

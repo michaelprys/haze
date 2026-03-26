@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import Logo from 'assets/images/logo.webp';
 import BaseBackground from 'components/base/BaseBackground.vue';
-import { useQuasar } from 'quasar';
 import handleError from 'src/utils/handleError.utils';
 import { useStoreAuth } from 'stores/auth.store';
 import { useRoute, useRouter } from 'vue-router';
+import Logo from 'assets/images/logo.webp';
+import { useQuasar } from 'quasar';
 
 const router = useRouter(),
     route = useRoute(),

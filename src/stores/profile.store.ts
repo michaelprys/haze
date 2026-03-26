@@ -1,7 +1,7 @@
-import { defineStore } from 'pinia';
+import type { ProfileInfo } from 'src/types/profileInfo.types';
 import { getCurrentUser } from 'src/api/auth.api';
 import { supabase } from 'src/api/supabase.api';
-import type { ProfileInfo } from 'src/types/profileInfo.types';
+import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 export const useStoreProfile = defineStore(

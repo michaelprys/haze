@@ -2,8 +2,7 @@
     font-family: Streamster;
     font-weight: normal;
     font-style: normal;
-    src:
-        url('../assets/fonts/Streamster.woff2') format('woff2');
+    src: url('../assets/fonts/Streamster.woff2') format('woff2');
     font-display: swap;
 }
 
@@ -61,7 +60,9 @@ img {
 }
 
 @media (prefers-reduced-motion: reduce) {
-    *, ::before, ::after {
+    *,
+    ::before,
+    ::after {
         animation-duration: 0.01ms !important;
         animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;

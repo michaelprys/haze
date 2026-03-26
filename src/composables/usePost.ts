@@ -1,11 +1,11 @@
-import type { QForm } from 'quasar';
-import { useQuasar } from 'quasar';
-import type { Post } from 'src/types/post.types';
 import { generateFileName } from 'src/utils/generateFileName.utils';
 import handleError from 'src/utils/handleError.utils';
 import { useStorePosts } from 'stores/posts.store';
-import { ref } from 'vue';
+import type { Post } from 'src/types/post.types';
 import { useRouter } from 'vue-router';
+import type { QForm } from 'quasar';
+import { useQuasar } from 'quasar';
+import { ref } from 'vue';
 
 export const usePost = () => {
     const router = useRouter(),
@@ -34,6 +34,7 @@ export const usePost = () => {
                 type: 'negative',
                 message: 'Form validation failed',
             });
+
             return;
         }
 
@@ -45,6 +46,7 @@ export const usePost = () => {
                 message: `Please ${hasCameraSupport ? 'take a photo' : 'add an image'} before publishing`,
             });
             loading.value = false;
+
             return;
         }
 

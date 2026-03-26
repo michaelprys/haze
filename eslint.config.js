@@ -1,70 +1,93 @@
 import js from '@eslint/js';
 import pluginQuasar from '@quasar/app-vite/eslint';
+import stylistic from '@stylistic/eslint-plugin';
 import prettierSkipFormatting from '@vue/eslint-config-prettier/skip-formatting';
-import { defineConfigWithVueTs, vueTsConfigs } from '@vue/eslint-config-typescript';
+import perfectionist from 'eslint-plugin-perfectionist';
 import pluginVue from 'eslint-plugin-vue';
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
+import vueParser from 'vue-eslint-parser';
 
-export default defineConfigWithVueTs(
-    {
-        /**
-         * Ignore the following files.
-         */
-        // ignores: []
-    },
-
-    pluginQuasar.configs.recommended(),
-    js.configs.recommended,
-    pluginVue.configs['flat/strongly-recommended'],
-    {
-        files: ['**/*.ts', '**/*.vue'],
-        rules: {
-            '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
-            // 'vue/attributes-order': 'off',
+export default tseslint
+    .config(
+        {
+            ignores: ['node_modules', '.quasar', 'dist', 'src-capacitor', 'src-cordova'],
         },
-    },
-
-    vueTsConfigs.recommendedTypeChecked,
-
-    {
-        languageOptions: {
-            ecmaVersion: 'latest',
-            sourceType: 'module',
-            globals: {
-                ...globals.browser,
-                ...globals.node,
-                process: 'readonly',
-                ga: 'readonly',
-                cordova: 'readonly',
-                Capacitor: 'readonly',
-                chrome: 'readonly',
-                browser: 'readonly',
-            },
-        },
-
-        rules: {
-            'prefer-promise-reject-errors': 'off',
-
-            // allow debugger during development only
-            'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-
-            'vue/block-order': [
-                'error',
-                {
-                    order: ['script', 'template', 'style'],
+        ...pluginQuasar.configs.recommended(),
+        js.configs.recommended,
+        ...tseslint.configs.recommendedTypeChecked,
+        ...pluginVue.configs['flat/strongly-recommended'],
+        stylistic.configs.recommended,
+        perfectionist.configs['recommended-flat'],
+        {
+            files: ['**/*.ts', '**/*.vue'],
+            languageOptions: {
+                parser: vueParser,
+                parserOptions: {
+                    parser: tseslint.parser,
+                    projectService: true,
+                    tsconfigRootDir: import.meta.dirname,
+                    extraFileExtensions: ['.vue'],
                 },
-            ],
-        },
-    },
-
-    {
-        files: ['src-pwa/custom-service-worker.ts'],
-        languageOptions: {
-            globals: {
-                ...globals.serviceworker,
+                globals: {
+                    ...globals.browser,
+                    ...globals.node,
+                    process: 'readonly',
+                },
+            },
+            plugins: {
+                '@stylistic': stylistic,
+                perfectionist,
+                vue: pluginVue,
+                '@typescript-eslint': tseslint.plugin,
+            },
+            rules: {
+                'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
+                '@typescript-eslint/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+                '@typescript-eslint/no-unused-vars': [
+                    'error',
+                    {
+                        vars: 'all',
+                        args: 'after-used',
+                        ignoreRestSiblings: true,
+                        argsIgnorePattern: '^_',
+                    },
+                ],
+                'perfectionist/sort-imports': [
+                    'error',
+                    {
+                        type: 'line-length',
+                        order: 'desc',
+                        sortSideEffects: true,
+                        groups: [
+                            [
+                                'side-effect',
+                                'builtin',
+                                'external',
+                                'internal',
+                                'parent',
+                                'sibling',
+                                'index',
+                                'style',
+                                'unknown',
+                            ],
+                        ],
+                    },
+                ],
+                '@stylistic/padding-line-between-statements': [
+                    'error',
+                    {
+                        blankLine: 'always',
+                        prev: '*',
+                        next: ['interface', 'type', 'function', 'export', 'return'],
+                    },
+                    { blankLine: 'always', prev: ['interface', 'type'], next: '*' },
+                    { blankLine: 'any', prev: 'import', next: 'import' },
+                ],
+                '@stylistic/type-annotation-spacing': ['error', { after: true }],
+                'vue/padding-line-between-blocks': ['error', 'always'],
             },
         },
-    },
-
-    prettierSkipFormatting,
-);
+        prettierSkipFormatting,
+    )
+    .filter((config) => config !== undefined && config !== null);

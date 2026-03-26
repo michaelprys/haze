@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import LayoutAuth from 'layouts/LayoutAuth.vue';
-import { useQuasar } from 'quasar';
 import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
 import handleError from 'src/utils/handleError.utils';
 import { useStoreAuth } from 'stores/auth.store';
-import { reactive, ref } from 'vue';
+import LayoutAuth from 'layouts/LayoutAuth.vue';
 import { useRouter } from 'vue-router';
+import { reactive, ref } from 'vue';
+import { useQuasar } from 'quasar';
 
 // Common
 const router = useRouter(),
@@ -28,6 +28,7 @@ const handleResetPassword = async () => {
             type: 'negative',
             message: 'Recovery token missing. Please request a new reset link',
         });
+
         return;
     }
 

@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import BaseButton from 'components/base/BaseButton.vue';
-import ProfileAvatar from 'components/profile/ProfileAvatar.vue';
 import ProfileUserInfo from 'components/profile/ProfileUserInfo.vue';
+import ProfileAvatar from 'components/profile/ProfileAvatar.vue';
+import BaseButton from 'components/base/BaseButton.vue';
 import { useStoreProfile } from 'stores/profile.store';
 
 withDefaults(

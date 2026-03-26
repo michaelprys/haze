@@ -1,8 +1,8 @@
+import type { Post, PostPayload } from 'src/types/post.types';
 import type { Database } from 'app/database.types';
-import { defineStore } from 'pinia';
 import { getCurrentUser } from 'src/api/auth.api';
 import { supabase } from 'src/api/supabase.api';
-import type { Post, PostPayload } from 'src/types/post.types';
+import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 type PostRow = Database['public']['Tables']['posts']['Row'];

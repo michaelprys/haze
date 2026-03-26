@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import PostCard from 'components/post/PostCard.vue';
-import PostModal from 'components/post/PostModal.vue';
 import ProfileCard from 'components/profile/ProfileCard.vue';
 import { useStorePosts } from 'src/stores/posts.store';
-import type { Post } from 'src/types/post.types';
-import handleError from 'src/utils/handleError.utils';
 import { useStoreProfile } from 'stores/profile.store';
+import PostModal from 'components/post/PostModal.vue';
+import handleError from 'src/utils/handleError.utils';
+import PostCard from 'components/post/PostCard.vue';
+import type { Post } from 'src/types/post.types';
 import { onMounted, ref } from 'vue';
 
 const storeProfile = useStoreProfile(),

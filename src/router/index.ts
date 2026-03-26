@@ -1,12 +1,12 @@
-import { defineRouter } from '#q-app/wrappers';
-import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
-import { useStoreAuth } from 'stores/auth.store';
 import {
     createMemoryHistory,
     createRouter,
     createWebHashHistory,
     createWebHistory,
 } from 'vue-router';
+import { getRecoveryToken } from 'src/utils/getRecoveryToken.utils';
+import { useStoreAuth } from 'stores/auth.store';
+import { defineRouter } from '#q-app/wrappers';
 import routes from './routes';
 
 /*

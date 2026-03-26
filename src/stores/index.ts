@@ -1,6 +1,6 @@
+import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
 import { defineStore } from '#q-app/wrappers';
 import { createPinia } from 'pinia';
-import piniaPluginPersistedState from 'pinia-plugin-persistedstate';
 
 /*
  * When adding new properties to stores, you should also

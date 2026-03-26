@@ -1,7 +1,7 @@
-import { ref } from 'vue';
-import type { Ref } from 'vue';
-import type { Post } from 'src/types/post.types';
 import handleError from 'src/utils/handleError.utils';
+import type { Post } from 'src/types/post.types';
+import type { Ref } from 'vue';
+import { ref } from 'vue';
 
 export const useCamera = (post: Ref<Post>) => {
     const hasCameraSupport = ref(true),

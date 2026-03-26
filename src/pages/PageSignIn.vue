@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import LayoutAuth from 'layouts/LayoutAuth.vue';
-import type { QForm } from 'quasar';
-import { useQuasar } from 'quasar';
+import { onMounted, reactive, ref, useTemplateRef } from 'vue';
 import type { SignInPayload } from 'src/types/auth.types';
 import handleError from 'src/utils/handleError.utils';
 import { useStoreAuth } from 'stores/auth.store';
-import { onMounted, reactive, ref, useTemplateRef } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
+import LayoutAuth from 'layouts/LayoutAuth.vue';
+import type { QForm } from 'quasar';
+import { useQuasar } from 'quasar';
 
 const router = useRouter(),
     route = useRoute(),
@@ -171,8 +171,8 @@ onMounted(async () => {
 .signin-form {
     --accent-color: #a29bfe;
     --secondary-color: #74b9ff;
-    --glow-color: rgba(162, 155, 254, 0.5);
-    --divider-color: rgba(255, 255, 255, 0.08);
+    --glow-color: rgb(162 155 254 / 50%);
+    --divider-color: rgb(255 255 255 / 8%);
 
     &__footer {
         display: flex;
@@ -180,9 +180,10 @@ onMounted(async () => {
 
         &-button {
             font-size: 0.75rem;
-            color: var(--accent-color);
             opacity: 0.7;
+            color: var(--accent-color);
             transition: opacity 0.3s;
+
             &:hover {
                 opacity: 1;
             }
@@ -193,12 +194,12 @@ onMounted(async () => {
 .auth-divider {
     display: flex;
     align-items: center;
-    margin: 2rem 0 1.5rem;
-    color: rgba(255, 255, 255, 0.35);
-    font-size: 0.65rem;
-    text-transform: uppercase;
-    letter-spacing: 0.2em;
     font-family: 'Space Grotesk', sans-serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.2em;
+    color: rgb(255 255 255 / 35%);
+    margin: 2rem 0 1.5rem;
+    text-transform: uppercase;
 
     &::before,
     &::after {
@@ -213,73 +214,73 @@ onMounted(async () => {
 }
 
 .guest-button {
-    width: 100%;
-    min-height: 3.75rem;
-    background: transparent;
-    border: 1px solid rgba(162, 155, 254, 0.3);
-    border-radius: 16px;
-    color: #fff;
-    overflow: hidden;
     position: relative;
-    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    min-height: 3.75rem;
+    width: 100%;
+    background: transparent;
+    color: #fff;
     animation: breathing-glow 3s infinite ease-in-out;
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    border: 1px solid rgb(162 155 254 / 30%);
+    border-radius: 16px;
+    overflow: hidden;
 
     &__content {
         display: flex;
         align-items: center;
-        gap: 12px;
         z-index: 10;
+        gap: 12px;
         font-family: 'Space Grotesk', sans-serif;
-        font-weight: 600;
         font-size: 1rem;
+        font-weight: 600;
         letter-spacing: 0.01em;
+        text-shadow: 0 0 10px rgb(162 155 254 / 50%);
         color: #fff;
-        text-shadow: 0 0 10px rgba(162, 155, 254, 0.5);
     }
 
     &__icon {
         font-size: 1.5rem;
-        color: #fff;
         filter: drop-shadow(0 0 5px var(--accent-color));
+        color: #fff;
         transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
 
     &__bg {
         position: absolute;
         inset: 0;
-        background: linear-gradient(135deg, rgba(162, 155, 254, 0.15), rgba(116, 185, 255, 0.15));
         z-index: 1;
+        background: linear-gradient(135deg, rgb(162 155 254 / 15%), rgb(116 185 255 / 15%));
     }
 
     &__flare {
         position: absolute;
-        top: 0;
-        left: -150%;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
         transform: skewX(-25deg);
         z-index: 2;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgb(255 255 255 / 20%), transparent);
         animation: flare-move 4s infinite cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        top: 0;
+        left: -150%;
     }
 
     &__glow-ring {
         position: absolute;
         inset: -2px;
+        z-index: 3;
+        opacity: 0.4;
+        background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
         border-radius: 16px;
         padding: 2px;
-        background: linear-gradient(135deg, var(--accent-color), var(--secondary-color));
         mask:
             linear-gradient(#fff 0 0) content-box,
             linear-gradient(#fff 0 0);
         mask-composite: exclude;
-        opacity: 0.4;
-        z-index: 3;
     }
 
     &:hover {
         transform: translateY(-4px) scale(1.01);
-        border-color: rgba(255, 255, 255, 0.5);
+        border-color: rgb(255 255 255 / 50%);
         box-shadow: 0 12px 30px -5px var(--glow-color);
 
         .guest-button__icon {
@@ -289,8 +290,8 @@ onMounted(async () => {
         .guest-button__bg {
             background: linear-gradient(
                 135deg,
-                rgba(162, 155, 254, 0.25),
-                rgba(116, 185, 255, 0.25)
+                rgb(162 155 254 / 25%),
+                rgb(116 185 255 / 25%)
             );
         }
 
@@ -307,12 +308,13 @@ onMounted(async () => {
 @keyframes breathing-glow {
     0%,
     100% {
-        box-shadow: 0 0 15px -5px rgba(162, 155, 254, 0.2);
-        border-color: rgba(162, 155, 254, 0.3);
+        box-shadow: 0 0 15px -5px rgb(162 155 254 / 20%);
+        border-color: rgb(162 155 254 / 30%);
     }
+
     50% {
-        box-shadow: 0 0 25px 0px rgba(162, 155, 254, 0.5);
-        border-color: rgba(162, 155, 254, 0.8);
+        box-shadow: 0 0 25px 0 rgb(162 155 254 / 50%);
+        border-color: rgb(162 155 254 / 80%);
     }
 }
 
@@ -320,6 +322,7 @@ onMounted(async () => {
     0% {
         left: -150%;
     }
+
     30%,
     100% {
         left: 200%;

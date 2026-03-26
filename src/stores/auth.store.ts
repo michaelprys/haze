@@ -1,7 +1,7 @@
-import type { User } from '@supabase/supabase-js';
-import { defineStore } from 'pinia';
-import { supabase } from 'src/api/supabase.api';
 import type { SignInPayload, SignUpPayload } from 'src/types/auth.types';
+import type { User } from '@supabase/supabase-js';
+import { supabase } from 'src/api/supabase.api';
+import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 
 export const useStoreAuth = defineStore('storeAuth', () => {

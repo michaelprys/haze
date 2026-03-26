@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { date } from 'quasar';
-import type { Post } from 'src/types/post.types';
 import { useStoreProfile } from 'stores/profile.store';
+import type { Post } from 'src/types/post.types';
+import { date } from 'quasar';
 
 const props = withDefaults(
     defineProps<{
