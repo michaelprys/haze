@@ -1,25 +1,32 @@
 <script setup lang="ts">
 import Logo from 'assets/images/logo.webp';
+import { ref } from 'vue';
 
 defineProps<{
     title: string;
     subtitle: string;
 }>();
+
+const isLogoLoaded = ref(false);
 </script>
 
 <template>
     <q-page class="auth">
         <div class="auth__container">
             <div class="auth__header">
-                <div class="auth__logo-wrapper">
+                <div
+                    class="auth__logo-wrapper"
+                    :class="{ 'auth__logo-wrapper--loading': !isLogoLoaded }">
                     <img
                         class="auth__logo"
+                        :class="{ 'auth__logo--loaded': isLogoLoaded }"
                         alt="Haze logo"
                         :src="Logo"
                         width="80"
                         height="80"
                         loading="eager"
-                        fetchpriority="high" />
+                        fetchpriority="high"
+                        @load="isLogoLoaded = true" />
                 </div>
 
                 <div class="auth__title">{{ title }}</div>
@@ -57,9 +64,17 @@ defineProps<{
 
     &__logo-wrapper {
         display: inline-flex;
-        box-shadow: 0 0 0.9375rem rgb(255 149 0 / 40%);
-        background: rgb(255 149 0 / 10%);
+        width: 5rem;
+        height: 5rem;
+        background: rgb(255 149 0 / 8%);
         border-radius: 1.25rem;
+        box-shadow: 0 0 1.5rem rgb(255 149 0 / 15%);
+        transition: all 0.5s ease;
+
+        &--loading {
+            animation: breath 2s infinite ease-in-out;
+            box-shadow: 0 0 1rem rgb(255 149 0 / 5%);
+        }
     }
 
     &__logo {
@@ -67,57 +82,66 @@ defineProps<{
         height: 5rem;
         margin-top: 0.3125rem;
         margin-left: 0.0625rem;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        &--loaded {
+            opacity: 1;
+        }
     }
 
     &__title {
         font-size: 1.8rem;
         font-weight: 700;
-        color: rgb(255 255 255 / 100%);
+        color: #fff;
+        margin-top: 1rem;
     }
 
     &__subtitle {
         font-size: 0.9rem;
-        color: rgb(119 119 119 / 100%);
+        color: #777;
     }
 
     &__card {
-        width: 100%;
-        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
-        background-color: rgb(18 18 18 / 100%);
+        background-color: #121212;
         border: 1px solid rgb(255 120 0 / 15%);
         border-radius: 1.25rem;
+        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
     }
 
     &__footer {
         font-size: 0.85rem;
-        color: rgb(119 119 119 / 100%);
+        color: #777;
         text-align: center;
+    }
+
+    @keyframes breath {
+        0%,
+        100% {
+            opacity: 0.5;
+            background: rgb(255 149 0 / 4%);
+        }
+        50% {
+            opacity: 1;
+            background: rgb(255 149 0 / 12%);
+        }
     }
 
     :deep() {
         .auth-button {
             width: 100%;
             height: 2.75rem;
-            letter-spacing: 0.03125rem;
             background: linear-gradient(135deg, #ff9500, #ff3a00);
             border-radius: 0.75rem;
-            transition:
-                transform 0.2s ease,
-                box-shadow 0.2s ease,
-                background-position 2s ease;
-
-            &:hover {
-                box-shadow: 0 0.75rem 1.75rem rgb(255 80 0 / 50%);
-            }
+            font-weight: 600;
         }
 
         .auth-link {
-            font-weight: 600;
             color: #ff9500;
-            cursor: pointer;
-            transition: 0.2s;
-            margin-left: 0.25rem;
             text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
+            cursor: pointer;
+            margin-left: 0.25rem;
 
             &:hover {
                 color: #ff3a00;
@@ -125,12 +149,8 @@ defineProps<{
         }
 
         .q-field__control {
-            background: rgb(255 255 255 / 2%);
+            background: rgba(255, 255, 255, 0.03);
             border-radius: 0.75rem;
-        }
-
-        .q-field__label {
-            color: #aaa;
         }
     }
 }

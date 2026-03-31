@@ -288,11 +288,7 @@ onMounted(async () => {
         }
 
         .guest-button__bg {
-            background: linear-gradient(
-                135deg,
-                rgb(162 155 254 / 25%),
-                rgb(116 185 255 / 25%)
-            );
+            background: linear-gradient(135deg, rgb(162 155 254 / 25%), rgb(116 185 255 / 25%));
         }
 
         .guest-button__glow-ring {
