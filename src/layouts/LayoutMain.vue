@@ -121,21 +121,35 @@ const handleSignOut = async () => {
         backdrop-filter: blur(0.75rem);
         background: $dark;
         border-bottom: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
-        &-buttons { display: flex; }
-        &-icon { color: $primary; }
+
+        &-buttons {
+            display: flex;
+        }
+
+        &-icon {
+            color: $primary;
+        }
     }
 
     &__logo {
         min-width: auto;
         padding: 0.25rem;
-        &:hover .main__logo-img { transform: scale(1.05); }
+
+        &:hover .main__logo-img {
+            transform: scale(1.05);
+        }
 
         &-img {
             width: 4.375rem;
             height: 4.375rem;
             opacity: 0;
-            transition: transform 0.3s ease, opacity 0.4s ease;
-            &--loaded { opacity: 1; }
+            transition:
+                transform 0.3s ease,
+                opacity 0.4s ease;
+
+            &--loaded {
+                opacity: 1;
+            }
         }
     }
 
@@ -156,12 +170,12 @@ const handleSignOut = async () => {
 }
 
 .logo-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
     position: relative;
     width: 4.375rem;
     height: 4.375rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 .logo-skeleton {
@@ -174,12 +188,25 @@ const handleSignOut = async () => {
 }
 
 @keyframes pulse {
-    0%, 100% { opacity: 0.3; transform: scale(0.95); }
-    50% { opacity: 0.6; transform: scale(1); }
+    0%,
+    100% {
+        transform: scale(0.95);
+        opacity: 0.3;
+    }
+
+    50% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
 }
 
 .no-hover-effect {
-    &:hover { background-color: transparent; }
-    :deep(.q-focus-helper) { display: none; }
+    &:hover {
+        background-color: transparent;
+    }
+}
+
+:deep(.q-focus-helper) {
+    display: none;
 }
 </style>

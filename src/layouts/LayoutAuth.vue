@@ -66,14 +66,14 @@ const isLogoLoaded = ref(false);
         display: inline-flex;
         width: 5rem;
         height: 5rem;
-        background: rgb(255 149 0 / 8%);
-        border-radius: 1.25rem;
         box-shadow: 0 0 1.5rem rgb(255 149 0 / 15%);
+        background: rgb(255 149 0 / 8%);
         transition: all 0.5s ease;
+        border-radius: 1.25rem;
 
         &--loading {
-            animation: breath 2s infinite ease-in-out;
             box-shadow: 0 0 1rem rgb(255 149 0 / 5%);
+            animation: breath 2s infinite ease-in-out;
         }
     }
 
@@ -84,6 +84,7 @@ const isLogoLoaded = ref(false);
         margin-left: 0.0625rem;
         opacity: 0;
         transition: opacity 0.6s ease;
+
         &--loaded {
             opacity: 1;
         }
@@ -102,10 +103,10 @@ const isLogoLoaded = ref(false);
     }
 
     &__card {
+        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
         background-color: #121212;
         border: 1px solid rgb(255 120 0 / 15%);
         border-radius: 1.25rem;
-        box-shadow: 0 0.9375rem 2.5rem rgb(0 0 0 / 60%);
     }
 
     &__footer {
@@ -114,33 +115,21 @@ const isLogoLoaded = ref(false);
         text-align: center;
     }
 
-    @keyframes breath {
-        0%,
-        100% {
-            opacity: 0.5;
-            background: rgb(255 149 0 / 4%);
-        }
-        50% {
-            opacity: 1;
-            background: rgb(255 149 0 / 12%);
-        }
-    }
-
     :deep() {
         .auth-button {
             width: 100%;
             height: 2.75rem;
+            font-weight: 600;
             background: linear-gradient(135deg, #ff9500, #ff3a00);
             border-radius: 0.75rem;
-            font-weight: 600;
         }
 
         .auth-link {
-            color: #ff9500;
-            text-decoration: none;
             font-weight: 600;
-            transition: color 0.2s ease;
+            color: #ff9500;
             cursor: pointer;
+            transition: color 0.2s ease;
+            text-decoration: none;
             margin-left: 0.25rem;
 
             &:hover {
@@ -149,8 +138,21 @@ const isLogoLoaded = ref(false);
         }
 
         .q-field__control {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgb(255 255 255 / 3%);
             border-radius: 0.75rem;
+        }
+    }
+
+    @keyframes breath {
+        0%,
+        100% {
+            opacity: 0.5;
+            background: rgb(255 149 0 / 4%);
+        }
+
+        50% {
+            opacity: 1;
+            background: rgb(255 149 0 / 12%);
         }
     }
 }
