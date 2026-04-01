@@ -158,9 +158,20 @@ const handleSignOut = async () => {
         transform: translate(-50%, -50%);
         font-family: Streamster, sans-serif;
         font-size: 1.5rem;
+        line-height: 1;
+        letter-spacing: 0.125rem;
+        color: $primary;
+        transition: text-shadow 0.2s ease;
         top: 50%;
         left: 50%;
-        color: $primary;
+        will-change: text-shadow;
+
+        &:hover {
+            text-shadow:
+                0 0 0 rgb(255 120 0 / 100%),
+                0 0 0.375rem rgb(255 90 0 / 90%),
+                0 0 0.625rem rgb(255 60 0 / 0%);
+        }
     }
 
     &__page-container {
