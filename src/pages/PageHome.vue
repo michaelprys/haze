@@ -40,30 +40,33 @@ onMounted(async () => {
 </script>
 
 <template>
-    <q-page class="dashboard q-pa-md">
+    <q-page class="dashboard">
         <div v-if="loadingPosts" class="dashboard__loading">
-            <q-spinner-dots color="orange" size="4rem" />
+            <q-spinner-dots color="primary" size="4rem" />
             <div class="dashboard__loading-text">loading your moments...</div>
         </div>
 
-        <div v-else class="dashboard__container">
+        <div
+            v-else
+            class="dashboard__container"
+            :class="{ 'dashboard__container--centered': storePosts.posts.length === 0 }">
             <section class="dashboard__content">
                 <div v-if="storePosts.posts.length <= 0" class="dashboard__empty">
                     <ProfileCard />
                 </div>
 
                 <div v-else>
-                    <q-infinite-scroll @load="onPostLoad" :offset="250">
+                    <q-infinite-scroll :offset="250" @load="onPostLoad">
                         <PostCard
                             v-for="post in storePosts.posts"
                             :key="post.id"
-                            :post="post"
                             :initial="initial"
+                            :post="post"
                             @show-modal="handleShowModal" />
 
                         <template #loading>
                             <div class="row justify-center q-my-md">
-                                <q-spinner-dots color="primary" size="40px" />
+                                <q-spinner-dots color="primary" size="2.5rem" />
                             </div>
                         </template>
                     </q-infinite-scroll>
@@ -81,12 +84,15 @@ onMounted(async () => {
 
 <style lang="scss" scoped>
 .dashboard {
-    display: grid;
-    place-items: center;
+    display: flex;
+    justify-content: center;
+    min-height: calc(100vh - 4rem);
+    padding: 3rem 1rem;
 
     &__loading {
+        align-self: center;
+        margin-top: -4rem;
         text-align: center;
-        margin: 5rem 0;
 
         &-text {
             margin-top: 1rem;
@@ -102,6 +108,12 @@ onMounted(async () => {
         max-width: 75rem;
         width: 100%;
         gap: 4rem;
+
+        &--centered {
+            align-self: center;
+            padding: 0;
+            margin-top: -4rem;
+        }
     }
 
     &__content {
@@ -117,7 +129,7 @@ onMounted(async () => {
 
     &__sidebar {
         position: sticky;
-        top: 6rem;
+        top: 7rem;
         flex-shrink: 0;
         width: 20rem;
 

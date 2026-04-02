@@ -49,8 +49,6 @@ const handleSignOut = async () => {
                             :class="{ 'main__logo-img--loaded': isLogoLoaded }"
                             alt="Haze logo"
                             :src="Logo"
-                            width="70"
-                            height="70"
                             loading="eager"
                             fetchpriority="high"
                             @load="isLogoLoaded = true" />
@@ -105,7 +103,7 @@ const handleSignOut = async () => {
             class="main__footer">
             <q-tabs
                 class="main__footer-tabs"
-                active-color="orange"
+                active-color="primary"
                 align="justify"
                 indicator-color="transparent">
                 <q-route-tab icon="fa-solid fa-home" :to="{ name: 'home' }" />
@@ -121,6 +119,7 @@ const handleSignOut = async () => {
         backdrop-filter: blur(0.75rem);
         background: $dark;
         border-bottom: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
+        height: 4rem;
 
         &-buttons {
             display: flex;
@@ -140,8 +139,8 @@ const handleSignOut = async () => {
         }
 
         &-img {
-            width: 4.375rem;
-            height: 4.375rem;
+            width: 3.5rem;
+            height: 3.5rem;
             opacity: 0;
             transition:
                 transform 0.3s ease,
@@ -155,6 +154,8 @@ const handleSignOut = async () => {
 
     &__title {
         position: absolute;
+        top: 43%;
+        left: 50%;
         transform: translate(-50%, -50%);
         font-family: Streamster, sans-serif;
         font-size: 1.5rem;
@@ -162,8 +163,6 @@ const handleSignOut = async () => {
         letter-spacing: 0.125rem;
         color: $primary;
         transition: text-shadow 0.2s ease;
-        top: 50%;
-        left: 50%;
         will-change: text-shadow;
 
         &:hover {
@@ -178,6 +177,21 @@ const handleSignOut = async () => {
         min-height: 100svh;
         background: radial-gradient(circle at top, var(--q-dark-page), var(--q-dark) 70%);
     }
+
+    &__footer {
+        display: none;
+        background: $dark;
+        backdrop-filter: blur(0.75rem);
+        border-top: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
+
+        @media (width <= 55rem) {
+            display: block;
+        }
+
+        &-tabs {
+            color: rgba($primary, 0.6);
+        }
+    }
 }
 
 .logo-container {
@@ -185,8 +199,8 @@ const handleSignOut = async () => {
     justify-content: center;
     align-items: center;
     position: relative;
-    width: 4.375rem;
-    height: 4.375rem;
+    width: 3.5rem;
+    height: 3.5rem;
 }
 
 .logo-skeleton {
