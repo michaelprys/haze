@@ -1,6 +1,8 @@
 # Haze 🌄
 
-Demo: [hazeapp.netlify.app](https://hazeapp.netlify.app)
+> *Aesthetic Cloud Photo Gallery*
+
+Live Demo: [hazeapp.netlify.app](https://hazeapp.netlify.app)
 
 ---
 
