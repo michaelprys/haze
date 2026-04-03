@@ -43,7 +43,7 @@ const handleSignOut = async () => {
                     :ripple="false"
                     :to="{ name: 'home' }">
                     <div class="logo-container">
-                        <div v-if="!isLogoLoaded" class="logo-skeleton" />
+                        <div v-if="!isLogoLoaded" class="logo-skeleton"></div>
                         <img
                             class="main__logo-img"
                             :class="{ 'main__logo-img--loaded': isLogoLoaded }"
@@ -116,10 +116,11 @@ const handleSignOut = async () => {
 <style lang="scss" scoped>
 .main {
     &__header {
+        height: 4rem;
         backdrop-filter: blur(0.75rem);
         background: $dark;
         border-bottom: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
-        height: 4rem;
+        contain: layout size;
 
         &-buttons {
             display: flex;
@@ -128,6 +129,11 @@ const handleSignOut = async () => {
         &-icon {
             color: $primary;
         }
+    }
+
+    &__container {
+        display: flex;
+        align-items: center;
     }
 
     &__logo {
@@ -154,15 +160,17 @@ const handleSignOut = async () => {
 
     &__title {
         position: absolute;
-        top: 43%;
-        left: 50%;
         transform: translate(-50%, -50%);
+        min-width: 5rem;
         font-family: Streamster, sans-serif;
         font-size: 1.5rem;
         line-height: 1;
         letter-spacing: 0.125rem;
         color: $primary;
         transition: text-shadow 0.2s ease;
+        text-align: center;
+        top: 50%;
+        left: 50%;
         will-change: text-shadow;
 
         &:hover {
@@ -180,16 +188,16 @@ const handleSignOut = async () => {
 
     &__footer {
         display: none;
-        background: $dark;
         backdrop-filter: blur(0.75rem);
+        background: $dark;
         border-top: 0.0625rem solid rgb(var(--q-primary-rgb), 0.2);
-
-        @media (width <= 55rem) {
-            display: block;
-        }
 
         &-tabs {
             color: rgba($primary, 0.6);
+        }
+
+        @media (width <= 55rem) {
+            display: block;
         }
     }
 }
@@ -201,6 +209,7 @@ const handleSignOut = async () => {
     position: relative;
     width: 3.5rem;
     height: 3.5rem;
+    flex-shrink: 0;
 }
 
 .logo-skeleton {

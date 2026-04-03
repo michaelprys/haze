@@ -240,6 +240,7 @@ onBeforeUnmount(() => {
     &__shot {
         position: absolute;
         inset: 0;
+        transform: scaleX(-1);
         z-index: 1;
         object-fit: cover;
     }
@@ -440,6 +441,16 @@ onBeforeUnmount(() => {
             min-width: 2.5rem;
             height: 2.5rem;
             font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: $breakpoint-xs) {
+        &__placeholder-wrapper {
+            font-size: 0.7rem;
+        }
+
+        &__placeholder-subtitle {
+            font-size: 0.6rem;
         }
     }
 }

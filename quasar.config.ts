@@ -28,7 +28,6 @@ export default defineConfig((ctx) => {
             'roboto-font', // optional, you are not bound to it
             'material-icons', // optional, you are not bound to it
         ],
-
         // Full list of options: https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#build
         build: {
             target: {
@@ -83,9 +82,8 @@ export default defineConfig((ctx) => {
         // https://v2.quasar.dev/quasar-cli-vite/quasar-config-file#framework
         framework: {
             config: {
-                dark: 'auto',
+                dark: true,
             },
-
             // iconSet: 'material-icons', // Quasar icon set
             // lang: 'en-US', // Quasar language pack
 
@@ -97,7 +95,7 @@ export default defineConfig((ctx) => {
             // directives: [],
 
             // Quasar plugins
-            plugins: ['Notify'],
+            plugins: ['Notify', 'Dark'],
         },
 
         // animations: 'all', // --- includes all animations
