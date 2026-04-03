@@ -1,15 +1,15 @@
 <script setup lang="ts">
 import { useGeolocation } from 'src/composables/useGeolocation';
+import { onBeforeUnmount, onMounted, ref, watch } from 'vue';
 import BaseButton from 'components/base/BaseButton.vue';
 import { useCamera } from 'src/composables/useCamera';
-import { onBeforeUnmount, onMounted, ref } from 'vue';
 import { usePost } from 'src/composables/usePost';
+import { Cropper } from 'vue-advanced-cropper';
+import 'vue-advanced-cropper/dist/style.css';
 import type { QForm } from 'quasar';
 
-// Post
 const { post, loading, handlePublishPost } = usePost();
 
-// Camera
 const {
     hasCameraSupport,
     isCameraInitializing,
@@ -26,8 +26,52 @@ const {
     checkDevice,
 } = useCamera(post);
 
-// Camera loading
 const formRef = ref<QForm | null | undefined>(null);
+const cropperRef = ref<InstanceType<typeof Cropper> | null>(null);
+const isEditing = ref(false);
+const originalImage = ref<string | null>(null);
+
+watch(imageCaptured, (newVal) => {
+    if (newVal && post.value.photoUrl) {
+        originalImage.value = post.value.photoUrl;
+    }
+});
+
+watch(
+    () => post.value.photoUrl,
+    (newUrl) => {
+        if (newUrl && !newUrl.startsWith('data:image/jpeg;base64') && !imageCaptured.value) {
+            originalImage.value = newUrl;
+        }
+    },
+);
+
+const applyCrop = () => {
+    const cropper = cropperRef.value;
+    if (cropper) {
+        const { canvas } = cropper.getResult();
+        if (canvas) {
+            post.value.photoUrl = canvas.toDataURL('image/jpeg', 0.9);
+        }
+    }
+    isEditing.value = false;
+};
+
+const resetSize = () => {
+    if (originalImage.value) {
+        post.value.photoUrl = originalImage.value;
+    }
+    isEditing.value = false;
+};
+
+const onPublish = async () => {
+    if (post.value.photoUrl) {
+        const response = await fetch(post.value.photoUrl);
+        const blob = await response.blob();
+        post.value.photoFile = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+    }
+    await handlePublishPost(hasCameraSupport.value, formRef.value);
+};
 
 const onDeviceChange = () => {
     isCameraInitializing.value = true;
@@ -39,28 +83,25 @@ const handleDeviceChange = () => {
     void onDeviceChange();
 };
 
-// Geolocation
 const { locationPending, hasGeolocation, getLocation } = useGeolocation(post);
 
-// Hooks
 onMounted(() => {
     void initCamera();
-
     navigator.mediaDevices.addEventListener('devicechange', handleDeviceChange);
 });
 
 onBeforeUnmount(() => {
-    post.value = {
-        id: '',
-        caption: '',
-        location: '',
-        photoFile: null,
-        photoUrl: '',
-        takenAt: new Date().toISOString(),
-    };
-
+    if (!loading.value) {
+        post.value = {
+            id: '',
+            caption: '',
+            location: '',
+            photoFile: null,
+            photoUrl: '',
+            takenAt: new Date().toISOString(),
+        };
+    }
     navigator.mediaDevices.removeEventListener('devicechange', handleDeviceChange);
-
     if (hasCameraSupport.value) {
         deactivateCamera();
     }
@@ -70,42 +111,80 @@ onBeforeUnmount(() => {
 <template>
     <q-page class="camera haze-bg q-pa-md relative">
         <q-card class="camera__card q-pa-lg">
-            <q-form
-                @submit.prevent="handlePublishPost(hasCameraSupport, formRef)"
-                class="camera__wrapper"
-                ref="formRef">
+            <q-form @submit.prevent="onPublish" class="camera__wrapper" ref="formRef">
                 <div class="camera__frame">
                     <q-skeleton
                         v-if="isCameraInitializing"
-                        animation="wave"
+                        animation="none"
                         class="camera__skeleton" />
 
                     <video
                         v-show="isCameraActive && !imageCaptured"
                         ref="videoRef"
-                        class="camera__shot"
+                        class="camera__shot camera__shot--video"
                         autoplay
-                        playsinline
-                        :style="{
-                            opacity: isCameraActive ? 1 : 0,
-                            transition: 'opacity 0.3s ease',
-                        }" />
-                    <canvas v-show="imageCaptured" ref="canvasRef" class="camera__shot" />
+                        playsinline />
+
+                    <cropper
+                        v-if="isEditing && originalImage"
+                        ref="cropperRef"
+                        class="camera__shot camera__cropper"
+                        :src="originalImage"
+                        :stencil-props="{ aspectRatio: 3 / 2 }"
+                        image-restriction="none"
+                        :transition="false" />
 
                     <q-img
-                        v-if="!hasCameraSupport && post.photoUrl"
-                        class="camera__shot"
+                        v-if="!isEditing && post.photoUrl"
+                        class="camera__shot camera__shot--static"
                         fit="cover"
-                        loading="eager"
+                        no-transition
+                        no-spinner
+                        :transition-show="null"
+                        :transition-hide="null"
                         :src="post.photoUrl" />
+
+                    <canvas ref="canvasRef" v-show="false" />
+
+                    <div v-if="post.photoUrl && !isCameraInitializing" class="camera__edit-layer">
+                        <div v-if="!isEditing" class="camera__edit-controls">
+                            <q-btn
+                                class="camera__action-btn"
+                                icon="aspect_ratio"
+                                round
+                                unelevated
+                                @click="isEditing = true">
+                                <q-tooltip>Edit Size</q-tooltip>
+                            </q-btn>
+                            <q-btn
+                                v-if="hasCameraSupport"
+                                class="camera__action-btn"
+                                icon="replay"
+                                round
+                                unelevated
+                                @click="resumeCamera">
+                                <q-tooltip>Retake</q-tooltip>
+                            </q-btn>
+                        </div>
+                        <div v-else class="camera__edit-controls camera__edit-controls--active">
+                            <q-btn
+                                class="camera__action-btn camera__action-btn--apply"
+                                icon="check"
+                                round
+                                unelevated
+                                @click="applyCrop" />
+                            <q-btn
+                                class="camera__action-btn camera__action-btn--reset"
+                                icon="restart_alt"
+                                round
+                                unelevated
+                                @click="resetSize" />
+                        </div>
+                    </div>
 
                     <div
                         v-show="!isCameraActive && !post.photoUrl && !imageCaptured"
-                        class="camera__placeholder"
-                        :style="{
-                            opacity: isCameraActive ? 0 : 1,
-                            transition: 'opacity 0.3s ease',
-                        }">
+                        class="camera__placeholder">
                         <div class="camera__placeholder-wrapper">
                             <span>
                                 turn on your camera, or add a memory
@@ -119,42 +198,36 @@ onBeforeUnmount(() => {
                 </div>
 
                 <div class="camera__buttons">
-                    <div class="camera__buttons-wrapper" v-if="hasCameraSupport">
+                    <div class="camera__buttons-wrapper">
                         <q-btn
-                            v-if="hasCameraSupport && !imageCaptured"
-                            class="camera__capture-button"
+                            v-if="hasCameraSupport && !post.photoUrl"
+                            class="camera__capture-button q-mr-lg"
                             icon="camera_alt"
                             round
                             size="lg"
                             unelevated
                             @click="captureImage" />
 
-                        <q-btn
-                            v-else-if="imageCaptured"
-                            class="camera__capture-button"
-                            icon="replay"
-                            round
-                            size="lg"
-                            unelevated
-                            @click="resumeCamera" />
+                        <q-file
+                            v-model="cameraModel"
+                            class="camera__filepicker"
+                            dense
+                            flat
+                            @update:model-value="getImageSrc">
+                            <template #default>
+                                <div v-if="post.photoUrl" class="camera__filepicker-text">
+                                    <q-icon name="restart_alt" size="xs" class="q-mr-sm" />
+                                    <span>replace memory</span>
+                                </div>
+                                <span v-else class="camera__filepicker-text">+ add memory</span>
+                            </template>
+                        </q-file>
                     </div>
-
-                    <q-file
-                        v-else
-                        v-model="cameraModel"
-                        class="camera__filepicker q-mt-lg"
-                        dense
-                        flat
-                        @update:model-value="getImageSrc">
-                        <template #default>
-                            <span class="camera__filepicker-text">+ add memory</span>
-                        </template>
-                    </q-file>
                 </div>
 
                 <q-input
                     v-model="post.caption"
-                    class="camera__input q-mt-lg"
+                    class="camera__input q-mt-md"
                     dark
                     dense
                     label="Caption"
@@ -179,13 +252,11 @@ onBeforeUnmount(() => {
                             color="orange"
                             size="18px"
                             style="margin-right: 0.45rem" />
-
                         <q-btn
                             v-if="!locationPending && hasGeolocation"
-                            class="camera__geo-button"
                             flat
-                            @mousedown.stop.prevent
                             @click.stop.prevent="getLocation"
+                            class="camera__geo-button"
                             icon="place" />
                     </template>
                 </q-input>
@@ -230,7 +301,7 @@ onBeforeUnmount(() => {
         box-shadow:
             0 1rem 2.5rem rgb(0 0 0 / 85%),
             0 0 0 0.125rem rgb(255 140 0 / 12%);
-        background: linear-gradient(180deg, #1e1e1e 0%, #141414 100%);
+        background: #000;
         margin: 0 auto;
         overflow: hidden;
         border: 2px solid rgb(255 154 60 / 12%);
@@ -240,9 +311,91 @@ onBeforeUnmount(() => {
     &__shot {
         position: absolute;
         inset: 0;
-        transform: scaleX(-1);
         z-index: 1;
+        width: 100%;
+        height: 100%;
         object-fit: cover;
+        transition: none !important;
+
+        &--video {
+            transform: scaleX(-1);
+        }
+    }
+
+    &__cropper {
+        display: block;
+        width: 100%;
+        height: 100%;
+        transition: none !important;
+
+        :deep(.vue-advanced-cropper__background),
+        :deep(.vue-advanced-cropper__foreground) {
+            background: #000;
+            transition: none !important;
+        }
+
+        :deep(.vue-advanced-cropper__image-wrapper) {
+            transition: none !important;
+        }
+
+        :deep(img) {
+            filter: none !important;
+            transition: none !important;
+        }
+    }
+
+    &__edit-layer {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        z-index: 10;
+    }
+
+    &__edit-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+
+        &--active {
+            flex-direction: row-reverse;
+        }
+    }
+
+    &__action-btn {
+        width: 38px;
+        height: 38px;
+        backdrop-filter: blur(8px);
+        background: rgb(15 15 15 / 60%);
+        color: rgb(255 255 255 / 85%);
+        transition: none !important;
+        border: 1px solid rgb(255 255 255 / 10%);
+
+        &:hover {
+            background: rgb(15 15 15 / 80%);
+            color: $primary;
+            border-color: rgba($primary, 0.5);
+        }
+
+        &--apply {
+            color: $positive;
+            border-color: rgba($positive, 0.4);
+        }
+
+        &--reset {
+            color: $warning;
+            border-color: rgba($warning, 0.4);
+        }
+    }
+
+    :deep(.vue-advanced-cropper) {
+        width: 100%;
+        height: 100%;
+        background: #000;
+        transition: none !important;
+
+        .vue-rectangle-stencil__border {
+            border: 2px solid $primary;
+        }
     }
 
     &__placeholder {
@@ -287,23 +440,21 @@ onBeforeUnmount(() => {
 
     &__buttons {
         width: 100%;
-        margin-top: 1rem;
+        margin-top: 0.5rem;
     }
 
     &__buttons-wrapper {
         display: flex;
-        justify-content: center;
-        margin-top: 1.5rem;
+        justify-content: flex-start;
+        align-items: center;
+        margin-top: 0.75rem;
+        min-height: 48px;
     }
 
     &__capture-button {
         box-shadow: 0 0.25rem 0.6rem rgb(0 0 0 / 50%);
         background: linear-gradient(235deg, #ff9a3c, #ff6b3c, #f04a46);
         color: white;
-        transition:
-            transform 0.2s ease,
-            box-shadow 0.2s ease,
-            filter 0.2s ease;
 
         &:hover {
             transform: scale(1.05);
@@ -318,7 +469,7 @@ onBeforeUnmount(() => {
 
     &__filepicker {
         align-items: center;
-        max-width: 13.75rem;
+        width: fit-content;
 
         :deep() {
             .q-field__native {
@@ -345,24 +496,15 @@ onBeforeUnmount(() => {
         font-size: 1rem;
         font-weight: 500;
         letter-spacing: 0.05em;
+        white-space: nowrap;
         text-shadow: 0 0 0.375rem rgb(255 122 0 / 35%);
         color: #ff9a3c;
         cursor: pointer;
-        transition: all 0.25s ease;
 
         &:hover {
             text-shadow: 0 0;
             color: #ffb15c;
         }
-    }
-
-    &__button-hover:hover {
-        transform: scale(1.1);
-    }
-
-    &__link-text:hover {
-        text-shadow: 0 0;
-        color: #ffb15c;
     }
 
     &__input {
@@ -383,48 +525,23 @@ onBeforeUnmount(() => {
         height: 32px;
         margin-right: -4px;
         border-radius: 0.5rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+            background: rgb(255 154 60 / 12%);
+            color: $primary;
+        }
 
         :deep(.q-icon) {
             font-size: 1.2rem;
             opacity: 0.8;
+            transition: all 0.2s ease;
         }
-    }
 
-    &__field-control {
-        background: #1b1b1b;
-        border-radius: 0.875rem;
-    }
-
-    &__label {
-        color: #ff9a3c;
-    }
-
-    &__field-border {
-        border-color: rgb(255 154 60 / 30%);
-    }
-
-    &__textarea-scrollbar {
-        scrollbar-color: rgb(255 154 60 / 45%) transparent;
-        scrollbar-width: thin;
-    }
-
-    &__textarea-thumb {
-        background: rgb(255 154 60 / 45%);
-        border-radius: 62.4375rem;
-    }
-
-    &__textarea-thumb-hover:hover {
-        background: rgb(255 154 60 / 70%);
-    }
-
-    &__post-button {
-        font-weight: 700;
-        letter-spacing: 0.0625rem;
-        background: linear-gradient(90deg, #ff7a00, #ff3c00, #000);
-        color: white;
-        transition: all 0.3s ease;
-        text-transform: uppercase;
-        border-radius: 62.4375rem;
+        &:hover :deep(.q-icon) {
+            transform: scale(1.1);
+            opacity: 1;
+        }
     }
 
     @media (max-width: $breakpoint-sm-min) {
