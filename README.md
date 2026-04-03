@@ -9,6 +9,7 @@ Live Demo: [hazeapp.netlify.app](https://hazeapp.netlify.app)
 ## Features
 
 - Capture or upload photos, with optional location tagging.
+- Crop and frame photos for the perfect shot.
 - Update avatar, username, or bio instantly.
 - Infinite scrolling feed with fast loading.
 
